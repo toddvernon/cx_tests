@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make clean:*)",
+      "Bash(make)",
+      "Bash(./darwin_arm64/cxstring_test)",
+      "Bash(grep:*)",
+      "Bash(sort:*)",
+      "Bash(./darwin_arm64/cxslist_test)",
+      "Bash(./darwin_arm64/cxeditbuffer_test:*)",
+      "Bash(./darwin_arm64/cxfile_test:*)",
+      "Bash(./darwin_arm64/cxdatetime_test)",
+      "Bash(./darwin_arm64/cxlogfile_test)",
+      "Bash(./darwin_arm64/cxnet_test:*)",
+      "Bash(./darwin_arm64/cxhandle_test:*)",
+      "Bash(./darwin_arm64/cxcallback_test:*)",
+      "Bash(echo:*)",
+      "Bash(lldb:*)",
+      "Bash(./darwin_arm64/cxprop_test:*)",
+      "Bash(./darwin_arm64/cxstar_test)",
+      "Bash(./darwin_arm64/cxexpression_test)",
+      "Bash(/tmp/test_negatives)",
+      "Bash(g++:*)",
+      "Bash(/tmp/test_negatives_fixed)",
+      "Bash(./darwin_arm64/cxthread_test:*)",
+      "Bash(./test_thread)",
+      "Bash(./test_cond)",
+      "Bash(./darwin_arm64/cxb64_test:*)",
+      "Bash(ls:*)",
+      "Bash(xargs:*)",
+      "Bash(./darwin_arm64/cxscreen_test:*)",
+      "Bash(./darwin_arm64/cxfunctor_test:*)",
+      "Bash(./darwin_arm64/cxlog_test:*)",
+      "Bash(./darwin_arm64/cxtz_test:*)",
+      "Bash(for dir in /Users/toddvernon/Library/CloudStorage/Dropbox/dev/cx/cx_tests/cx*/)",
+      "Bash(do if [ -f \"$dir/Makefile\" ])",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(make test:*)"
+    ]
+  }
+}

@@ -1,0 +1,5126 @@
+========================================
+Running cx_tests for: darwin_arm64
+========================================
+
+=== cxb64 tests ===
+./darwin_arm64/cxb64_test
+CxB64 Test Suite
+================
+
+== CxB64Encoder Basic Tests ==
+  PASS: encoder ctor doesn't crash
+  PASS: encoder initialize doesn't crash
+
+== CxB64Decoder Basic Tests ==
+  PASS: decoder ctor doesn't crash
+  PASS: decoder initialize doesn't crash
+
+== RFC 4648 Test Vectors ==
+  PASS: encode empty string
+  PASS: encode 'f' -> 'Zg=='
+  PASS: encode 'fo' -> 'Zm8='
+  PASS: encode 'foo' -> 'Zm9v'
+  PASS: encode 'foob' -> 'Zm9vYg=='
+  PASS: encode 'fooba' -> 'Zm9vYmE='
+  PASS: encode 'foobar' -> 'Zm9vYmFy'
+
+== Decode Test Vectors ==
+  PASS: decode 'Zg==' -> 'f'
+  PASS: decode 'Zm8=' -> 'fo'
+  PASS: decode 'Zm9v' -> 'foo'
+  PASS: decode 'Zm9vYmFy' -> 'foobar'
+
+== Round-Trip Tests ==
+  PASS: round-trip 'Hello, World!'
+  PASS: round-trip printable ASCII
+  PASS: round-trip binary with nulls
+
+== Padding Edge Cases ==
+  PASS: 1 byte: double padding
+  PASS: 1 byte: round-trip
+  PASS: 2 bytes: single padding
+  PASS: 2 bytes: round-trip
+  PASS: 3 bytes: no padding
+  PASS: 3 bytes: round-trip
+
+== Special Characters Tests ==
+  PASS: special chars round-trip
+  PASS: all zeros -> AAAAAAAA
+  PASS: all zeros round-trip
+  PASS: 0xFFFFFF -> '////'
+  PASS: all 0xFF round-trip
+
+== Larger Data Tests ==
+  PASS: 100 bytes round-trip
+  PASS: 1000 bytes round-trip
+  PASS: 10000 bytes round-trip
+  PASS: large data produces lines
+
+== Multiple Process Calls Tests ==
+  PASS: encode in chunks: 'foo'+'bar' -> 'Zm9vYmFy'
+  PASS: decode multi-line
+
+================
+Results: 35 passed, 0 failed
+
+=== cxcallback tests ===
+./darwin_arm64/cxcallback_test
+CxCallback Test Suite
+=====================
+
+== CxCountedBody Tests ==
+  PASS: initial count is 0
+  PASS: incCount increments to 1
+  PASS: three incCount calls gives count of 3
+  PASS: decCount decrements
+  PASS: decCount to zero
+  PASS: mixed inc/dec gives correct count
+
+== CxFunctor Tests ==
+  PASS: functor default ctor: callCount is 0
+  PASS: functor default ctor: value is 0
+  PASS: functor with initial value
+  PASS: functor invocation increments callCount
+  PASS: functor invocation increments value
+  PASS: multiple invocations: callCount is 3
+  PASS: multiple invocations: value is 3
+  PASS: functor through base pointer works
+  PASS: accumulator functor works
+  PASS: functor f1 independent
+  PASS: functor f2 independent
+
+== CxCallback Nil Callback Tests ==
+  PASS: nil callback throws CxCallbackException
+  PASS: multiple nil callbacks both throw
+
+== CxCallback Function Callback Tests ==
+  PASS: function callback invokes function
+  PASS: function callback passes argument
+  PASS: function callback invoked 3 times
+  PASS: function callback last arg is 3
+  PASS: first function: arg unchanged
+  PASS: second function: arg doubled
+  PASS: function callback does not throw
+
+== CxCallback Member Callback Tests ==
+  PASS: member callback invokes member
+  PASS: member callback passes argument
+  PASS: member callback invoked 3 times
+  PASS: member callback last value is 30
+  PASS: first member: arg unchanged
+  PASS: second member: arg doubled
+  PASS: accumulator member callback: 10+20+30=60
+  PASS: receiver 1 got 100
+  PASS: receiver 2 got 200
+
+== CxCallback Copy Constructor Tests ==
+  PASS: copy invokes same function
+  PASS: copy passes argument correctly
+  PASS: both copies invoke function
+  PASS: copy of nil callback is also nil
+  PASS: deeply copied callback works
+
+== CxCallback Assignment Operator Tests ==
+  PASS: assigned callback invokes function
+  PASS: nil assigned over valid throws
+  PASS: same-body assignment works
+  PASS: chain assignment works
+  PASS: first function: 5
+  PASS: replaced with double: 10
+
+== CxCallback Different Types Tests ==
+  PASS: double callback works
+  PASS: string callback works
+  PASS: class callback works
+
+== CxCallback Lifetime Tests ==
+  PASS: callback survives scope
+  PASS: callback works after original gone
+  PASS: callback survives multiple scopes
+  PASS: reassignment to triple: 10*3=30
+
+== CxCallback Edge Cases Tests ==
+  PASS: zero argument works
+  PASS: negative argument works
+  PASS: large argument works
+  PASS: null string argument works
+  PASS: empty string argument works
+
+== CxCallback Stress Tests ==
+  PASS: 1000 invocations
+  PASS: last arg is 999
+  PASS: 100 copies all reference same body
+  PASS: 50 different callbacks
+  PASS: rapid reassignment: final callback works
+
+=====================
+Results: 63 passed, 0 failed
+
+=== cxdatetime tests ===
+./darwin_arm64/cxdatetime_test
+CxDateTime Test Suite
+=====================
+
+== CxDateTime Constructor Tests ==
+  PASS: default ctor >= before
+  PASS: default ctor <= after
+  PASS: epoch ctor stores correct value
+  PASS: component ctor year
+  PASS: component ctor month
+  PASS: component ctor day
+  PASS: component ctor hour
+  PASS: component ctor minute
+  PASS: component ctor second
+  PASS: string ctor year
+  PASS: string ctor month
+  PASS: string ctor day
+  PASS: string ctor hour
+  PASS: string ctor minute
+  PASS: string ctor second
+  PASS: copy ctor copies value
+
+== CxDateTime Timezone Tests ==
+  PASS: NY timezone name
+  PASS: LA timezone name
+  PASS: same instant different zones
+  PASS: breakdown to different timezone hour
+
+== CxDateTime Offset Tests ==
+  PASS: offsetSeconds adds 30
+  PASS: offsetMinutes adds 5 min
+  PASS: offsetHours adds 3 hr
+  PASS: offsetDays adds 1 day
+  PASS: offsetMonths moves to February
+  PASS: offsetYears moves to 2021
+  PASS: negative offsetSeconds
+
+== CxDateTime Format Tests ==
+  PASS: default format non-empty
+  PASS: default format contains year
+  PASS: format YYYY-MM-DD
+  PASS: format HH:MM:SS
+  PASS: format with UTC zone
+  PASS: format UTC hour
+  PASS: format NY hour (UTC-4 in summer)
+
+== CxDateTime Compare/Assign Tests ==
+  PASS: equal times compare equal
+  PASS: different times not equal
+  PASS: assignment copies value
+  PASS: self-assignment preserves value
+
+== CxDateTime Static Method Tests ==
+  PASS: now_epochSeconds >= system before
+  PASS: now_epochSeconds <= system after
+  PASS: now_tp creates valid time
+  PASS: now_tp within 1 sec of now
+  PASS: firstSecondOfTheDay year
+  PASS: firstSecondOfTheDay month
+  PASS: firstSecondOfTheDay day
+  PASS: firstSecondOfTheDay hour
+  PASS: firstSecondOfTheDay minute
+  PASS: firstSecondOfTheDay second
+  PASS: lastSecondOfTheDay year
+  PASS: lastSecondOfTheDay month
+  PASS: lastSecondOfTheDay day
+  PASS: lastSecondOfTheDay hour
+  PASS: lastSecondOfTheDay minute
+  PASS: lastSecondOfTheDay second
+  PASS: formatTimeLength contains hours
+  PASS: formatTimeLength contains minutes
+  PASS: formatTimeLength zero duration
+
+== CxDateTime Edge Cases ==
+  PASS: leap year 2020
+  PASS: February
+  PASS: 29th day
+  PASS: DST spring forward hour
+  PASS: year boundary crosses to new year
+  PASS: year boundary January
+  PASS: year boundary day 1
+  PASS: epoch 0 year 1970
+  PASS: epoch 0 January
+  PASS: epoch 0 day 1
+
+== CxDateTime Timezone Constructor Tests ==
+  PASS: epoch with UTC zone hour
+  PASS: string with zone year
+  PASS: string with zone hour
+  PASS: time_point with UTC zone name
+  PASS: now with Tokyo zone
+
+=====================
+Results: 72 passed, 0 failed
+
+=== cxdirectory tests ===
+./darwin_arm64/cxdirectory_test
+CxDirectory Test Suite
+======================
+
+== CxDirectory Basic Tests ==
+  PASS: default ctor is relative path
+  PASS: default ctor empty directory path
+  PASS: directory path recognized as directory
+  PASS: directory path not a file
+  PASS: existing directory not invalid
+  PASS: file path recognized as file
+  PASS: file path not a directory
+  PASS: existing file not invalid
+  PASS: nonexistent path is invalid
+  PASS: invalid path not a file
+  PASS: invalid path not a directory
+
+== CxDirectory Path Type Tests ==
+  PASS: absolute path recognized
+  PASS: absolute path not relative
+  PASS: relative path recognized
+  PASS: relative path not absolute
+  PASS: subdir path is relative
+
+== CxDirectory directoryPath Tests ==
+  PASS: directoryPath contains dir name
+  PASS: directoryPath ends with /
+  PASS: file's directoryPath contains parent dir
+  PASS: file's directoryPath excludes filename
+  PASS: root subdir in path
+
+== CxDirectory fileNameList Tests ==
+  PASS: fileNameList has expected entries
+  PASS: found txt files
+  PASS: found csv file
+  PASS: found md file
+  PASS: file path has one entry in list
+  PASS: file path contains correct filename
+
+== CxDirectory filePathList Tests ==
+  PASS: filePathList has expected entries
+  PASS: all file paths are absolute
+  PASS: file paths contain directory name
+
+== CxDirectory Wildcard Tests ==
+  PASS: *.txt filter returns 2 files
+  PASS: all filtered files are txt
+  PASS: file*.txt returns 2 files
+  PASS: *.xyz filter returns 0 files
+  PASS: * filter matches files
+
+== CxDirectory filterBy Tests ==
+  PASS: filterBy *.txt returns 2
+  PASS: fileNameList after filter has 2 entries
+  PASS: filter reduced count
+  PASS: first filter matches file* files
+  PASS: second filter further reduces
+
+== CxDirectory Copy/Assignment Tests ==
+  PASS: copied dir is directory
+  PASS: copied dir is absolute
+  PASS: copied dir has same path
+  PASS: copied dir has same file count
+  PASS: assigned dir is directory
+  PASS: assigned dir has same path
+  PASS: self-assignment preserves state
+
+== CxDirectory::getFileType Tests ==
+  PASS: getFileType returns CxFILE for file
+  PASS: getFileType returns CxDIRECTORY for dir
+  PASS: getFileType returns CxINVALID for nonexistent
+  PASS: getFileType returns CxDIRECTORY for /tmp
+
+== CxDirectory Nested Directory Tests ==
+  PASS: subdir is directory
+  PASS: subdir has files
+  PASS: found nested.txt in subdir
+  PASS: nested file is file
+  PASS: nested file not directory
+
+== CxDirectory Edge Cases ==
+  PASS: trailing slash handled
+  PASS: path with space handled
+  PASS: empty path handled gracefully
+  PASS: leading/trailing whitespace stripped from path
+  PASS: trailing whitespace stripped
+  PASS: leading whitespace stripped
+
+======================
+Results: 62 passed, 0 failed
+
+=== cxeditbuffer tests ===
+./darwin_arm64/cxeditbuffer_test
+CxEditBuffer Test Suite
+=======================
+
+== Constructor Tests ==
+  PASS: default ctor creates empty buffer
+  PASS: default ctor cursor row is 0
+  PASS: default ctor cursor col is 0
+  PASS: default ctor buffer not touched
+  PASS: default ctor buffer not read-only
+  PASS: tab ctor creates empty buffer
+  PASS: reset clears buffer
+  PASS: reset resets cursor row
+  PASS: reset resets cursor col
+
+== Character Insertion Tests ==
+  PASS: addCharacter creates line
+  PASS: line(0) returns non-null
+  PASS: addCharacter stores char
+  PASS: multiple addCharacter builds string
+  PASS: cursor row stays 0 after characters
+  PASS: cursor col advances with characters
+  PASS: addCharacter(CxString) works
+  PASS: cursor row advances after addReturn
+  PASS: cursor col is 0 after addReturn
+  PASS: addReturn creates new line
+  PASS: first line correct after return
+  PASS: second line correct after return
+  PASS: cursor row advances after split
+  PASS: cursor col is 0 after split
+  PASS: return in middle creates two lines
+  PASS: split line first part
+  PASS: split line second part
+  PASS: buffer not touched initially
+  PASS: buffer touched after addCharacter
+
+== Backspace Tests ==
+  PASS: backspace removes last char
+  PASS: cursor moves back after backspace
+  PASS: backspace at line start joins lines
+  PASS: joined line content correct
+  PASS: cursor row is 0 after join
+  PASS: cursor col at join point (end of first line)
+  PASS: backspace at start returns NONE
+  PASS: content unchanged
+  PASS: multiple backspaces work
+
+== Cursor Movement Tests ==
+  PASS: cursorRight moves right
+  PASS: cursorLeft moves left
+  PASS: cursorUp moves to previous row
+  PASS: cursorDown moves to next row
+  PASS: cursorGotoRequest valid position
+  PASS: cursorGotoRequest sets row
+  PASS: cursorGotoRequest sets col
+  PASS: cursorGotoRequest invalid row
+  PASS: cursorLeft at start wraps up
+  PASS: cursor row on previous line after wrap up
+  PASS: cursor col at end of previous line after wrap up
+  PASS: cursorRight at end wraps down
+  PASS: cursor row on next line after wrap down
+  PASS: cursor col at start of next line after wrap down
+
+== Line Access Tests ==
+  PASS: line(0) correct
+  PASS: line(1) correct
+  PASS: line(2) correct
+  PASS: line(invalid) returns NULL
+  PASS: empty buffer has 0 lines
+  PASS: one char creates 1 line
+  PASS: return creates 2 lines
+  PASS: characterAt(0,0) correct
+  PASS: characterAt(0,1) correct
+  PASS: characterAt(0,2) correct
+  PASS: characterAt invalid col returns 0
+
+== Mark and Cut/Copy Tests ==
+  PASS: setMark captures row
+  PASS: setMark captures col
+  PASS: copyText returns marked text
+  PASS: copyText doesn't modify buffer
+  PASS: cutToMark returns cut text
+  PASS: cutToMark removes text
+  PASS: cursor at mark position after cut
+  PASS: cutTextToEndOfLine returns end of line
+  PASS: cutTextToEndOfLine removes text
+  PASS: cursor stays at cut position
+  PASS: deleteText removes marked region
+
+== Insert and Paste Tests ==
+  PASS: insertTextAtCursor inserts text
+  PASS: cursor advances past inserted text
+  PASS: pasteFromCutBuffer inserts text
+  PASS: cursor advances past pasted text
+  PASS: insertTextAtCursor handles newlines
+  PASS: cursor row advances with newlines
+
+== Find and Replace Tests ==
+  PASS: findString returns true when found
+  PASS: findString moves cursor to match
+  PASS: findString returns false when not found
+  PASS: findString finds text on later line
+  PASS: findString cursor on correct row
+  PASS: findString positions cursor at match
+  PASS: replaceString returns false when no more matches
+  PASS: replaceString replaces text
+  PASS: replaceString returns true when more matches exist
+  PASS: first replaceString works
+
+== Load From String Tests ==
+  PASS: loadTextFromString creates line
+  PASS: loadTextFromString content correct
+  PASS: cursor row is 0 after loadTextFromString
+  PASS: cursor col is 0 after loadTextFromString
+  PASS: loadTextFromString creates multiple lines
+  PASS: loadTextFromString line 1
+  PASS: loadTextFromString line 2
+  PASS: loadTextFromString line 3
+  PASS: cursor row is 0 after multi-line load
+  PASS: cursor col is 0 after multi-line load
+  PASS: flattenBuffer contains newline
+
+== Status Methods Tests ==
+  PASS: default not read-only
+  PASS: setReadOnly(1) makes read-only
+  PASS: setReadOnly(0) makes writable
+  PASS: new buffer not touched
+  PASS: buffer touched after edit
+  PASS: getFilePath returns set path
+  PASS: name can be set and read
+  PASS: visual screen line persists
+  PASS: visual screen col persists
+
+== Position Evaluation Tests ==
+  PASS: evaluatePosition valid insert
+  PASS: evaluatePosition append col
+  PASS: evaluatePosition invalid row
+  PASS: evaluatePosition invalid col
+
+== Tab Handling Tests ==
+  PASS: cursor not on tab extension after addTab
+  PASS: cursor not on tab ext after addTab at start
+  PASS: cursor at tab stop after addTab at col 0
+  PASS: cursor not on tab ext after addTab at col 3
+  PASS: cursor at next tab stop after addTab
+  PASS: cursorRight skips tab extensions
+  PASS: cursorRight jumps past tab extensions
+  PASS: cursorLeft skips tab extensions
+  PASS: cursorLeft jumps back to tab start
+  PASS: cursorUp avoids tab extension
+  PASS: cursorUp moved to row 0
+  PASS: cursorDown avoids tab extension
+  PASS: cursorDown moved to row 1
+  PASS: evaluatePosition detects mid-tab at col 1
+  PASS: evaluatePosition detects mid-tab at col 2
+  PASS: evaluatePosition detects mid-tab at col 3
+  PASS: evaluatePosition valid at tab char
+  PASS: evaluatePosition valid after tab
+  PASS: cursorGotoRequest rejects mid-tab
+  PASS: cursor not on tab ext after rejected goto
+  PASS: cursor not on ext after backspace removes char
+  PASS: cursor not on ext after backspace removes tab
+  PASS: cursor at col 1 after tab backspace
+  PASS: cursor not on ext after multiple tabs
+  PASS: cursor after two tabs and char
+  PASS: cursorLeft past second tab valid
+  PASS: cursorLeft through second tab valid
+  PASS: cursorLeft through first tab valid
+  PASS: cursor at start after navigating back
+  PASS: cursor valid after insert before tab
+  PASS: cursor valid after tab from col 2
+  PASS: tab aligns to tab stop from col 2
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+  PASS: cursor never on tab ext during traversal
+
+=======================
+Results: 155 passed, 0 failed
+
+=== cxexpression tests ===
+./darwin_arm64/cxexpression_test
+CxExpression Test Suite
+=======================
+
+== CxExpressionToken Constructor Tests ==
+  PASS: default ctor: type is NONE
+  PASS: default ctor: text is empty
+  PASS: default ctor: value is 0.0
+  PASS: param ctor: type
+  PASS: param ctor: text
+  PASS: param ctor: value
+  PASS: copy ctor: type
+  PASS: copy ctor: text
+  PASS: assignment: type
+  PASS: assignment: text
+  PASS: self-assignment: preserved
+
+== CxExpressionToken Operator Tests ==
+  PASS: equality: same tokens
+  PASS: inequality: different types
+  PASS: inequality: different values
+  PASS: inequality: different text
+
+== CxExpressionToken Helper Function Tests ==
+  PASS: isparen: (
+  PASS: isparen: )
+  PASS: isparen: x is not paren
+  PASS: isleftparen: (
+  PASS: isleftparen: ) is not left
+  PASS: isperiod: .
+  PASS: isperiod: , is not period
+  PASS: isexponent: e
+  PASS: isexponent: E
+  PASS: isexponent: x is not exponent
+  PASS: is_one_of: + in +-*/
+  PASS: is_one_of: / in +-*/
+  PASS: is_one_of: x not in +-*/
+  PASS: not_one_of: x not in +-*/
+  PASS: not_one_of: + is in +-*/
+  PASS: is_in: 3 in digits
+  PASS: is_in: a not in digits
+  PASS: iswhite: space
+  PASS: iswhite: tab
+  PASS: iswhite: x is not white
+  PASS: isvarfunc: a
+  PASS: isvarfunc: Z
+  PASS: isvarfunc: _
+  PASS: isvarfunc: digit
+  PASS: isvarfunc: $
+  PASS: isvarfunc: + is not varfunc
+  PASS: isnull: null char
+  PASS: isnull: x is not null
+
+== CxExpressionToken asString Tests ==
+  PASS: asString: PLUS_SIGN
+  PASS: asString: MINUS_SIGN
+  PASS: asString: MULT_SIGN
+  PASS: asString: DIV_SIGN
+  PASS: asString: LEFT_PAREN
+  PASS: asString: RIGHT_PAREN
+  PASS: asString: COMMA
+  PASS: asString: VARIABLE
+  PASS: asString: FUNCTION
+  PASS: asString: END
+
+== CxExpressionVariableDatabase Tests ==
+  PASS: base db: VariableDefined returns UNDEFINED
+  PASS: base db: VariableEvaluate returns UNDEFINED
+
+== CxExpressionIntrinsicVariableDatabase Tests ==
+  PASS: intrinsic: M_PI defined
+  PASS: intrinsic: M_PI value
+  PASS: intrinsic: M_E defined
+  PASS: intrinsic: M_E value
+  PASS: intrinsic: M_LOG2E defined
+  PASS: intrinsic: M_LOG2E value
+  PASS: intrinsic: M_LOG10E defined
+  PASS: intrinsic: M_LN2 defined
+  PASS: intrinsic: M_LN10 defined
+  PASS: intrinsic: M_PI_2 defined
+  PASS: intrinsic: M_PI_2 value
+  PASS: intrinsic: M_PI_4 defined
+  PASS: intrinsic: M_1_PI defined
+  PASS: intrinsic: M_2_PI defined
+  PASS: intrinsic: M_2_SQRTPI defined
+  PASS: intrinsic: M_SQRT2 defined
+  PASS: intrinsic: M_SQRT2 value
+  PASS: intrinsic: M_SQRT1_2 defined
+  PASS: intrinsic: undefined variable
+
+== CxExpressionFunctionDatabase Tests ==
+  PASS: base db: FunctionDefined returns UNDEFINED
+  PASS: base db: FunctionEvaluate returns UNDEFINED
+
+== CxExpressionIntrinsicFunctionDatabase Defined Tests ==
+  PASS: func defined: SIN
+  PASS: func defined: COS
+  PASS: func defined: TAN
+  PASS: func defined: ASIN
+  PASS: func defined: ACOS
+  PASS: func defined: ATAN
+  PASS: func defined: SINH
+  PASS: func defined: COSH
+  PASS: func defined: TANH
+  PASS: func defined: ASINH
+  PASS: func defined: ACOSH
+  PASS: func defined: ATANH
+  PASS: func defined: LOG
+  PASS: func defined: EXP
+  PASS: func defined: LOG10
+  PASS: func defined: ALOG10
+  PASS: func defined: ABS
+  PASS: func defined: CEIL
+  PASS: func defined: FLOOR
+  PASS: func defined: SQRT
+  PASS: func defined: ATAN2
+  PASS: func defined: POW
+  PASS: func defined: MIN
+  PASS: func defined: MAX
+  PASS: func defined: R2D
+  PASS: func defined: D2R
+  PASS: func undefined: UNDEFINED
+
+== CxExpressionIntrinsicFunctionDatabase Evaluate Tests ==
+  PASS: SIN(0) = 0
+  PASS: SIN(PI/2) = 1
+  PASS: COS(0) = 1
+  PASS: COS(PI) = -1
+  PASS: TAN(0) = 0
+  PASS: ASIN(0) = 0
+  PASS: ACOS(1) = 0
+  PASS: ATAN(0) = 0
+  PASS: LOG(e) = 1
+  PASS: LOG(1) = 0
+  PASS: EXP(0) = 1
+  PASS: EXP(1) = e
+  PASS: LOG10(10) = 1
+  PASS: LOG10(100) = 2
+  PASS: ALOG10(2) = 100
+  PASS: ABS(-5) = 5
+  PASS: ABS(5) = 5
+  PASS: CEIL(4.3) = 5
+  PASS: CEIL(-4.3) = -4
+  PASS: FLOOR(4.7) = 4
+  PASS: FLOOR(-4.7) = -5
+  PASS: SQRT(4) = 2
+  PASS: SQRT(9) = 3
+  PASS: ATAN2(1,1) = PI/4
+  PASS: POW(2,3) = 8
+  PASS: POW(10,2) = 100
+  PASS: MIN(5,3,7) = 3
+  PASS: MAX(5,3,7) = 7
+  PASS: R2D(PI) = 180
+  PASS: D2R(180) = PI
+
+== CxExpressionIntrinsicFunctionDatabase Error Tests ==
+  PASS: SIN with 2 args: BAD_NUMBER_OF_ARGS
+  PASS: POW with 1 arg: BAD_NUMBER_OF_ARGS
+  PASS: LOG(-1): RANGE_ERROR
+  PASS: LOG(0): RANGE_ERROR
+  PASS: LOG10(-1): RANGE_ERROR
+  PASS: SQRT(-1): RANGE_ERROR
+
+== CxExpression Simple Number Tests ==
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 5
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 5
+  PASS: 5 = 5
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.140000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=3.140000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.140000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 3.14
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 3.14
+  PASS: 3.14 = 3.14
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(7.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=7.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: -7
+-----[ EVALUATION ]------------------------------
+  PASS: eval: -7
+  PASS: -7 = -7
+- ParseToTokens: its a number
+- ParseToTokens: its a number(150.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=150.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=150.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 1.5e2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 1.5e2
+  PASS: 1.5e2 = 150
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.050000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=0.050000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.050000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 5e-2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 5e-2
+  PASS: 5e-2 = 0.05
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=0.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 0
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 0
+  PASS: 0 = 0
+
+== CxExpression Basic Arithmetic Tests ==
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 2+3
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 2+3
+  PASS: 2+3 = 5
+- ParseToTokens: its a number
+- ParseToTokens: its a number(7.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=7.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 7-4
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 7-4
+  PASS: 7-4 = 3
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 3*4
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 3*4
+  PASS: 3*4 = 12
+- ParseToTokens: its a number
+- ParseToTokens: its a number(15.000000)
+- ParseToTokens: its a / sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=15.000000) 
+- CheckSyntax: got next tokenTOKEN(DIV_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=15.000000) 
+- CheckSyntax2: got next token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 15/3
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 15/3
+  PASS: 15/3 = 5
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 1+2+3+4
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 1+2+3+4
+  PASS: 1+2+3+4 = 10
+- ParseToTokens: its a number
+- ParseToTokens: its a number(10.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=10.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=10.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 10-3+2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 10-3+2
+  PASS: 10-3+2 = 9
+- ParseToTokens: its a number
+- ParseToTokens: its a number(12.000000)
+- ParseToTokens: its a / sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=12.000000) 
+- CheckSyntax: got next tokenTOKEN(DIV_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=12.000000) 
+- CheckSyntax2: got next token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 12/3*2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 12/3*2
+  PASS: 12/3*2 = 8
+
+== CxExpression Precedence Tests ==
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 2+3*4
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 2+3*4
+  PASS: 2+3*4 = 14 (not 20)
+- ParseToTokens: its a number
+- ParseToTokens: its a number(10.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(6.000000)
+- ParseToTokens: its a / sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=10.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=6.000000) 
+- CheckSyntax: got next tokenTOKEN(DIV_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=10.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=6.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=6.000000) 
+- CheckSyntax2: got next token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 10-6/2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 10-6/2
+  PASS: 10-6/2 = 7 (not 2)
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(6.000000)
+- ParseToTokens: its a / sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=6.000000) 
+- CheckSyntax: got next tokenTOKEN(DIV_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=6.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=6.000000) 
+- CheckSyntax2: got next token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 2+3*4-6/2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 2+3*4-6/2
+  PASS: 2+3*4-6/2 = 11
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 1+2*3+4
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 1+2*3+4
+  PASS: 1+2*3+4 = 11
+
+== CxExpression Parentheses Tests ==
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: (2+3)*4
+-----[ EVALUATION ]------------------------------
+  PASS: eval: (2+3)*4
+  PASS: (2+3)*4 = 20
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: ((2+3)*4)
+-----[ EVALUATION ]------------------------------
+  PASS: eval: ((2+3)*4)
+  PASS: ((2+3)*4) = 20
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a * sign
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: (2+3)*(4+5)
+-----[ EVALUATION ]------------------------------
+  PASS: eval: (2+3)*(4+5)
+  PASS: (2+3)*(4+5) = 45
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(10.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(6.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a / sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=10.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=6.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DIV_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=10.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=10.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=6.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=6.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: (10-6)/2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: (10-6)/2
+  PASS: (10-6)/2 = 2
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: (((1+2)))
+-----[ EVALUATION ]------------------------------
+  PASS: eval: (((1+2)))
+  PASS: (((1+2))) = 3
+
+== CxExpression Unary Minus Tests ==
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: -5
+-----[ EVALUATION ]------------------------------
+  PASS: eval: -5
+  PASS: -5 = -5
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: -5+3
+-----[ EVALUATION ]------------------------------
+  PASS: eval: -5+3
+  PASS: -5+3 = -2
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: (-5)*2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: (-5)*2
+  PASS: (-5)*2 = -10
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: --5
+-----[ EVALUATION ]------------------------------
+  PASS: eval: --5
+  PASS: --5 = 5
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: ---5
+-----[ EVALUATION ]------------------------------
+  PASS: eval: ---5
+  PASS: ---5 = -5
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: ----5
+-----[ EVALUATION ]------------------------------
+  PASS: eval: ----5
+  PASS: ----5 = 5
+- ParseToTokens: its a - sign
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: -(-5)
+-----[ EVALUATION ]------------------------------
+  PASS: eval: -(-5)
+  PASS: -(-5) = 5
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 3--2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 3--2
+  PASS: 3--2 = 5
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 3---2
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 3---2
+  PASS: 3---2 = 1
+
+== CxExpression Variable Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_PI)
+- ParseToTokens: its a variable (M_PI) found in intrinsic database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=M_PI) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: M_PI
+-----[ EVALUATION ]------------------------------
+  PASS: eval: M_PI
+  PASS: M_PI = pi
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_E)
+- ParseToTokens: its a variable (M_E) found in intrinsic database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=M_E) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_E) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: M_E
+-----[ EVALUATION ]------------------------------
+  PASS: eval: M_E
+  PASS: M_E = e
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_PI)
+- ParseToTokens: its a variable (M_PI) found in intrinsic database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(VAR=M_PI) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 2*M_PI
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 2*M_PI
+  PASS: 2*M_PI = 2pi
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_PI)
+- ParseToTokens: its a variable (M_PI) found in intrinsic database
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=M_PI) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: M_PI+1
+-----[ EVALUATION ]------------------------------
+  PASS: eval: M_PI+1
+  PASS: M_PI+1
+
+== CxExpression Function Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=0.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SIN(0)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=0.000000
+  PASS: eval: SIN(0)
+  PASS: SIN(0) = 0
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (COS)
+- ParseToTokens: function (COS) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=COS) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=0.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=COS) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: COS(0)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=0.000000
+  PASS: eval: COS(0)
+  PASS: COS(0) = 1
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SQRT)
+- ParseToTokens: function (SQRT) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SQRT) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SQRT) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SQRT(4)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=4.000000
+  PASS: eval: SQRT(4)
+  PASS: SQRT(4) = 2
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (ABS)
+- ParseToTokens: function (ABS) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=ABS) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=ABS) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: ABS(-5)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=-5.000000
+  PASS: eval: ABS(-5)
+  PASS: ABS(-5) = 5
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SQRT)
+- ParseToTokens: function (SQRT) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SQRT) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SQRT) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SQRT(2+2)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=4.000000
+  PASS: eval: SQRT(2+2)
+  PASS: SQRT(2+2) = 2
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (ABS)
+- ParseToTokens: function (ABS) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=ABS) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=0.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=ABS) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: ABS(SIN(0))
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=0.000000
+ARGS=1
+result[0]=0.000000
+  PASS: eval: ABS(SIN(0))
+  PASS: ABS(SIN(0)) = 0
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_PI)
+- ParseToTokens: its a variable (M_PI) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(VAR=M_PI) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SIN(M_PI)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=3.141593
+  PASS: eval: SIN(M_PI)
+  PASS: SIN(M_PI) ~ 0
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SQRT)
+- ParseToTokens: function (SQRT) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SQRT) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SQRT) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SQRT(4)+3
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=4.000000
+  PASS: eval: SQRT(4)+3
+  PASS: SQRT(4)+3 = 5
+
+== CxExpression Multi-Argument Function Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (POW)
+- ParseToTokens: function (POW) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=POW) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: POW(2,3)
+-----[ EVALUATION ]------------------------------
+ARGS=2
+result[0]=2.000000
+result[1]=3.000000
+  PASS: eval: POW(2,3)
+  PASS: POW(2,3) = 8
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (ATAN2)
+- ParseToTokens: function (ATAN2) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=ATAN2) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=ATAN2) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: ATAN2(1,1)
+-----[ EVALUATION ]------------------------------
+ARGS=2
+result[0]=1.000000
+result[1]=1.000000
+  PASS: eval: ATAN2(1,1)
+  PASS: ATAN2(1,1) = PI/4
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (MIN)
+- ParseToTokens: function (MIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=MIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=MIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: MIN(5,3)
+-----[ EVALUATION ]------------------------------
+ARGS=2
+result[0]=5.000000
+result[1]=3.000000
+  PASS: eval: MIN(5,3)
+  PASS: MIN(5,3) = 3
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (MAX)
+- ParseToTokens: function (MAX) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=MAX) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=MAX) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: MAX(5,3)
+-----[ EVALUATION ]------------------------------
+ARGS=2
+result[0]=5.000000
+result[1]=3.000000
+  PASS: eval: MAX(5,3)
+  PASS: MAX(5,3) = 5
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (MIN)
+- ParseToTokens: function (MIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(7.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=MIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=7.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=MIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: MIN(5,3,7)
+-----[ EVALUATION ]------------------------------
+ARGS=3
+result[0]=5.000000
+result[1]=3.000000
+result[2]=7.000000
+  PASS: eval: MIN(5,3,7)
+  PASS: MIN(5,3,7) = 3
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (MAX)
+- ParseToTokens: function (MAX) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(7.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=MAX) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=7.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=MAX) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: MAX(5,3,7)
+-----[ EVALUATION ]------------------------------
+ARGS=3
+result[0]=5.000000
+result[1]=3.000000
+result[2]=7.000000
+  PASS: eval: MAX(5,3,7)
+  PASS: MAX(5,3,7) = 7
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (POW)
+- ParseToTokens: function (POW) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=POW) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: POW(1+1,2+1)
+-----[ EVALUATION ]------------------------------
+ARGS=2
+result[0]=2.000000
+result[1]=3.000000
+  PASS: eval: POW(1+1,2+1)
+  PASS: POW(1+1,2+1) = 8
+
+== CxExpression Complex Expression Tests ==
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a - sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a / sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(MINUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(DIV_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MINUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: (3+4)*2-5/5
+-----[ EVALUATION ]------------------------------
+  PASS: eval: (3+4)*2-5/5
+  PASS: (3+4)*2-5/5 = 13
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SQRT)
+- ParseToTokens: function (SQRT) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(16.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a + sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (POW)
+- ParseToTokens: function (POW) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SQRT) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=16.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=POW) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SQRT) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=16.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SQRT(16)+POW(2,3)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=16.000000
+ARGS=2
+result[0]=2.000000
+result[1]=3.000000
+  PASS: eval: SQRT(16)+POW(2,3)
+  PASS: SQRT(16)+POW(2,3) = 12
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (POW)
+- ParseToTokens: function (POW) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a + sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (POW)
+- ParseToTokens: function (POW) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (COS)
+- ParseToTokens: function (COS) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=POW) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=POW) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=COS) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=COS) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: sin^2+cos^2
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=1.000000
+ARGS=2
+result[0]=0.841471
+result[1]=2.000000
+ARGS=1
+result[0]=1.000000
+ARGS=2
+result[0]=0.540302
+result[1]=2.000000
+  PASS: eval: sin^2+cos^2
+  PASS: sin^2(1)+cos^2(1) = 1
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_PI)
+- ParseToTokens: its a variable (M_PI) found in intrinsic database
+- ParseToTokens: its a / sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(VAR=M_PI) 
+- CheckSyntax: got next tokenTOKEN(DIV_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got next token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(DIV_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SIN(M_PI/2)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=1.570796
+  PASS: eval: SIN(M_PI/2)
+  PASS: SIN(PI/2) = 1
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (LOG)
+- ParseToTokens: function (LOG) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (EXP)
+- ParseToTokens: function (EXP) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=LOG) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=EXP) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=LOG) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=EXP) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: LOG(EXP(5))
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=5.000000
+ARGS=1
+result[0]=148.413159
+  PASS: eval: LOG(EXP(5))
+  PASS: LOG(EXP(5)) = 5
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (POW)
+- ParseToTokens: function (POW) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=POW) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=1.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=POW) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=1.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 2x^2+3x+1
+-----[ EVALUATION ]------------------------------
+ARGS=2
+result[0]=2.000000
+result[1]=2.000000
+  PASS: eval: 2x^2+3x+1
+  PASS: 2*2^2+3*2+1 = 15
+
+== CxExpression Whitespace Tests ==
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: 2 + 3
+-----[ EVALUATION ]------------------------------
+  PASS: eval: 2 + 3
+  PASS: 2 + 3 = 5
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(4.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=4.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=4.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: spaced expr
+-----[ EVALUATION ]------------------------------
+  PASS: eval: spaced expr
+  PASS: 2+3*4 with spaces = 14
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=0.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: SIN( 0 )
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=0.000000
+  PASS: eval: SIN( 0 )
+  PASS: SIN( 0 ) = 0
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: leading spaces
+-----[ EVALUATION ]------------------------------
+  PASS: eval: leading spaces
+  PASS:    5 = 5
+
+== CxExpression Error Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (unknown_var)
+- ParseToTokens: variable (unknown_var) not found in intrinsic database
+- ParseToTokens: variable (unknown_var) not found in either database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(UNKNOWN_VARIABLE=unknown_var) 
+  PASS: parse error: unknown variable
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (UNKNOWN_FUNC)
+- ParseToTokens: function (UNKNOWN_FUNC) not found in intrinsic database
+- ParseToTokens: function (UNKNOWN_FUNC) not found in either database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(1.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(UNKNOWN_FUNCTION=UNKNOWN_FUNC) 
+  PASS: parse error: unknown function
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count don't match 
+- CheckSyntax: got first tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(UNBALANCED_PARENS) 
+  PASS: parse error: missing )
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count don't match 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(UNBALANCED_PARENS) 
+  PASS: parse error: missing (
+- CheckSyntax: got first tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse error: trailing operator
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: double operator handled
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+-----[ EVALUATION ]------------------------------
+ARGS=0
+  PASS: empty function args handled
+
+== CxExpression GetVariableList Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_PI)
+- ParseToTokens: its a variable (M_PI) found in intrinsic database
+- ParseToTokens: its a + sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_E)
+- ParseToTokens: its a variable (M_E) found in intrinsic database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=M_PI) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(VAR=M_E) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(VAR=M_E) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_E) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: GetVariableList: 2 variables
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: GetVariableList: no variables
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=0.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: GetVariableList: function not counted as variable
+
+== CxExpression GetErrorString Tests ==
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: GetErrorString after success
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (unknown_var)
+- ParseToTokens: variable (unknown_var) not found in intrinsic database
+- ParseToTokens: variable (unknown_var) not found in either database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(UNKNOWN_VARIABLE=unknown_var) 
+  PASS: GetErrorString has content after error
+
+== CxExpression Custom Variable Database Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: x
+-----[ EVALUATION ]------------------------------
+  PASS: eval: x
+  PASS: x = 10
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (y)
+- ParseToTokens: variable (y) not found in intrinsic database
+- ParseToTokens: variable (y) found in user database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=y) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=y) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: y
+-----[ EVALUATION ]------------------------------
+  PASS: eval: y
+  PASS: y = 20
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its a + sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (y)
+- ParseToTokens: variable (y) not found in intrinsic database
+- ParseToTokens: variable (y) found in user database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(VAR=y) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(VAR=y) 
+- CheckSyntax2: got current token --> TOKEN(VAR=y) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: x+y
+-----[ EVALUATION ]------------------------------
+  PASS: eval: x+y
+  PASS: x+y = 30
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its a * sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (M_PI)
+- ParseToTokens: its a variable (M_PI) found in intrinsic database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(VAR=M_PI) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got current token --> TOKEN(VAR=M_PI) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: x*M_PI
+-----[ EVALUATION ]------------------------------
+  PASS: eval: x*M_PI
+  PASS: x*M_PI = 10*PI
+
+== CxExpression Custom Function Database Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (DOUBLE)
+- ParseToTokens: function (DOUBLE) not found in intrinsic database
+- ParseToTokens: function (DOUBLE) found in user database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=DOUBLE) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=DOUBLE) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: DOUBLE(5)
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=5.000000
+  PASS: eval: DOUBLE(5)
+  PASS: DOUBLE(5) = 10
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (ADD)
+- ParseToTokens: function (ADD) not found in intrinsic database
+- ParseToTokens: function (ADD) found in user database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(3.000000)
+- ParseToTokens: its a , sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(7.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=ADD) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=3.000000) 
+- CheckSyntax: got next tokenTOKEN(COMMA) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=7.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=ADD) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=3.000000) 
+- CheckSyntax2: got next token --> TOKEN(COMMA) 
+- CheckSyntax2: got current token --> TOKEN(COMMA) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=7.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: ADD(3,7)
+-----[ EVALUATION ]------------------------------
+ARGS=2
+result[0]=3.000000
+result[1]=7.000000
+  PASS: eval: ADD(3,7)
+  PASS: ADD(3,7) = 10
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (DOUBLE)
+- ParseToTokens: function (DOUBLE) not found in intrinsic database
+- ParseToTokens: function (DOUBLE) found in user database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a function (SIN)
+- ParseToTokens: function (SIN) found in intrinsic database
+- ParseToTokens: its a paren
+- ParseToTokens: its a left paren
+- ParseToTokens: its a number
+- ParseToTokens: its a number(0.000000)
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its a paren
+- ParseToTokens: its a right paren
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(FUNC=DOUBLE) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(FUNC=SIN) 
+- CheckSyntax: got next tokenTOKEN(LEFT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=0.000000) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(RIGHT_PAREN) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=DOUBLE) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(FUNC=SIN) 
+- CheckSyntax2: got next token --> TOKEN(LEFT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=0.000000) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got current token --> TOKEN(RIGHT_PAREN) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse: DOUBLE(SIN(0))
+-----[ EVALUATION ]------------------------------
+ARGS=1
+result[0]=0.000000
+ARGS=1
+result[0]=0.000000
+  PASS: eval: DOUBLE(SIN(0))
+  PASS: DOUBLE(SIN(0)) = 0
+
+=======================
+Results: 352 passed, 0 failed
+
+=== cxfile tests ===
+./darwin_arm64/cxfile_test
+CxFile Test Suite
+=================
+
+== CxFile Basic Tests ==
+  PASS: default ctor file not open
+  PASS: open nonexistent file returns 0
+  PASS: open for write succeeds
+  PASS: file is open after open
+  PASS: file not open after close
+  PASS: path() returns correct path
+
+== CxFile Read/Write Tests ==
+  PASS: read back written content
+  PASS: fwrite returns correct count
+  PASS: fread returns correct count
+  PASS: fread content matches
+  PASS: printf line 1 present
+  PASS: printf line 2 present
+  PASS: printf number present
+
+== CxFile Seek/Tell Tests ==
+  PASS: tell() is 0 at start
+  PASS: tell() after seek(5, SEEK_SET)
+  PASS: read after seek returns correct char
+  PASS: tell() after relative seek
+  PASS: seek from end reads last char
+
+== CxFile EOF Tests ==
+  PASS: eof() false at start
+  PASS: eof() true after reading all
+
+== CxFile getStat Tests ==
+  PASS: getStat returns correct size
+  PASS: getStat shows regular file
+
+== CxFile getch/getUntil Tests ==
+  PASS: getch returns 1 char
+  PASS: getch returns first char
+  PASS: getch returns second char
+  PASS: getUntil stops at delimiter
+
+== CxFile Static Methods Tests ==
+  PASS: tempName returns non-empty string
+  PASS: tempName returns /tmp/ path
+  PASS: tempName generates unique names
+  PASS: tempName with prefix returns non-empty
+  PASS: tempName with prefix returns /tmp/ path
+  PASS: tempName uses custom prefix
+  PASS: tempName with prefix creates file
+  PASS: tildaExpansion removes tilde
+  PASS: tildaExpansion expands path
+  PASS: tildaExpansion leaves absolute paths
+
+== CxFile Copy/Assignment Tests ==
+  PASS: copy ctor file is open
+  PASS: copy ctor path correct
+  PASS: assigned file is open
+  PASS: assigned path correct
+
+== CxFileName Tests ==
+  PASS: default ctor empty name
+  PASS: default ctor empty extension
+  PASS: name extracted correctly
+  PASS: extension extracted correctly
+  PASS: name without extension
+  PASS: no extension when none present
+  PASS: extension is last part
+  PASS: fullName returns complete name
+  PASS: setName changes name
+  PASS: fullName after setName
+  PASS: setExtension changes extension
+  PASS: fullName after setExtension
+  PASS: copy ctor name
+  PASS: copy ctor extension
+  PASS: assignment name
+  PASS: assignment extension
+  PASS: hidden file handled
+
+== CxFileAccess Tests ==
+  PASS: non-existent path returns NOT_FOUND
+  PASS: existing file found readable
+  PASS: non-existent in /tmp returns NOT_FOUND_W
+  PASS: directory returns NOT_A_REGULAR_FILE
+
+== CxFile Append Mode Tests ==
+  PASS: append preserves original
+  PASS: append adds new content
+  PASS: append order correct
+
+== CxFile Binary Mode Tests ==
+  PASS: binary write correct size
+  PASS: binary read correct size
+  PASS: binary data matches
+
+=================
+Results: 67 passed, 0 failed
+
+=== cxfunctor tests ===
+./darwin_arm64/cxfunctor_test
+CxFunctor Test Suite
+====================
+
+== CxFreeFunctor0 Tests ==
+  PASS: functor created, not yet called
+  PASS: functor() calls free function
+  PASS: functor can be called multiple times
+  PASS: functor with return type works
+
+== CxFreeFunctor1 Tests ==
+  PASS: functor1 called
+  PASS: functor1 passed parameter correctly
+  PASS: functor1 with different value works
+
+== CxFreeFunctor2 Tests ==
+  PASS: functor2 called
+  PASS: functor2 passed both parameters
+
+== CxFreeFunctor3 Tests ==
+  PASS: functor3 called
+  PASS: functor3 passed all parameters (1+2+3=6)
+
+== CxFreeFunctor4 Tests ==
+  PASS: functor4 called
+  PASS: functor4 passed all parameters (1+2+3+4=10)
+
+== CxFreeFunctor5 Tests ==
+  PASS: functor5 called
+  PASS: functor5 passed all parameters (1+2+3+4+5=15)
+
+== CxFreeFunctor6 Tests ==
+  PASS: functor6 called
+  PASS: functor6 passed all parameters (1+2+3+4+5+6=21)
+
+== CxMemberFunctor0 Tests ==
+  PASS: member functor created, not called
+  PASS: member functor0 called method
+
+== CxMemberFunctor1 Tests ==
+  PASS: member functor1 called
+  PASS: member functor1 passed parameter
+
+== CxMemberFunctor2 Tests ==
+  PASS: member functor2 called
+  PASS: member functor2 passed parameters (30+40=70)
+
+== CxMemberFunctor3 Tests ==
+  PASS: member functor3 called
+  PASS: member functor3 passed all parameters
+
+== CxMemberFunctor4 Tests ==
+  PASS: member functor4 called
+  PASS: member functor4 passed all parameters
+
+== CxMemberFunctor5 Tests ==
+  PASS: member functor5 called
+  PASS: member functor5 passed all parameters
+
+== CxMemberFunctor6 Tests ==
+  PASS: member functor6 called
+  PASS: member functor6 passed all parameters
+
+== CxDeferCall Free Function Tests ==
+  PASS: CxDeferCall creates functor for 0-arg func
+  PASS: deferred 0-arg call executed
+  PASS: deferred 1-arg call passed parameter
+  PASS: deferred 2-arg call passed parameters
+  PASS: deferred 3-arg call passed parameters
+  PASS: deferred 4-arg call passed parameters
+  PASS: deferred 5-arg call passed parameters
+  PASS: deferred 6-arg call passed parameters
+
+== CxDeferCall Member Function Tests ==
+  PASS: CxDeferCall creates functor for member func
+  PASS: deferred member 0-arg call executed
+  PASS: deferred member 1-arg call passed parameter
+  PASS: deferred member 2-arg call passed parameters
+  PASS: deferred member 3-arg call passed parameters
+  PASS: deferred member 4-arg call passed parameters
+  PASS: deferred member 5-arg call passed parameters
+  PASS: deferred member 6-arg call passed parameters
+
+== CxDeferCall Const Member Function Tests ==
+  PASS: deferred const member 0-arg call executed
+  PASS: deferred const member 1-arg call passed parameter
+
+== CxSimpleReferencer Tests ==
+  PASS: CxSimpleReferencer stores reference
+  PASS: modification through referencer affects original
+  PASS: referencer sees changes to original
+
+== CxReference Tests ==
+  PASS: CxReference creates valid referencer
+  PASS: modification through CxReference affects original
+
+== CxFunctor Polymorphism Tests ==
+  PASS: all functors called through base pointer
+  PASS: last functor result correct
+
+== Edge Case Tests ==
+  PASS: functor with reference parameter modifies original
+  PASS: functor can be called multiple times
+  PASS: functor works with heap-allocated object
+
+====================
+Results: 59 passed, 0 failed
+
+=== cxhandle tests ===
+./darwin_arm64/cxhandle_test
+CxHandle Test Suite
+===================
+
+== CxCounted Tests ==
+  PASS: Add() returns 1 first time
+  PASS: Add() returns 3 after three calls
+  PASS: Remove() returns 2 after Add x3, Remove x1
+  PASS: Remove() returns 0 when count reaches zero
+  PASS: Reset() sets count to 0, next Add returns 1
+  PASS: Add/Remove sequence maintains correct count
+
+== CxCountedPtr Tests ==
+  PASS: default ctor sets _pData to NULL
+  PASS: pointer ctor sets _pData correctly
+  PASS: CxCountedPtr inherits Add/Remove from CxCounted
+  PASS: CxCountedPtr holds dynamic pointer
+
+== CxHandle Default Constructor Tests ==
+  PASS: default ctor creates null handle
+  PASS: multiple default handles are all null
+
+== CxHandle Pointer Constructor Tests ==
+  PASS: pointer ctor creates non-null handle
+  PASS: one object constructed
+  PASS: object destroyed when handle goes out of scope
+  PASS: can access object through ->
+  PASS: can modify object through ->
+
+== CxHandle Copy Constructor Tests ==
+  PASS: copy is non-null
+  PASS: copy has same value
+  PASS: object not destroyed while both handles exist
+  PASS: object not destroyed while h1 still exists
+  PASS: object destroyed after all handles gone
+  PASS: modification through copy affects original
+  PASS: object alive with 4 handles
+  PASS: object destroyed after all 4 handles gone
+
+== CxHandle Assignment Operator Tests ==
+  PASS: assigned handle is non-null
+  PASS: assigned handle has correct value
+  PASS: object destroyed after handles gone
+  PASS: previous object destroyed on reassignment
+  PASS: correct object was destroyed
+  PASS: both objects destroyed at end
+  PASS: self-assignment preserves value
+  PASS: self-assignment doesn't destroy object
+  PASS: shared-ref assignment preserves value
+  PASS: shared-ref assignment doesn't destroy object
+  PASS: chain assignment h2 correct
+  PASS: chain assignment h3 correct
+  PASS: one object destroyed after chain
+
+== CxHandle Dereference Operator Tests ==
+  PASS: operator* returns correct reference
+  PASS: can modify through operator*
+  PASS: operator-> works for method call
+  PASS: operator& returns valid pointer
+
+== CxHandle Conversion Tests ==
+  PASS: implicit conversion to T* works
+  PASS: converted pointer has correct value
+  PASS: null handle converts to NULL pointer
+  PASS: handle usable as pointer parameter
+
+== CxHandle IsNull Tests ==
+  PASS: default handle IsNull returns true
+  PASS: pointer handle IsNull returns false
+  PASS: NULL pointer handle IsNull returns true
+
+== CxHandle NullCheck Tests ==
+  PASS: operator* throws on null handle
+  PASS: operator-> throws on null handle
+  PASS: operator& throws on null handle
+  PASS: valid handle does not throw
+
+== CxHandle Reference Counting Tests ==
+  PASS: single handle: object destroyed on scope exit
+  PASS: two handles: object alive
+  PASS: h1 gone but h2 still holds reference
+  PASS: both handles gone: object destroyed
+  PASS: 5 handles: object alive
+  PASS: all 5 gone: one object destroyed
+  PASS: three objects created
+  PASS: reassignment destroys object 2
+  PASS: reassignment destroys object 3
+  PASS: all objects destroyed at end
+
+== CxHandle Different Types Tests ==
+  PASS: handle to SimpleObject works
+  PASS: handle to int works
+  PASS: handle to char works
+  PASS: handle to double works
+  PASS: handle to array element works
+
+== CxHandle Lifetime Tests ==
+  PASS: nested scopes: all alive
+  PASS: h3 gone, h1 h2 still hold ref
+  PASS: h2 gone, h1 still holds ref
+  PASS: h1 gone: object destroyed
+  PASS: inner scope: alive
+  PASS: inner gone but outer holds ref
+  PASS: outer has correct value
+  PASS: first object destroyed on reassign
+  PASS: second object destroyed on reassign
+  PASS: third object destroyed on reassign
+
+== CxHandle Edge Cases ==
+  PASS: initially null
+  PASS: now valid after assignment
+  PASS: has correct value
+  PASS: initially valid
+  PASS: now null after assignment
+  PASS: object was destroyed
+  PASS: copy of null handle is null
+  PASS: null assigned to null is still null
+  PASS: h3 still references object 1
+  PASS: h1 now references object 2
+  PASS: both objects still alive
+
+== CxHandle Stress Tests ==
+  PASS: 100 handles: object alive
+  PASS: all handles gone: one object destroyed
+  PASS: 50 objects created
+  PASS: all 50 alive
+  PASS: all 50 destroyed
+  PASS: 21 objects created
+  PASS: 20 objects destroyed during reassignment
+  PASS: final value correct
+
+===================
+Results: 97 passed, 0 failed
+
+=== cxhashmap tests ===
+./darwin_arm64/cxhashmap_test
+CxHashmap Test Suite
+====================
+
+== CxHashmap Constructor Tests ==
+  PASS: default constructor: size is 0
+  PASS: sized constructor: size is 0
+  PASS: small sized constructor: size is 0
+
+== CxHashmap Insert Tests ==
+  PASS: insert first: returns false (no replacement)
+  PASS: insert first: size is 1
+  PASS: insert second: returns false
+  PASS: insert second: size is 2
+  PASS: insert duplicate: returns true (replaced)
+  PASS: insert duplicate: size unchanged
+  PASS: insert duplicate: value updated
+
+== CxHashmap Find Tests ==
+  PASS: find in empty: returns NULL
+  PASS: find existing: returns non-NULL
+  PASS: find existing: correct value
+  PASS: find non-existent: returns NULL
+  PASS: find multiple: key 10
+  PASS: find multiple: key 20
+  PASS: find multiple: key 30
+  PASS: find multiple: key 42 still works
+
+== CxHashmap operator[] Tests ==
+  PASS: operator[]: creates entry, size is 1
+  PASS: operator[]: value stored correctly
+  PASS: operator[] existing: size unchanged
+  PASS: operator[] existing: value updated
+  PASS: operator[] multiple: size is 4
+
+== CxHashmapIterator Tests ==
+  PASS: iterator empty: next() returns false
+  PASS: iterator: visits 3 items
+  PASS: iterator: sum of values is 600
+  PASS: iterator: getKey before next() returns NULL
+  PASS: iterator: getEntry before next() returns NULL
+
+== CxHashmap String Key/Entry Tests ==
+  PASS: string map: size is 3
+  PASS: string find: apple
+  PASS: string find: banana
+  PASS: string find: cherry
+  PASS: string find: non-existent returns NULL
+  PASS: string operator[]: size is 4
+
+== CxHashmap Resize Tests ==
+  PASS: resize: 100 items inserted
+  PASS: resize: all 100 items findable
+  PASS: resize: iterator visits 100 items
+
+== CxHashmap Collision Tests ==
+  PASS: collision: all 4 items stored
+  PASS: collision: find key 0
+  PASS: collision: find key 8
+  PASS: collision: find key 16
+  PASS: collision: find key 24
+
+== CxHashmap Edge Case Tests ==
+  PASS: edge: zero key works
+  PASS: edge: negative keys stored
+  PASS: edge: find negative key -1
+  PASS: edge: find negative key -100
+  PASS: edge: empty string key works
+  PASS: edge: single char keys stored
+  PASS: edge: 1000 items stored
+  PASS: edge: find item 500 of 1000
+
+== CxHashmap getSize Tests ==
+  PASS: getSize: empty map is 0
+  PASS: getSize: after 1 insert is 1
+  PASS: getSize: after 3 inserts is 3
+  PASS: getSize: replacement doesn't increase
+  PASS: getSize: operator[] new key increases
+  PASS: getSize: operator[] existing key unchanged
+
+== CxHashmap Mixed Types Tests ==
+  PASS: mixed: int->int map works
+  PASS: mixed: string->string map works
+  PASS: mixed: int->string map works
+  PASS: mixed: string->int map works
+  PASS: mixed: int->string lookup
+  PASS: mixed: string->int lookup
+
+====================
+Results: 62 passed, 0 failed
+
+=== cxjson tests ===
+./darwin_arm64/cxjson_test
+CxJSON Test Suite
+=================
+
+== CxJSONString Tests ==
+  PASS: default ctor sets STRING type
+  PASS: default ctor creates empty string
+  PASS: value ctor sets STRING type
+  PASS: value ctor stores string
+  PASS: set/get works
+  PASS: empty string works
+  PASS: string with tab
+  PASS: string with newline
+
+== CxJSONNumber Tests ==
+  PASS: default ctor sets NUMBER type
+  PASS: value ctor sets NUMBER type
+  PASS: value ctor stores number
+  PASS: set/get works
+  PASS: zero works
+  PASS: negative number works
+  PASS: negative value correct
+  PASS: integer value works
+
+== CxJSONBoolean Tests ==
+  PASS: default ctor sets BOOLEAN type
+  PASS: value ctor sets BOOLEAN type
+  PASS: true value stored
+  PASS: false value stored
+  PASS: set true works
+  PASS: set false works
+
+== CxJSONNull Tests ==
+  PASS: ctor sets JNULL type
+
+== CxJSONMember Tests ==
+  PASS: default ctor empty var
+  PASS: default ctor null object
+  PASS: name stored correctly
+  PASS: object not null
+  PASS: object type correct
+  PASS: number member name
+  PASS: number member value
+  PASS: removeObject returns object
+  PASS: removed object type correct
+  PASS: object is null after remove
+
+== CxJSONObject Tests ==
+  PASS: ctor sets OBJECT type
+  PASS: default ctor empty object
+  PASS: append increases entries
+  PASS: append second member
+  PASS: at(0) returns member
+  PASS: at(0) correct member
+  PASS: at(1) returns member
+  PASS: at(1) correct member
+  PASS: find existing member
+  PASS: find returns correct member
+  PASS: find non-existing returns NULL
+  PASS: removeAt returns member
+  PASS: removeAt correct member
+  PASS: removeAt decreases entries
+  PASS: first member intact
+  PASS: last member shifted
+  PASS: clear empties object
+
+== CxJSONArray Tests ==
+  PASS: ctor sets ARRAY type
+  PASS: default ctor empty array
+  PASS: append increases entries
+  PASS: multiple appends
+  PASS: at(0) returns item
+  PASS: at(0) correct type
+  PASS: at(0) correct value
+  PASS: at(2) correct value
+  PASS: mixed array has 4 entries
+  PASS: first is string
+  PASS: second is number
+  PASS: third is boolean
+  PASS: fourth is null
+  PASS: clear empties array
+  PASS: outer array has 2 entries
+  PASS: first is nested array
+  PASS: nested array has 2 entries
+
+== CxJSONFactory Parse Tests ==
+  PASS: standalone string returns NULL
+  PASS: standalone number returns NULL
+  PASS: standalone true returns NULL
+  PASS: standalone false returns NULL
+  PASS: standalone null returns NULL
+  PASS: parse empty object not null
+  PASS: parsed empty object type
+  PASS: empty object has 0 entries
+  PASS: parse simple object not null
+  PASS: parsed object type
+  PASS: object has 2 members
+  PASS: found name member
+  PASS: name value correct
+  PASS: found age member
+  PASS: age value correct
+  PASS: parse empty array not null
+  PASS: parsed empty array type
+  PASS: empty array has 0 entries
+  PASS: parse simple array not null
+  PASS: parsed array type
+  PASS: array has 3 entries
+  PASS: array[0] correct
+  PASS: array[2] correct
+  PASS: parse mixed array not null
+  PASS: mixed array has 4 entries
+  PASS: mixed[0] is string
+  PASS: mixed[1] is number
+  PASS: mixed[2] is boolean
+  PASS: mixed[3] is null
+  PASS: parse nested object not null
+  PASS: found person member
+  PASS: person is object
+  PASS: nested object has 2 members
+  PASS: found nested name
+  PASS: parse object with array not null
+  PASS: found numbers member
+  PASS: numbers is array
+  PASS: numbers array has 3 entries
+  PASS: parse array of objects not null
+  PASS: array has 2 objects
+  PASS: arr[0] is object
+  PASS: arr[1] is object
+
+== Type Checking Tests ==
+  PASS: CxJSONString type is STRING
+  PASS: CxJSONNumber type is NUMBER
+  PASS: CxJSONBoolean type is BOOLEAN
+  PASS: CxJSONNull type is JNULL
+  PASS: CxJSONObject type is OBJECT
+  PASS: CxJSONArray type is ARRAY
+  PASS: base ptr string type
+  PASS: base ptr number type
+  PASS: base ptr boolean type
+  PASS: base ptr null type
+
+=================
+Results: 119 passed, 0 failed
+
+=== cxlog tests ===
+./darwin_arm64/cxlog_test
+CxLogFile Test Suite
+====================
+
+== CxLogFile Constructor Tests ==
+  PASS: default constructor creates log object
+  PASS: constructor with properties works
+
+== CxLogFile Open/Close Tests ==
+  PASS: open returns success
+  PASS: isOpen returns true after open
+  PASS: log file was created
+  PASS: isOpen returns false after close
+  PASS: open with mode 'a' succeeds
+
+== CxLogFile Path Tests ==
+  PASS: path() returns correct path
+
+== CxLogFile Printf Basic Tests ==
+  PASS: INFO message contains [  INFO tag
+  PASS: INFO message contains user text
+  PASS: ERROR message contains [ ERROR tag
+  PASS: ERROR message contains user text
+  PASS: DATA message contains [  DATA tag
+  PASS: DETAIL message contains [DETAIL tag
+
+== CxLogFile Printf Format Tests ==
+  PASS: printf formats integer correctly
+  PASS: printf formats string correctly
+  PASS: printf formats multiple args
+
+== CxLogFile Log Flag Tests ==
+  PASS: disabled INFO not logged
+  PASS: INFO disabled correctly
+  PASS: ERROR enabled correctly
+  PASS: DATA disabled correctly
+  PASS: DETAIL disabled correctly
+
+== CxLogFile Timestamp Tests ==
+  PASS: timestamp includes time separators
+  PASS: message logged without timestamp
+
+== CxLogFile PID Tests ==
+  PASS: PID appears in log output
+
+== CxLogFile Line Number Tests ==
+  PASS: filename appears with line numbers
+
+== CxLogFile Copy/Assignment Tests ==
+  PASS: copy constructor shares file handle
+  PASS: assignment operator shares file handle
+
+== CxLogFile Global Log Tests ==
+  PASS: getGlobalLogFile returns non-null
+  PASS: getGlobalLogFile returns same instance
+
+== CxLogFile Multiple Messages Tests ==
+  PASS: first message logged
+  PASS: second message logged
+  PASS: error message logged
+  PASS: third message logged
+  PASS: correct number of INFO entries
+
+== CxLogFile Append Mode Tests ==
+  PASS: first message preserved in append
+  PASS: second message appended
+
+====================
+Results: 37 passed, 0 failed
+
+=== cxlogfile tests ===
+./darwin_arm64/cxlogfile_test
+CxLogFile Test Suite
+====================
+
+== CxLogFile Basic Tests ==
+  PASS: default ctor not open
+  PASS: open returns success
+  PASS: log is open after open
+  PASS: log not open after close
+  PASS: path() returns correct path
+
+== CxLogFile printf Tests ==
+  PASS: INFO log contains INFO tag
+  PASS: INFO log contains message
+  PASS: ERROR log contains ERROR tag
+  PASS: ERROR log contains message
+  PASS: DATA log enabled by default
+  PASS: DETAIL log enabled by default
+
+== CxLogFile Property Tests ==
+  PASS: DATA enabled via property
+  PASS: DETAIL enabled via property
+  PASS: INFO disabled via property
+  PASS: message logged without timestamp
+  PASS: line numbers include filename
+  PASS: message logged without PID
+
+== CxLogFile Multiple Entry Tests ==
+  PASS: first entry present
+  PASS: second entry present
+  PASS: third entry present
+  PASS: INFO in mixed log
+  PASS: ERROR in mixed log
+  PASS: integer formatted
+  PASS: string formatted
+  PASS: float formatted
+
+== CxLogFile Copy/Assignment Tests ==
+  PASS: original message present
+  PASS: copy message present
+  PASS: first message present
+  PASS: assigned message present
+
+== CxLogFile Global Log Tests ==
+  PASS: getGlobalLogFile returns non-null
+
+== CxLogFile Open Mode Tests ==
+  PASS: first write preserved
+  PASS: appended content present
+  PASS: original content overwritten
+  PASS: new content present
+
+== CxLogFile Timestamp Tests ==
+  PASS: timestamp contains colons
+
+== CxLogFile Edge Cases ==
+  PASS: empty message still logs INFO tag
+  PASS: long message logged
+  PASS: special chars message logged
+
+====================
+Results: 38 passed, 0 failed
+
+=== cxnet tests ===
+./darwin_arm64/cxnet_test
+CxNet Test Suite
+================
+
+== CxInetAddress Constructor Tests ==
+  PASS: default ctor port is 0
+  PASS: port-only ctor sets port
+  PASS: port+host ctor sets port
+  PASS: port+host ctor has target
+  PASS: copy ctor copies port
+  PASS: assignment copies port
+
+== CxInetAddress Localhost Tests ==
+  PASS: localhost process succeeds
+  PASS: localhost address is valid
+  PASS: 127.0.0.1 address is valid
+  PASS: 127.0.0.1 has non-zero IP
+  PASS: target returns hostname
+
+== CxInetAddress Static Method Tests ==
+  PASS: addressAsString for loopback
+  PASS: getHostByName localhost returns non-zero
+  PASS: getHostByName 127.0.0.1 returns non-zero
+  PASS: me() returns non-empty hostname
+
+== CxInetAddress sockaddr Tests ==
+  PASS: sockAddr returns non-null
+  PASS: sockAddrSize returns correct size
+  PASS: sockAddr port matches
+  PASS: sockaddr_in ctor sets port
+
+== CxInetAddress Invalid Address Tests ==
+  PASS: invalid hostname handled gracefully
+  PASS: empty hostname with port 0
+
+== CxSocket Constructor Tests ==
+  PASS: default ctor creates valid fd
+  PASS: default ctor socket is good
+  PASS: TCP ctor creates valid fd
+  PASS: TCP socket is good
+  PASS: UDP ctor creates valid fd
+  PASS: UDP socket is good
+  PASS: copy ctor shares fd
+  PASS: assignment shares fd
+
+== CxSocket Bind Tests ==
+  PASS: bind to ephemeral port succeeds
+  PASS: getsockname returns valid sockaddr
+  PASS: getsockname returns assigned port
+  PASS: bind to specific port handled
+
+== CxSocket Listen Tests ==
+  PASS: listen succeeds after bind
+  PASS: listen with backlog 10 succeeds
+
+== CxSocket Blocking Mode Tests ==
+  PASS: socket good after setNonBlocking
+  PASS: socket good after setBlocking
+
+== CxSocket getsockname Tests ==
+  PASS: getsockname returns valid address
+  PASS: port() matches sockaddr port
+  PASS: getsockname port is non-zero
+
+== CxSocket Shutdown Tests ==
+  PASS: shutdown handled gracefully
+  PASS: socket had valid fd before close
+
+== CxSocket Select Tests ==
+  PASS: no data pending on listening socket
+
+== CxSocket UDP Tests ==
+  PASS: UDP bind succeeds
+  PASS: UDP getsockname returns valid address
+
+================
+Results: 45 passed, 0 failed
+
+=== cxprop tests ===
+./darwin_arm64/cxprop_test
+CxProp Test Suite
+=================
+
+== CxPropEntry Constructor Tests ==
+  PASS: default ctor: var is empty
+  PASS: default ctor: val is empty
+  PASS: var/val ctor: var is 'name'
+  PASS: var/val ctor: val is 'value'
+  PASS: empty strings ctor: var is empty
+  PASS: empty strings ctor: val is empty
+  PASS: var only: var is 'key'
+  PASS: var only: val is empty
+  PASS: copy ctor: var copied
+  PASS: copy ctor: val copied
+
+== CxPropEntry Operator Tests ==
+  PASS: assignment: var assigned
+  PASS: assignment: val assigned
+  PASS: self-assignment: var preserved
+  PASS: self-assignment: val preserved
+  PASS: equality: same var and val are equal
+  PASS: equality: different var not equal
+  PASS: equality: different val not equal
+  PASS: equality: both different not equal
+  PASS: equality: empty entries are equal
+
+== CxPropEntry Accessor Tests ==
+  PASS: _var equals var()
+  PASS: _val equals val()
+  PASS: direct _var modification works
+  PASS: direct _val modification works
+
+== CxPropertyList Constructor Tests ==
+  PASS: default ctor: entries is 0
+  PASS: copy ctor: entries copied
+  PASS: copy ctor: value accessible
+  PASS: copy ctor: 3 entries copied
+  PASS: copy ctor: entry a
+  PASS: copy ctor: entry b
+  PASS: copy ctor: entry c
+
+== CxPropertyList Set/Get Tests ==
+  PASS: basic set/get
+  PASS: multiple: first
+  PASS: multiple: second
+  PASS: multiple: third
+  PASS: update existing property
+  PASS: update doesn't add duplicate
+  PASS: get non-existent returns empty
+  PASS: empty value stored
+  PASS: empty value property exists
+  PASS: set from var=val string
+  PASS: set from var=val with spaces
+  PASS: set var= creates property
+
+== CxPropertyList Has/Remove Tests ==
+  PASS: has returns true for existing
+  PASS: has returns false for non-existing
+  PASS: remove returns true
+  PASS: removed property no longer exists
+  PASS: remove non-existing returns false
+  PASS: other property still exists
+  PASS: remove from empty returns false
+  PASS: first removed
+  PASS: second still exists
+  PASS: third still exists
+  PASS: entries is 2
+  PASS: first still exists
+  PASS: middle removed
+  PASS: third still exists
+  PASS: first still exists
+  PASS: second still exists
+  PASS: last removed
+
+== CxPropertyList Entries/At Tests ==
+  PASS: empty list has 0 entries
+  PASS: 1 entry after 1 add
+  PASS: 2 entries after 2 adds
+  PASS: 3 entries after 3 adds
+  PASS: updates don't increase count
+  PASS: at(0) var is first
+  PASS: at(0) val is 1
+  PASS: at(1) var is second
+  PASS: at(1) val is 2
+
+== CxPropertyList Clear Tests ==
+  PASS: clear removes all entries
+  PASS: a no longer exists
+  PASS: b no longer exists
+  PASS: c no longer exists
+  PASS: clear empty list is safe
+  PASS: can add after clear
+  PASS: new value accessible
+
+== CxPropertyList Assignment Tests ==
+  PASS: basic assignment works
+  PASS: assignment has new entry
+  PASS: assignment value correct
+  PASS: self-assignment preserves data
+  PASS: chain assignment pl2
+  PASS: chain assignment pl3
+
+== CxPropertyList operator+ Tests ==
+  PASS: original entry preserved
+  PASS: appended entry added
+  PASS: total entries is 2
+  PASS: append multiple: 3 entries
+  PASS: append to empty works
+  PASS: append empty doesn't change count
+  PASS: self-append is no-op
+
+== CxPropertyList Import Tests ==
+  PASS: import semicolon: 3 entries
+  PASS: import semicolon: a=1
+  PASS: import semicolon: b=2
+  PASS: import semicolon: c=3
+  PASS: import newline: 3 entries
+  PASS: import newline: host
+  PASS: import newline: port
+  PASS: import comma: x=10
+  PASS: import comma: y=20
+  PASS: import comma: z=30
+  PASS: import single: 1 entry
+  PASS: import single: value
+  PASS: import empty: 0 entries
+  PASS: import adds to existing
+  PASS: existing preserved
+  PASS: new added
+
+== CxPropertyList parseArgs Tests ==
+  PASS: flag with no arg sets TRUE
+  PASS: flag with arg gets value
+  PASS: multiple: -a is TRUE
+  PASS: multiple: -b has value
+  PASS: remaining: flag parsed
+  PASS: remaining: contains file1
+  PASS: remaining: contains file2
+  PASS: attached value parsed
+  PASS: undefined flag sets $ERROR
+  PASS: missing arg sets $ERROR
+  PASS: empty cmdline: no flags
+  PASS: empty cmdline: no entries
+  PASS: non-flag first goes to *
+  PASS: * contains filename
+
+== CxPropertyList Edge Cases ==
+  PASS: key with dots
+  PASS: value with special chars
+  PASS: key with spaces
+  PASS: very long value
+  PASS: 100 properties
+  PASS: property 50 accessible
+  PASS: property 99 accessible
+  PASS: keys are case-sensitive
+  PASS: Key has value1
+  PASS: KEY has value2
+  PASS: key has value3
+  PASS: value contains equals sign
+
+=================
+Results: 130 passed, 0 failed
+
+=== cxscreen tests ===
+./darwin_arm64/cxscreen_test
+CxScreen Test Suite
+===================
+
+== CxCursor Tests ==
+  PASS: CxCursor ctor
+  PASS: locateTerminalString(0,0) -> ESC[1;1H
+  PASS: locateTerminalString(9,19) -> ESC[10;20H
+  PASS: showTerminalString -> ESC[?25h
+  PASS: hideTerminalString -> ESC[?25l
+  PASS: moveLeftTerminalString(5) -> ESC[5D
+  PASS: moveRightTerminalString(3) -> ESC[3C
+  PASS: moveToColumnTerminalString(0) -> ESC[1G
+  PASS: moveToColumnTerminalString(79) -> ESC[80G
+  PASS: clearToEndOfLineTerminalString -> ESC[K
+  PASS: clearFromPositionDownTerminalString -> ESC[J
+  PASS: savePositionTerminalString -> ESC[s
+  PASS: restorePositionTerminalString -> ESC[u
+
+== CxColor Base Tests ==
+  PASS: CxColor ctor: type is BASE
+  PASS: CxColor terminalString is empty
+
+== CxRGBColor Tests ==
+  PASS: CxRGBColor default: type is RGB_BASE
+  PASS: CxRGBColor(255,128,0): red is 255
+  PASS: CxRGBColor(255,128,0): green is 128
+  PASS: CxRGBColor(255,128,0): blue is 0
+  PASS: CxRGBColor copy ctor preserves values
+  PASS: CxRGBColor assignment preserves values
+
+== CxRGBForegroundColor Tests ==
+  PASS: type is RGB_FOREGROUND
+  PASS: CxRGBForegroundColor(255,0,0): RGB values correct
+  PASS: terminalString -> ESC[38;2;255;128;64m
+  PASS: resetTerminalString -> ESC[39m
+
+== CxRGBBackgroundColor Tests ==
+  PASS: type is RGB_BACKGROUND
+  PASS: terminalString -> ESC[48;2;0;255;128m
+  PASS: resetTerminalString -> ESC[49m
+
+== CxAnsiColor Tests ==
+  PASS: CxAnsiColor: type is ANSI_BASE
+
+== CxAnsiForegroundColor Tests ==
+  PASS: type is ANSI_FOREGROUND
+  PASS: CxAnsiForegroundColor(red): type correct
+  PASS: copy ctor: type preserved
+  PASS: terminalString for 'red' is non-empty
+  PASS: resetTerminalString -> ESC[39m
+
+== CxAnsiBackgroundColor Tests ==
+  PASS: type is ANSI_BACKGROUND
+  PASS: CxAnsiBackgroundColor(blue): type correct
+  PASS: resetTerminalString -> ESC[49m
+
+== CxXterm256Color Tests ==
+  PASS: CxXterm256Color: type is XTERM256_BASE
+
+== CxXterm256ForegroundColor Tests ==
+  PASS: type is XTERM256_FOREGROUND
+  PASS: CxXterm256ForegroundColor(Red): type correct
+  PASS: copy ctor: type preserved
+  PASS: terminalString for 'Red' is non-empty
+  PASS: resetTerminalString -> ESC[39m
+
+== CxXterm256BackgroundColor Tests ==
+  PASS: type is XTERM256_BACKGROUND
+  PASS: CxXterm256BackgroundColor(Green): type correct
+  PASS: resetTerminalString -> ESC[49m
+
+== CxScreen Tests ==
+  PASS: CxScreen::rows() returns non-negative
+  PASS: CxScreen::cols() returns non-negative
+
+===================
+Results: 48 passed, 0 failed
+
+=== cxslist tests ===
+./darwin_arm64/cxslist_test
+CxSList Test Suite
+==================
+
+== Constructor Tests ==
+  PASS: default ctor creates empty list
+  PASS: default ctor empty() returns true
+  PASS: copy ctor copies all entries
+  PASS: copy ctor first item correct
+  PASS: copy ctor last item correct
+  PASS: assignment copies entries
+  PASS: assignment first item correct
+  PASS: assignment second item correct
+  PASS: self-assignment preserves entries
+  PASS: self-assignment preserves data
+
+== Append and Insert Tests ==
+  PASS: append increases entries
+  PASS: append stores correct value
+  PASS: append multiple items
+  PASS: first item correct
+  PASS: second item correct
+  PASS: third item correct
+  PASS: append list merges entries
+  PASS: appended list first item
+  PASS: appended list second item
+  PASS: insertAtHead increases entries
+  PASS: insertAtHead places at head
+  PASS: insertAtHead shifts existing
+  PASS: insertAtHead on empty list
+  PASS: insertAtHead value correct
+  PASS: insertAfter increases entries
+  PASS: insertAfter places correctly
+  PASS: push_back works like append
+
+== Stack Operations Tests ==
+  PASS: push adds items
+  PASS: push adds at end
+  PASS: pop returns last item
+  PASS: pop removes item
+  PASS: peek returns last item
+  PASS: peek doesn't remove item
+  PASS: pop first
+  PASS: pop second
+  PASS: pop third
+  PASS: list empty after all pops
+
+== Access Tests ==
+  PASS: at(0) returns first
+  PASS: at(1) returns second
+  PASS: at(2) returns third
+  PASS: first returns first item
+  PASS: first removes item
+  PASS: first shifts remaining
+  PASS: last returns last item
+  PASS: last removes item
+  PASS: last preserves remaining
+
+== Modification Tests ==
+  PASS: replaceAt changes value
+  PASS: replaceAt doesn't change count
+  PASS: replaceAt middle works
+  PASS: removeAt reduces count
+  PASS: removeAt first shifts items
+  PASS: removeAt middle reduces count
+  PASS: removeAt middle shifts
+  PASS: removeAt last reduces count
+  PASS: removeAt last preserves first
+  PASS: removeAt only item empties list
+  PASS: list is empty after removing only item
+  PASS: clear empties list
+  PASS: empty() true after clear
+  PASS: swap moves first to last
+  PASS: swap moves last to first
+  PASS: swap preserves middle
+
+== Iterator Tests ==
+  PASS: begin() points to first
+  PASS: ++iterator moves to next
+  PASS: iterator traverses all items
+  PASS: iterator == works for equal
+  PASS: iterator != works for different
+  PASS: erase removes item
+  PASS: erase preserves before
+  PASS: erase preserves after
+
+== Sort Tests ==
+  PASS: quickSort first item
+  PASS: quickSort second item
+  PASS: quickSort third item
+  PASS: quickSort preserves sorted first
+  PASS: quickSort preserves sorted last
+  PASS: quickSort reverse first
+  PASS: quickSort reverse last
+  PASS: quickSort single item count
+  PASS: quickSort single item value
+  PASS: quickSort empty list
+
+== Size Methods Tests ==
+  PASS: entries() 0 for empty
+  PASS: size() 0 for empty
+  PASS: entries() 1 after append
+  PASS: size() 1 after append
+  PASS: entries() 2 after second append
+  PASS: size() 2 after second append
+  PASS: empty() true for new list
+  PASS: empty() false after append
+  PASS: empty() true after remove
+
+==================
+Results: 89 passed, 0 failed
+
+=== cxstar tests ===
+./darwin_arm64/cxstar_test
+CxStar Test Suite
+=================
+
+== CxStringMatch Constructor Tests ==
+  PASS: default ctor doesn't crash
+  PASS: string ctor: can find substring
+  PASS: empty string: isNext returns false
+
+== CxStringMatch isNext Tests ==
+  PASS: find single substring
+  PASS: find substring at start
+  PASS: sequence: find first
+  PASS: sequence: find second
+  PASS: sequence: find third
+  PASS: order: find middle first
+  PASS: order: can't find earlier after later
+  PASS: not found: returns false
+  PASS: duplicate: find first
+  PASS: duplicate: find second
+  PASS: overlap: find first aa
+  PASS: overlap: find second aa
+  PASS: case sensitive: lowercase not found
+  PASS: case sensitive: exact case found
+  PASS: single char: a
+  PASS: single char: c
+  PASS: single char: f
+
+== CxMatchTemplate Constructor Tests ==
+  PASS: default ctor: matches nothing
+  PASS: CxString ctor: pattern works
+  PASS: char* ctor: pattern works
+  PASS: copy ctor: pattern works
+  PASS: copy ctor: non-match fails
+  PASS: assignment: pattern works
+  PASS: self-assignment: pattern preserved
+
+== CxMatchTemplate Wildcard Tests ==
+  PASS: * matches anything
+  PASS: * matches file.txt
+  PASS: * matches single char
+  PASS: file*: matches 'file' exactly
+  PASS: file*: matches file.txt
+  PASS: file*: matches filename
+  PASS: file*: doesn't match myfile
+  PASS: file*: doesn't match afile
+  PASS: *.txt: matches file.txt
+  PASS: *.txt: matches a.txt
+  PASS: *.txt: matches .txt
+  PASS: *.txt: doesn't match file.doc
+  PASS: *.txt: doesn't match txt (no dot)
+  PASS: *test*: matches test exactly
+  PASS: *test*: matches testing
+  PASS: *test*: matches mytest
+  PASS: *test*: matches mytesting
+  PASS: *test*: doesn't match tes
+  PASS: a*b*c: matches abc
+  PASS: a*b*c: matches aXbXc
+  PASS: a*b*c: matches aXXXbYYYc
+  PASS: a*b*c: doesn't match ab (no c)
+  PASS: a*b*c: doesn't match bc (no a at start)
+  PASS: a**b: matches ab
+  PASS: a**b: matches aXb
+
+== CxMatchTemplate Exact Match Tests ==
+  PASS: exact: matches same string
+  PASS: exact: doesn't match longer
+  PASS: exact: doesn't match shorter
+  PASS: exact: doesn't match with prefix
+  PASS: exact: doesn't match with suffix
+  PASS: single char: matches x
+  PASS: single char: doesn't match xx (exact only)
+  PASS: single char: doesn't match y
+  PASS: long exact: matches
+  PASS: long exact: doesn't match partial
+  PASS: long exact: doesn't match extended
+
+== CxMatchTemplate Edge Case Tests ==
+  PASS: empty pattern: doesn't match anything
+  PASS: empty pattern: doesn't match empty string
+  PASS: * doesn't match empty candidate
+  PASS: * doesn't match whitespace-only (stripped)
+  PASS: pattern leading spaces: stripped
+  PASS: candidate spaces: stripped
+  PASS: space-only pattern: matches nothing
+  PASS: long pattern: matches
+
+== CxMatchTemplate File Extension Tests ==
+  PASS: *.txt matches readme.txt
+  PASS: *.txt matches NOTES.txt
+  PASS: *.txt case sensitive
+  PASS: *.cpp matches main.cpp
+  PASS: *.cpp doesn't match .c
+  PASS: *.h matches header.h
+  PASS: *.h doesn't match .hpp
+  PASS: test_* matches test_file.txt
+  PASS: test_* matches test_
+  PASS: test_* doesn't match mytest_file
+  PASS: log_*.txt matches log_2024.txt
+  PASS: log_*.txt matches log_.txt
+  PASS: log_*.txt doesn't match .log
+  PASS: log_*.txt doesn't match prefix
+
+== CxMatchTemplate Special Character Tests ==
+  PASS: dots: exact match
+  PASS: dots: no match without dots
+  PASS: numbers: match
+  PASS: numbers: partial doesn't match
+  PASS: underscores: match
+  PASS: underscores: minimal match
+  PASS: hyphens: match
+
+== CxMatchTemplate Regression Tests ==
+  PASS: ab matches ab
+    INFO: 'ab' vs 'abab': NO MATCH
+    INFO: 'ab' vs 'xab': NO MATCH
+    INFO: 'ab' vs 'abx': NO MATCH
+  PASS: no-wildcard shouldn't match with prefix
+  PASS: no-wildcard shouldn't match with suffix
+  PASS: a*a matches aa
+  PASS: a*a matches aba
+  PASS: a*a matches abba
+  PASS: a*a doesn't match single a
+  PASS: a*a doesn't match ab
+  PASS: a*b matches ab
+  PASS: a*b matches aXb
+  PASS: a*b doesn't match ba (wrong order)
+  PASS: a*b doesn't match b (no a)
+  PASS: ** matches anything
+  PASS: *x matches x
+  PASS: *x matches ax
+  PASS: *x doesn't match xa
+  PASS: x* matches x
+  PASS: x* matches xa
+  PASS: x* doesn't match ax
+  PASS: *x* matches x
+  PASS: *x* matches ax
+  PASS: *x* matches xa
+  PASS: *x* matches axa
+  PASS: a*b*c: abc
+  PASS: a*b*c: aXbYc
+  PASS: a*b*c: cba wrong order
+  PASS: a*b*c: acb wrong order
+
+== CxMatchTemplate Case Sensitivity Tests ==
+  PASS: exact case matches
+  PASS: lowercase doesn't match
+  PASS: uppercase doesn't match
+  PASS: mixed case doesn't match
+  PASS: *.TXT matches .TXT
+  PASS: *.TXT doesn't match .txt
+  PASS: *Test* matches myTestFile
+  PASS: *Test* doesn't match mytestfile
+
+=================
+Results: 127 passed, 0 failed
+
+=== cxstring tests ===
+./darwin_arm64/cxstring_test
+CxString Test Suite
+===================
+
+== Constructor Tests ==
+  PASS: default ctor creates null string
+  PASS: default ctor length is 0
+  PASS: char* ctor sets correct length
+  PASS: char* ctor sets correct data
+  PASS: char* ctor with len truncates
+  PASS: char* ctor with len has correct data
+  PASS: char ctor length is 1
+  PASS: char ctor has correct data
+  PASS: int ctor converts correctly
+  PASS: int ctor handles negative
+  PASS: long ctor converts correctly
+  PASS: double ctor creates non-empty string
+  PASS: copy ctor copies data
+  PASS: copy ctor copies length
+  PASS: pointer ctor copies data
+  PASS: pointer ctor with NULL creates null string
+
+== Operator Tests ==
+  PASS: assignment copies data
+  PASS: assignment copies length
+  PASS: self-assignment preserves data
+  PASS: operator+ concatenates
+  PASS: operator+ correct length
+  PASS: operator+ doesn't modify left operand
+  PASS: operator+= appends
+  PASS: operator+= correct length
+  PASS: operator== returns true for equal strings
+  PASS: operator== returns false for different strings
+  PASS: operator!= returns false for equal strings
+  PASS: operator!= returns true for different strings
+  PASS: operator<= returns true for lesser string
+  PASS: operator<= returns true for equal strings
+  PASS: operator<= returns false for greater string
+  PASS: empty + string works
+  PASS: string + empty works
+
+== String Operations Tests ==
+  PASS: append(CxString) works
+  PASS: append(CxString) correct length
+  PASS: append(char) works
+  PASS: append(char) correct length
+  PASS: append to empty string works
+  PASS: insert(CxString, pos) works
+  PASS: insert at beginning works
+  PASS: insert(char, pos) works
+  PASS: remove(start, len) works
+  PASS: remove correct length
+  PASS: remove from beginning works
+  PASS: subString from start works
+  PASS: subString correct length
+  PASS: subString from middle works
+  PASS: subString doesn't modify original
+  PASS: replaceAll replaces all occurrences
+  PASS: replaceAll returns correct count
+  PASS: replaceAll with no match unchanged
+  PASS: replaceAll returns 0 for no matches
+  PASS: replaceAll with longer replacement
+  PASS: replaceAll with shorter replacement
+  PASS: numberOfOccurances counts correctly
+  PASS: numberOfOccurances returns 0 for no matches
+
+== Searching Tests ==
+  PASS: firstChar finds first occurrence
+  PASS: firstChar finds at beginning
+  PASS: firstChar finds at end
+  PASS: firstChar returns -1 for not found
+  PASS: firstChar(charSet) finds delimiter
+  PASS: firstChar(charSet) finds first vowel
+  PASS: firstChar(charSet) returns -1 for not found
+  PASS: firstChar(charSet, delim) finds position
+  PASS: firstChar(charSet, delim) returns delimiter
+  PASS: lastChar finds last occurrence
+  PASS: lastChar finds at beginning
+  PASS: lastChar finds at end
+  PASS: lastChar returns -1 for not found
+  PASS: index finds substring
+  PASS: index finds at beginning
+  PASS: index returns -1 for not found
+  PASS: index with start=0 finds first
+  PASS: index with start=1 finds second
+  PASS: index with start past last returns -1
+  PASS: charAt returns first char
+  PASS: charAt returns last char
+  PASS: charAt returns middle char
+  PASS: charInString returns TRUE when found
+  PASS: charInString returns FALSE when not found
+
+== Tokenizing Tests ==
+  PASS: nextToken returns first token
+  PASS: nextToken leaves delimiter in string
+  PASS: nextToken first of three
+  PASS: nextToken second of three
+  PASS: nextToken third of three
+  PASS: nextToken with delim returns token
+  PASS: nextToken reports which delimiter was found
+  PASS: nextToken returns whole string if no delim
+  PASS: nextToken empties string when no delim
+  PASS: nextToken strips leading delims first
+  PASS: stripLeading removes leading spaces
+  PASS: stripLeading removes multiple char types
+  PASS: stripLeading unchanged when nothing to strip
+  PASS: stripLeading can strip entire string
+  PASS: stripTrailing removes trailing spaces
+  PASS: stripTrailing removes multiple char types
+  PASS: stripTrailing unchanged when nothing to strip
+  PASS: stripTrailing can strip entire string
+  PASS: strip methods can be chained
+
+== Conversion Tests ==
+  PASS: toInt converts positive
+  PASS: toInt converts negative
+  PASS: toInt converts zero
+  PASS: toLong converts positive
+  PASS: toLong converts negative
+  PASS: toUnsignedLong converts large value
+  PASS: toFloat converts decimal
+  PASS: toFloat converts negative
+  PASS: toDouble converts decimal
+  PASS: toDouble converts negative
+  PASS: isInt returns true for valid int
+  PASS: isInt returns true for negative
+  PASS: isInt returns false for float
+  PASS: isInt returns false for text
+  PASS: isInt returns false for mixed
+  PASS: isFloat returns true for decimal
+  PASS: isFloat returns true for integer
+  PASS: isFloat returns true for negative
+  PASS: isFloat returns false for text
+  PASS: setInt sets value
+  PASS: setInt overwrites with negative
+  PASS: setLong sets value
+  PASS: setUnsignedLong sets large value
+  PASS: setDouble sets value
+  PASS: setString copies value
+
+== Static Method Tests ==
+  PASS: toUpper converts lowercase
+  PASS: toUpper converts mixed case
+  PASS: toUpper preserves uppercase
+  PASS: toUpper preserves digits
+  PASS: toLower converts uppercase
+  PASS: toLower converts mixed case
+  PASS: toLower preserves lowercase
+  PASS: toLower preserves digits
+  PASS: netNormalize removes CRLF
+  PASS: netNormalize removes LF
+  PASS: netNormalize removes CR
+  PASS: netNormalize unchanged without newlines
+  PASS: removeCarriageReturns removes all CR
+  PASS: removeCarriageReturns unchanged without CR
+  PASS: urlDecode decodes %20 to space
+  PASS: urlDecode decodes + to space
+  PASS: urlDecode decodes %3D to =
+  PASS: urlDecode unchanged without encoding
+  PASS: hashValue same for equal strings
+  PASS: hashValue different for different strings
+  PASS: compare returns 0 for equal
+  PASS: compare returns negative for lesser
+  PASS: compare returns positive for greater
+  PASS: printf formats int
+  PASS: printf formats strings
+  PASS: findAndReplaceFirst returns position
+  PASS: findAndReplaceFirst replaces first only
+  PASS: findAndReplaceFirst returns -1 for no match
+  PASS: findAndReplaceFirst with startPos finds second
+  PASS: findAndReplaceFirst with startPos replaces correctly
+
+===================
+Results: 154 passed, 0 failed
+
+=== cxthread tests ===
+./darwin_arm64/cxthread_test
+CxThread Test Suite
+===================
+
+== CxMutex Basic Tests ==
+  PASS: mutex ctor doesn't crash
+  PASS: mutex acquire doesn't crash
+  PASS: mutex release doesn't crash
+  PASS: mutex multiple cycles
+  PASS: tryAcquire: acquired when free
+
+== CxMutex Contention Tests ==
+  PASS: mutex protects shared counter
+
+== CxRecursiveMutex Basic Tests ==
+  PASS: recursive mutex ctor doesn't crash
+  PASS: recursive mutex single acquire/release
+  PASS: recursive mutex triple acquire
+  PASS: recursive mutex triple release
+  PASS: recursive mutex 100 acquires/releases
+
+== CxCondition Basic Tests ==
+  PASS: condition ctor doesn't crash
+  PASS: signal without waiter doesn't deadlock
+
+== CxCondition Wait/Signal Tests ==
+  PASS: condition wait/signal
+  PASS: timedWait: got signal
+  PASS: timedWait: flag set
+  PASS: timedWait: timeout
+
+== CxThread Basic Tests ==
+  PASS: thread ctor doesn't crash
+  PASS: thread run() executed
+  PASS: thread not completed immediately
+  PASS: thread completed after join
+
+== CxThread suggestQuit Tests ==
+  PASS: thread ran some iterations
+  PASS: thread stopped after suggestQuit
+  PASS: resetSuggestQuit allows restart
+
+== Multiple Threads Tests ==
+  PASS: multiple threads complete
+
+== CxThreadDuple Tests ==
+  PASS: duple run1 executed
+  PASS: duple run2 executed
+
+== CxRunnable Tests ==
+  PASS: runnable ctor doesn't crash
+  PASS: runnable run() executes
+  PASS: runnable isQuitRequest returns 0
+
+== CxQuitRequest Tests ==
+  PASS: QuitRequest ctor doesn't crash
+  PASS: QuitRequest isQuitRequest returns 1
+  PASS: QuitRequest run() doesn't crash
+
+== CxPCQueue Basic Tests ==
+  PASS: PCQueue ctor doesn't crash
+  PASS: PCQueue single item
+  PASS: PCQueue FIFO: first
+  PASS: PCQueue FIFO: second
+  PASS: PCQueue FIFO: third
+  PASS: PCQueue string: first
+  PASS: PCQueue string: second
+  PASS: PCQueue pointer: first
+  PASS: PCQueue pointer: second
+
+== CxPCQueue Concurrency Tests ==
+  PASS: PCQueue producer/consumer
+  PASS: PCQueue multi-producer
+
+== CxPCQueue Timeout Tests ==
+  PASS: PCQueue deQueue timeout throws
+  PASS: PCQueue enQueue timeout throws
+
+== CxRunnableThread Tests ==
+  PASS: RunnableThread ctor doesn't crash
+  PASS: RunnableThread processed 3 items
+  PASS: RunnableThread not executing before start
+  PASS: RunnableThread isExecuting doesn't crash
+
+== CxThreadPool Tests ==
+  PASS: ThreadPool ctor doesn't start threads
+  PASS: ThreadPool start/quit/join without work
+  PASS: ThreadPool processed all 20 items
+  PASS: ThreadPool high throughput: all 50 items
+  PASS: ThreadPool enqueue after quit throws
+
+===================
+Results: 55 passed, 0 failed
+
+=== cxtime tests ===
+./darwin_arm64/cxtime_test
+CxTime Test Suite
+=================
+
+== CxTime Constructor Tests ==
+  PASS: default ctor >= before
+  PASS: default ctor <= after
+  PASS: epoch ctor stores correct value
+  PASS: component ctor year
+  PASS: component ctor month
+  PASS: component ctor day
+  PASS: component ctor hour
+  PASS: component ctor minute
+  PASS: component ctor second
+  PASS: copy ctor copies value
+  PASS: copy ctor year matches
+  PASS: epoch 0 stored correctly
+
+== CxTime Accessor Tests ==
+  PASS: year accessor
+  PASS: month accessor
+  PASS: day accessor
+  PASS: hour accessor
+  PASS: minute accessor
+  PASS: second accessor
+  PASS: midnight hour
+  PASS: midnight minute
+  PASS: midnight second
+  PASS: end of day hour
+  PASS: end of day minute
+  PASS: end of day second
+  PASS: January is month 1
+  PASS: December is month 12
+
+== CxTime Offset Tests ==
+  PASS: offsetSeconds adds 30
+  PASS: offsetSeconds result
+  PASS: offsetSeconds negative
+  PASS: offsetMinutes adds 5 min
+  PASS: offsetMinutes result
+  PASS: offsetHours adds 3 hr
+  PASS: offsetHours result
+  PASS: offsetDays adds 1 day
+  PASS: offsetDays result
+  PASS: offsetDays crosses to February
+  PASS: offsetDays day is 1
+  PASS: offsetHours negative crosses day
+  PASS: offsetHours negative hour
+
+== CxTime Compare/Assign Tests ==
+  PASS: equal times compare equal
+  PASS: different times not equal
+  PASS: assignment copies value
+  PASS: assignment year
+  PASS: self-assignment preserves value
+
+== CxTime::now Tests ==
+  PASS: now() >= system time before
+  PASS: now() <= system time after
+  PASS: consecutive now() non-decreasing
+
+== CxTime String Tests ==
+  PASS: asString returns non-empty
+  PASS: asString contains year
+  PASS: formatted string YYYY-MM-DD
+  PASS: formatted string HH:MM:SS
+  PASS: formatted full datetime
+  PASS: formatted weekday non-empty
+
+== CxTime::monthNumber Tests ==
+  PASS: jan = 1
+  PASS: feb = 2
+  PASS: mar = 3
+  PASS: apr = 4
+  PASS: may = 5
+  PASS: jun = 6
+  PASS: jul = 7
+  PASS: aug = 8
+  PASS: sep = 9
+  PASS: oct = 10
+  PASS: nov = 11
+  PASS: dec = 12
+  PASS: JAN uppercase = 1
+  PASS: Jan mixed case = 1
+  PASS: DEC uppercase = 12
+  PASS: invalid month = -1
+  PASS: empty string = -1
+
+== CxTime Day Boundary Tests ==
+  PASS: first second year
+  PASS: first second month
+  PASS: first second day
+  PASS: first second hour
+  PASS: first second minute
+  PASS: first second second
+  PASS: last second year
+  PASS: last second month
+  PASS: last second day
+  PASS: last second hour
+  PASS: last second minute
+  PASS: last second second
+  PASS: first and last same day
+  PASS: last > first
+  PASS: difference is 86399 sec
+
+== CxTime::formatTimeLength Tests ==
+  PASS: zero duration
+  PASS: 30 seconds
+  PASS: 5 minutes
+  PASS: 30 seconds in duration
+  PASS: hours in duration
+  PASS: 30 minutes in duration
+  PASS: 45 seconds in duration
+
+== CxTime Edge Cases ==
+  PASS: leap year 2020
+  PASS: February
+  PASS: 29th day
+  PASS: Y2K year
+  PASS: future year 2035
+  PASS: January 31
+  PASS: April 30
+  PASS: epoch seconds round-trip
+
+=================
+Results: 100 passed, 0 failed
+
+=== cxtz tests ===
+./darwin_arm64/cxtz_test
+CxDateTime Test Suite
+=====================
+
+== CxDateTime Constructor Tests ==
+  PASS: default constructor: epochSeconds is positive
+  PASS: default constructor: timezone name is set
+  PASS: epoch constructor: preserves epoch seconds
+  PASS: parts constructor: year correct
+  PASS: parts constructor: month correct
+  PASS: parts constructor: day correct
+  PASS: parts constructor: hour correct
+  PASS: parts constructor: minute correct
+  PASS: parts constructor: second correct
+  PASS: string constructor: year correct
+  PASS: string constructor: month correct
+  PASS: string constructor: day correct
+  PASS: string constructor: hour correct
+
+== CxDateTime Copy/Assignment Tests ==
+  PASS: copy constructor: epoch matches
+  PASS: copy constructor: equality operator works
+  PASS: assignment: epoch matches
+  PASS: assignment: equality operator works
+  PASS: self-assignment: preserved
+
+== CxDateTime Timezone Tests ==
+  PASS: UTC timezone: name contains UTC
+  PASS: named timezone: date preserved
+  PASS: local timezone: has a name
+  PASS: timeZone(): returns correct zone
+
+== CxDateTime Breakdown Tests ==
+  PASS: breakdown: year
+  PASS: breakdown: month
+  PASS: breakdown: day
+  PASS: breakdown: hour
+  PASS: breakdown: minute
+  PASS: breakdown: second
+  PASS: breakdown with timezone: hour offset correctly
+
+== CxDateTime Offset Tests ==
+  PASS: offsetYears: adds years correctly
+  PASS: offsetMonths: adds months correctly
+  PASS: offsetDays: adds days correctly
+  PASS: offsetHours: adds hours correctly
+  PASS: offsetMinutes: adds minutes correctly
+  PASS: offsetSeconds: adds seconds correctly
+  PASS: offsetDays negative: subtracts correctly
+  PASS: offsetDays: handles month rollover
+
+== CxDateTime Format Tests ==
+  PASS: format default: contains date
+  PASS: format default: contains time
+  PASS: format custom: date only
+  PASS: format custom: time only
+  PASS: format custom: weekday
+
+== CxDateTime Static Method Tests ==
+  PASS: now_epochSeconds: returns reasonable value
+  PASS: now_tp: returns valid time_point
+  PASS: firstSecondOfTheDay: date preserved
+  PASS: firstSecondOfTheDay: time is 00:00:00
+  PASS: lastSecondOfTheDay: date preserved
+  PASS: lastSecondOfTheDay: time is 23:59:59
+  PASS: formatTimeLength: hours correct
+  PASS: formatTimeLength: minutes correct
+  PASS: formatTimeLength: seconds correct
+  PASS: formatTimeLength: seconds only
+  PASS: formatTimeLength: zero duration
+
+== CxDateTime Edge Case Tests ==
+  PASS: leap year: Feb 29 valid in 2020
+  PASS: non-leap year: Feb 29 normalizes to Mar 1
+  PASS: year boundary: rollover works
+  PASS: epoch zero: 1970-01-01 00:00:00 UTC
+  PASS: midnight: 00:00:00 preserved
+
+== CxDateTime::zoneNameToZone Tests ==
+  PASS: valid timezone: LA loads correctly
+  PASS: valid timezone: London loads correctly
+  PASS: empty string: returns local timezone
+
+=====================
+Results: 61 passed, 0 failed
+
+========================================
+All tests completed for: darwin_arm64
+========================================
