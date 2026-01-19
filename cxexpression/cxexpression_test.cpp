@@ -1244,6 +1244,98 @@ void testExpressionCustomVariables() {
 }
 
 //-----------------------------------------------------------------------------------------
+// Test setVariableDatabase() - setting database after construction
+//-----------------------------------------------------------------------------------------
+void testExpressionSetVariableDatabase() {
+    printf("\n== CxExpression setVariableDatabase Tests ==\n");
+
+    TestVariableDatabase *varDb = new TestVariableDatabase();
+    double result;
+
+    // Create expression without variable database, then set it
+    {
+        CxExpression expr("x+y");
+        // Set the variable database after construction
+        expr.setVariableDatabase(varDb);
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse after setVariableDatabase: x+y");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval after setVariableDatabase: x+y");
+        check(doubleEqual(result, 30.0), "x+y = 30 after setVariableDatabase");
+    }
+
+    // Create expression with NULL database initially, then set custom database
+    {
+        CxExpression expr("x*2", NULL, NULL);
+        expr.setVariableDatabase(varDb);
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse x*2 after setVariableDatabase");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval x*2 after setVariableDatabase");
+        check(doubleEqual(result, 20.0), "x*2 = 20 after setVariableDatabase");
+    }
+
+    // Parse first, then set database before evaluation
+    // This simulates the spreadsheet use case where formulas are parsed once
+    // and the database is set before each evaluation
+    {
+        CxExpression expr("x+5");
+        expr.setVariableDatabase(varDb);
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse x+5");
+
+        // First evaluation
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "first eval x+5");
+        check(doubleEqual(result, 15.0), "first eval x+5 = 15");
+
+        // Re-evaluate (simulating recalculation)
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "second eval x+5");
+        check(doubleEqual(result, 15.0), "second eval x+5 = 15");
+    }
+
+    // Test changing database between evaluations
+    // This tests if variable values are looked up fresh during each Evaluate()
+    // This is the key feature for spreadsheet recalculation
+    {
+        // Create a second database with different values
+        class AltVariableDatabase : public CxExpressionVariableDatabase {
+        public:
+            returnCode VariableDefined(CxString name) {
+                if (name == "x") return VARIABLE_DEFINED;
+                return VARIABLE_UNDEFINED;
+            }
+            returnCode VariableEvaluate(CxString name, double *result) {
+                if (name == "x") { *result = 100.0; return VARIABLE_DEFINED; }
+                return VARIABLE_UNDEFINED;
+            }
+        };
+
+        AltVariableDatabase *altDb = new AltVariableDatabase();
+
+        CxExpression expr("x");
+        expr.setVariableDatabase(varDb);  // varDb has x=10
+        expr.Parse();
+
+        // First evaluation with original database
+        expr.Evaluate(&result);
+        check(doubleEqual(result, 10.0), "x = 10 with first database");
+
+        // Change database and re-evaluate - should use new values
+        expr.setVariableDatabase(altDb);  // altDb has x=100
+        expr.Evaluate(&result);
+        check(doubleEqual(result, 100.0), "x = 100 after changing database");
+
+        delete altDb;
+    }
+
+    // Test setting database after construction, before parse (spreadsheet pattern)
+    {
+        CxExpression expr("x*y+5");
+        expr.setVariableDatabase(varDb);
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse x*y+5 with db set before parse");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval x*y+5");
+        check(doubleEqual(result, 205.0), "x*y+5 = 10*20+5 = 205");
+    }
+
+    delete varDb;
+}
+
+//-----------------------------------------------------------------------------------------
 // Custom function database test
 //-----------------------------------------------------------------------------------------
 class TestFunctionDatabase : public CxExpressionFunctionDatabase {
@@ -1343,6 +1435,9 @@ int main(int argc, char **argv) {
     // Custom database tests
     testExpressionCustomVariables();
     testExpressionCustomFunctions();
+
+    // setVariableDatabase tests (new functionality)
+    testExpressionSetVariableDatabase();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
