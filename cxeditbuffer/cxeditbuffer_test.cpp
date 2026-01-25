@@ -878,6 +878,270 @@ void testTabHandling() {
 }
 
 //-----------------------------------------------------------------------------------------
+// Multi-line find and replace tests
+//-----------------------------------------------------------------------------------------
+void testMultiLineFind() {
+    printf("\n== Multi-Line Find Tests ==\n");
+
+    // find "dat\n" - segment at end of line with trailing newline
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("file.dat\nnextline");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("dat\n"));
+        check(found, "find 'dat\\n' found in buffer");
+        check(buffer.cursor.row == 0, "find 'dat\\n' cursor on row 0");
+        check(buffer.cursor.col == 5, "find 'dat\\n' cursor at col 5 (start of 'dat')");
+    }
+
+    // find "\ntime" - empty first segment, match at start of next line
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("prev\ntimestamp");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("\ntime"));
+        check(found, "find '\\ntime' found in buffer");
+        check(buffer.cursor.row == 0, "find '\\ntime' cursor on row 0");
+        check(buffer.cursor.col == 4, "find '\\ntime' cursor at col 4 (EOL of 'prev')");
+    }
+
+    // find "\n\n" - matches a blank line (EOL + empty line + next line boundary)
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("foo\n\nbar");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("\n\n"));
+        check(found, "find '\\n\\n' found in buffer with blank line");
+        check(buffer.cursor.row == 0, "find '\\n\\n' cursor on row 0");
+        check(buffer.cursor.col == 3, "find '\\n\\n' cursor at col 3 (EOL of 'foo')");
+    }
+
+    // find "line1\nline2" - multi-word across two lines
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("aaa line1\nline2 bbb\nother");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("line1\nline2"));
+        check(found, "find 'line1\\nline2' found across lines");
+        check(buffer.cursor.row == 0, "find cross-line cursor on row 0");
+        check(buffer.cursor.col == 4, "find cross-line cursor at start of 'line1'");
+    }
+
+    // find across three lines
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("header\nmiddle\nfooter\nend");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("header\nmiddle\nfooter"));
+        check(found, "find across 3 lines found");
+        check(buffer.cursor.row == 0, "find 3-line cursor on row 0");
+        check(buffer.cursor.col == 0, "find 3-line cursor at col 0");
+    }
+
+    // find not found - segment doesn't match end of line
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("file.txt\nnextline");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("dat\n"));
+        check(!found, "find 'dat\\n' not found when line ends with .txt");
+    }
+
+    // find not found - not enough lines in buffer
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("onlyline");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("only\n"));
+        check(!found, "find with trailing newline not found in single-line buffer");
+    }
+
+    // find not found - middle segment doesn't match entire line
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("header\nmiddle extra\nfooter");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("header\nmiddle\nfooter"));
+        check(!found, "find fails when middle segment doesn't match entire line");
+    }
+
+    // find not found - last segment doesn't match start of last line
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("header\nXfooter");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("header\nfooter"));
+        check(!found, "find fails when last segment doesn't match start");
+    }
+
+    // findAgain skips current match
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("aa\nbb\naa\nbb");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("aa\nbb"));
+        check(found, "first find 'aa\\nbb' found");
+        check(buffer.cursor.row == 0, "first find at row 0");
+
+        found = buffer.findAgain(CxString("aa\nbb"), TRUE);
+        check(found, "findAgain 'aa\\nbb' finds second occurrence");
+        check(buffer.cursor.row == 2, "findAgain at row 2");
+    }
+
+    // find with empty last segment at end of buffer - should not match
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("lastline");
+        buffer.cursorGotoRequest(0, 0);
+        int found = buffer.findString(CxString("lastline\n"));
+        check(!found, "find 'lastline\\n' not found at end of buffer (no trailing newline)");
+    }
+}
+
+
+void testMultiLineReplace() {
+    printf("\n== Multi-Line Replace Tests ==\n");
+
+    // Example A: "find: .dat\n" replace: "todd" - join lines
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("file.dat\nnextline");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString(".dat\n"));
+        buffer.replaceString(CxString(".dat\n"), CxString("todd"));
+        check(buffer.numberOfLines() == 1, "replace joins lines: 1 line");
+        check(strcmp(buffer.line(0)->data(), "filetoddnextline") == 0,
+              "replace join result: 'filetoddnextline'");
+    }
+
+    // Example B: "find: \ntime" replace: "\ntodd" - preserve lines, replace start
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("prev\ntimestamp");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("\ntime"));
+        buffer.replaceString(CxString("\ntime"), CxString("\ntodd"));
+        check(buffer.numberOfLines() == 2, "replace preserves 2 lines");
+        check(strcmp(buffer.line(0)->data(), "prev") == 0,
+              "replace preserve first line: 'prev'");
+        check(strcmp(buffer.line(1)->data(), "toddstamp") == 0,
+              "replace preserve second line: 'toddstamp'");
+    }
+
+    // Example C: "find: \n\n" replace: "\n" - remove blank line
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("foo\n\nbar");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("\n\n"));
+        buffer.replaceString(CxString("\n\n"), CxString("\n"));
+        check(buffer.numberOfLines() == 2, "replace removes blank line: 2 lines");
+        check(strcmp(buffer.line(0)->data(), "foo") == 0,
+              "remove blank line first: 'foo'");
+        check(strcmp(buffer.line(1)->data(), "bar") == 0,
+              "remove blank line second: 'bar'");
+    }
+
+    // Replace with empty string - delete matched region (join lines)
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("hello\nworld");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("lo\nwor"));
+        buffer.replaceString(CxString("lo\nwor"), CxString(""));
+        check(buffer.numberOfLines() == 1, "empty replace joins: 1 line");
+        check(strcmp(buffer.line(0)->data(), "helld") == 0,
+              "empty replace result: 'helld'");
+    }
+
+    // Replace multi-line with longer multi-line
+    // "aaa\nbbb" matches lines 0-1 entirely; "ccc" on line 2 is not part of the match
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("aaa\nbbb\nccc");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("aaa\nbbb"));
+        buffer.replaceString(CxString("aaa\nbbb"), CxString("xxx\nyyy\nzzz"));
+        check(buffer.numberOfLines() == 4, "replace expands: 4 lines");
+        check(strcmp(buffer.line(0)->data(), "xxx") == 0, "expand first: 'xxx'");
+        check(strcmp(buffer.line(1)->data(), "yyy") == 0, "expand middle: 'yyy'");
+        check(strcmp(buffer.line(2)->data(), "zzz") == 0, "expand last: 'zzz'");
+        check(strcmp(buffer.line(3)->data(), "ccc") == 0, "expand preserved: 'ccc'");
+    }
+
+    // Replace single-segment (join) preserving prefix and suffix
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("prefix_end\nstart_suffix");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("end\nstart"));
+        buffer.replaceString(CxString("end\nstart"), CxString("JOINED"));
+        check(buffer.numberOfLines() == 1, "join with prefix/suffix: 1 line");
+        check(strcmp(buffer.line(0)->data(), "prefix_JOINED_suffix") == 0,
+              "join result: 'prefix_JOINED_suffix'");
+    }
+
+    // replaceAgain - cursor not at match just does findAgain
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("aa\nbb\naa\nbb");
+        buffer.cursorGotoRequest(0, 0);
+        // cursor is at (0,0) which is not at a match for "aa\nbb" (would need to be at col 0 but
+        // seg0="aa" must be at end of line, which it is since line is "aa")
+        // Actually for "aa\nbb", seg0="aa" must match at end of line 0, and seg1="bb" at start of line 1
+        // Line 0 is "aa" (length 2), so endPos = 2-2 = 0. matchCol = 0.
+        // So cursor at (0,0) IS at the match. Let's adjust:
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("aa\nbb"));
+        // Now replace
+        buffer.replaceString(CxString("aa\nbb"), CxString("XX\nYY"));
+        check(strcmp(buffer.line(0)->data(), "XX") == 0, "replaceAgain first: 'XX'");
+        check(strcmp(buffer.line(1)->data(), "YY") == 0, "replaceAgain second: 'YY'");
+    }
+
+    // Replace at various positions in the buffer (not at start)
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("keep\nfind_end\nfind_start\nkeep");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("end\nfind"));
+        // cursor should be on row 1, at the 'e' of "end"
+        check(buffer.cursor.row == 1, "find in middle: cursor row 1");
+        buffer.replaceString(CxString("end\nfind"), CxString("REPLACED"));
+        check(buffer.numberOfLines() == 3, "replace in middle: 3 lines");
+        check(strcmp(buffer.line(0)->data(), "keep") == 0, "middle replace line 0 unchanged");
+        check(strcmp(buffer.line(1)->data(), "find_REPLACED_start") == 0,
+              "middle replace line 1: 'find_REPLACED_start'");
+        check(strcmp(buffer.line(2)->data(), "keep") == 0, "middle replace line 2 unchanged");
+    }
+
+    // Replace multiple occurrences sequentially
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("a\nb\na\nb\na\nb");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("a\nb"));
+        buffer.replaceString(CxString("a\nb"), CxString("X"));
+        // After first replace: "X\na\nb\na\nb" -> cursor finds next match
+        check(strcmp(buffer.line(0)->data(), "X") == 0, "sequential replace 1st line");
+        // The findAgain should have found the next occurrence
+    }
+
+    // Trailing newline in find: "line\n" with single-line buffer after
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("first\nsecond\nthird");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.findString(CxString("first\n"));
+        buffer.replaceString(CxString("first\n"), CxString(""));
+        check(strcmp(buffer.line(0)->data(), "second") == 0,
+              "trailing newline replace removes first line");
+        check(buffer.numberOfLines() == 2, "trailing newline replace: 2 lines remain");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -892,6 +1156,8 @@ int main(int argc, char **argv) {
     testMarkAndCut();
     testInsertAndPaste();
     testFindAndReplace();
+    testMultiLineFind();
+    testMultiLineReplace();
     testLoadFromString();
     testStatusMethods();
     testPositionEvaluation();
