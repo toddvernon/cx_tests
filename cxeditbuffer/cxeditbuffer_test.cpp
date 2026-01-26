@@ -331,6 +331,33 @@ void testLineAccess() {
         check(buffer.numberOfLines() == 2, "return creates 2 lines");
     }
 
+    // characterCount - basic
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("hello");
+        // "hello" = 5 chars + 1 newline = 6
+        check(buffer.characterCount() == 6, "characterCount: 'hello' = 6 (5 + newline)");
+    }
+
+    // characterCount - multiple lines
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("ab\ncd\nef");
+        // "ab" + newline + "cd" + newline + "ef" + newline = 2+1+2+1+2+1 = 9
+        check(buffer.characterCount() == 9, "characterCount: 'ab\\ncd\\nef' = 9");
+    }
+
+    // characterCount - excludes tab extensions (0xFF)
+    {
+        CxEditBuffer buffer(4);  // 4-space tabs
+        buffer.addCharacter('a');
+        buffer.addTab();  // tab at col 1 expands to cols 1,2,3 (3 chars: 1 tab + 2 extensions)
+        buffer.addCharacter('b');
+        // Internal: "a" + tab + 0xFF + 0xFF + "b" = 5 raw chars
+        // Logical: "a" + tab + "b" + newline = 4 chars
+        check(buffer.characterCount() == 4, "characterCount excludes tab extensions");
+    }
+
     // characterAt
     {
         CxEditBuffer buffer;
@@ -547,6 +574,51 @@ void testFindAndReplace() {
         // Returns true because there's another "ll" in the second "hello"
         check(foundNext, "replaceString returns true when more matches exist");
         check(strcmp(buffer.line(0)->data(), "heLLo hello") == 0, "first replaceString works");
+    }
+
+    // replace-all where replacement contains find string (regression test for infinite loop)
+    // This tests that cursor advances past replacement to avoid re-finding within it
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("// comment\n// another");
+        buffer.cursorGotoRequest(0, 0);
+
+        // Simulate replace-all: loop until no more matches
+        // Note: replaceAgain returns TRUE if NEXT match found, FALSE otherwise
+        // So for N occurrences, we get N-1 TRUE returns + 1 FALSE (loop exit)
+        int count = 0;
+        int maxIterations = 100;  // safety limit
+        while (buffer.replaceAgain("//", "///") && count < maxIterations) {
+            count++;
+        }
+
+        // 2 occurrences: 1st replace returns TRUE (found 2nd), 2nd returns FALSE → count=1
+        check(count == 1, "replace-all with overlapping pattern: 1 TRUE return for 2 occurrences");
+        check(count < maxIterations, "replace-all terminates (no infinite loop)");
+        check(strcmp(buffer.line(0)->data(), "/// comment") == 0,
+              "replace-all line 0: '/// comment'");
+        check(strcmp(buffer.line(1)->data(), "/// another") == 0,
+              "replace-all line 1: '/// another'");
+    }
+
+    // replace-all on single line with multiple adjacent matches
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("////");  // two adjacent "//" patterns
+        buffer.cursorGotoRequest(0, 0);
+
+        int count = 0;
+        int maxIterations = 100;
+        while (buffer.replaceAgain("//", "///") && count < maxIterations) {
+            count++;
+        }
+
+        // 2 occurrences: 1st replace returns TRUE (found 2nd), 2nd returns FALSE → count=1
+        check(count == 1, "adjacent patterns: 1 TRUE return for 2 occurrences");
+        check(count < maxIterations, "adjacent patterns: terminates");
+        // "////" -> "/////" (first //) -> "//////" (second //)
+        check(strcmp(buffer.line(0)->data(), "//////") == 0,
+              "adjacent replace result: '//////'");
     }
 }
 
