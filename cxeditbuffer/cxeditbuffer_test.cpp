@@ -358,6 +358,68 @@ void testLineAccess() {
         check(buffer.characterCount() == 4, "characterCount excludes tab extensions");
     }
 
+    // detab - convert tabs to spaces
+    {
+        CxEditBuffer buffer(4);  // 4-space tabs
+        buffer.addCharacter('\t');  // tab at col 0 = 4 chars internal
+        buffer.addCharacter('x');
+        buffer.detab();
+        CxString *line = buffer.line(0);
+        // tab + extensions should become 4 spaces
+        check(line->length() == 5, "detab: line length is 5 (4 spaces + x)");
+        check(line->charAt(0) == ' ', "detab: char 0 is space");
+        check(line->charAt(3) == ' ', "detab: char 3 is space");
+        check(line->charAt(4) == 'x', "detab: char 4 is x");
+    }
+
+    // entab - convert leading spaces to tabs
+    {
+        CxEditBuffer buffer(4);  // 4-space tabs
+        buffer.loadTextFromString("    hello");  // 4 leading spaces
+        buffer.entab();
+        CxString *line = buffer.line(0);
+        // 4 spaces should become tab + 3 extensions (0xFF)
+        check(line->charAt(0) == '\t', "entab: char 0 is tab");
+        check((unsigned char)line->charAt(1) == 0xFF, "entab: char 1 is 0xFF extension");
+        check((unsigned char)line->charAt(2) == 0xFF, "entab: char 2 is 0xFF extension");
+        check((unsigned char)line->charAt(3) == 0xFF, "entab: char 3 is 0xFF extension");
+        check(line->charAt(4) == 'h', "entab: char 4 is h");
+    }
+
+    // entab - partial leading spaces stay as spaces
+    {
+        CxEditBuffer buffer(4);  // 4-space tabs
+        buffer.loadTextFromString("  hi");  // 2 leading spaces (not enough for tab)
+        buffer.entab();
+        CxString *line = buffer.line(0);
+        check(line->charAt(0) == ' ', "entab partial: char 0 is space");
+        check(line->charAt(1) == ' ', "entab partial: char 1 is space");
+        check(line->charAt(2) == 'h', "entab partial: char 2 is h");
+    }
+
+    // entab - 8 spaces becomes 2 tabs
+    {
+        CxEditBuffer buffer(4);  // 4-space tabs
+        buffer.loadTextFromString("        code");  // 8 leading spaces
+        buffer.entab();
+        CxString *line = buffer.line(0);
+        check(line->charAt(0) == '\t', "entab 8 spaces: first tab");
+        check(line->charAt(4) == '\t', "entab 8 spaces: second tab");
+        check(line->charAt(8) == 'c', "entab 8 spaces: code starts at 8");
+    }
+
+    // detab then entab roundtrip
+    {
+        CxEditBuffer buffer(4);
+        buffer.addCharacter('\t');
+        buffer.addCharacter('x');
+        buffer.detab();  // tab -> spaces
+        buffer.entab();  // spaces -> tab
+        CxString *line = buffer.line(0);
+        check(line->charAt(0) == '\t', "roundtrip: char 0 is tab after detab+entab");
+        check(line->charAt(4) == 'x', "roundtrip: x at position 4");
+    }
+
     // characterAt
     {
         CxEditBuffer buffer;
