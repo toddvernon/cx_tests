@@ -1,9 +1,10 @@
 ========================================
-Running cx_tests for: darwin_arm64
+Running cx_tests for: linux_x86_64
 ========================================
 
 === cxb64 tests ===
-./darwin_arm64/cxb64_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxb64'
+./linux_x86_64/cxb64_test
 CxB64 Test Suite
 ================
 
@@ -62,9 +63,11 @@ CxB64 Test Suite
 
 ================
 Results: 35 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxb64'
 
 === cxcallback tests ===
-./darwin_arm64/cxcallback_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxcallback'
+./linux_x86_64/cxcallback_test
 CxCallback Test Suite
 =====================
 
@@ -155,9 +158,11 @@ CxCallback Test Suite
 
 =====================
 Results: 63 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxcallback'
 
 === cxdatetime tests ===
-./darwin_arm64/cxdatetime_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdatetime'
+./linux_x86_64/cxdatetime_test
 CxDateTime Test Suite
 =====================
 
@@ -251,9 +256,11 @@ CxDateTime Test Suite
 
 =====================
 Results: 72 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdatetime'
 
 === cxdirectory tests ===
-./darwin_arm64/cxdirectory_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdirectory'
+./linux_x86_64/cxdirectory_test
 CxDirectory Test Suite
 ======================
 
@@ -343,9 +350,11 @@ CxDirectory Test Suite
 
 ======================
 Results: 62 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdirectory'
 
 === cxeditbuffer tests ===
-./darwin_arm64/cxeditbuffer_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxeditbuffer'
+./linux_x86_64/cxeditbuffer_test
 CxEditBuffer Test Suite
 =======================
 
@@ -416,6 +425,26 @@ CxEditBuffer Test Suite
   PASS: empty buffer has 0 lines
   PASS: one char creates 1 line
   PASS: return creates 2 lines
+  PASS: characterCount: 'hello' = 6 (5 + newline)
+  PASS: characterCount: 'ab\ncd\nef' = 9
+  PASS: characterCount excludes tab extensions
+  PASS: detab: line length is 5 (4 spaces + x)
+  PASS: detab: char 0 is space
+  PASS: detab: char 3 is space
+  PASS: detab: char 4 is x
+  PASS: entab: char 0 is tab
+  PASS: entab: char 1 is 0xFF extension
+  PASS: entab: char 2 is 0xFF extension
+  PASS: entab: char 3 is 0xFF extension
+  PASS: entab: char 4 is h
+  PASS: entab partial: char 0 is space
+  PASS: entab partial: char 1 is space
+  PASS: entab partial: char 2 is h
+  PASS: entab 8 spaces: first tab
+  PASS: entab 8 spaces: second tab
+  PASS: entab 8 spaces: code starts at 8
+  PASS: roundtrip: char 0 is tab after detab+entab
+  PASS: roundtrip: x at position 4
   PASS: characterAt(0,0) correct
   PASS: characterAt(0,1) correct
   PASS: characterAt(0,2) correct
@@ -453,6 +482,68 @@ CxEditBuffer Test Suite
   PASS: replaceString replaces text
   PASS: replaceString returns true when more matches exist
   PASS: first replaceString works
+  PASS: replace-all with overlapping pattern: 1 TRUE return for 2 occurrences
+  PASS: replace-all terminates (no infinite loop)
+  PASS: replace-all line 0: '/// comment'
+  PASS: replace-all line 1: '/// another'
+  PASS: adjacent patterns: 1 TRUE return for 2 occurrences
+  PASS: adjacent patterns: terminates
+  PASS: adjacent replace result: '//////'
+
+== Multi-Line Find Tests ==
+  PASS: find 'dat\n' found in buffer
+  PASS: find 'dat\n' cursor on row 0
+  PASS: find 'dat\n' cursor at col 5 (start of 'dat')
+  PASS: find '\ntime' found in buffer
+  PASS: find '\ntime' cursor on row 0
+  PASS: find '\ntime' cursor at col 4 (EOL of 'prev')
+  PASS: find '\n\n' found in buffer with blank line
+  PASS: find '\n\n' cursor on row 0
+  PASS: find '\n\n' cursor at col 3 (EOL of 'foo')
+  PASS: find 'line1\nline2' found across lines
+  PASS: find cross-line cursor on row 0
+  PASS: find cross-line cursor at start of 'line1'
+  PASS: find across 3 lines found
+  PASS: find 3-line cursor on row 0
+  PASS: find 3-line cursor at col 0
+  PASS: find 'dat\n' not found when line ends with .txt
+  PASS: find with trailing newline not found in single-line buffer
+  PASS: find fails when middle segment doesn't match entire line
+  PASS: find fails when last segment doesn't match start
+  PASS: first find 'aa\nbb' found
+  PASS: first find at row 0
+  PASS: findAgain 'aa\nbb' finds second occurrence
+  PASS: findAgain at row 2
+  PASS: find 'lastline\n' not found at end of buffer (no trailing newline)
+
+== Multi-Line Replace Tests ==
+  PASS: replace joins lines: 1 line
+  PASS: replace join result: 'filetoddnextline'
+  PASS: replace preserves 2 lines
+  PASS: replace preserve first line: 'prev'
+  PASS: replace preserve second line: 'toddstamp'
+  PASS: replace removes blank line: 2 lines
+  PASS: remove blank line first: 'foo'
+  PASS: remove blank line second: 'bar'
+  PASS: empty replace joins: 1 line
+  PASS: empty replace result: 'helld'
+  PASS: replace expands: 4 lines
+  PASS: expand first: 'xxx'
+  PASS: expand middle: 'yyy'
+  PASS: expand last: 'zzz'
+  PASS: expand preserved: 'ccc'
+  PASS: join with prefix/suffix: 1 line
+  PASS: join result: 'prefix_JOINED_suffix'
+  PASS: replaceAgain first: 'XX'
+  PASS: replaceAgain second: 'YY'
+  PASS: find in middle: cursor row 1
+  PASS: replace in middle: 3 lines
+  PASS: middle replace line 0 unchanged
+  PASS: middle replace line 1: 'find_REPLACED_start'
+  PASS: middle replace line 2 unchanged
+  PASS: sequential replace 1st line
+  PASS: trailing newline replace removes first line
+  PASS: trailing newline replace: 2 lines remain
 
 == Load From String Tests ==
   PASS: loadTextFromString creates line
@@ -529,10 +620,12 @@ CxEditBuffer Test Suite
   PASS: cursor never on tab ext during traversal
 
 =======================
-Results: 155 passed, 0 failed
+Results: 233 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxeditbuffer'
 
 === cxexpression tests ===
-./darwin_arm64/cxexpression_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxexpression'
+./linux_x86_64/cxexpression_test
 CxExpression Test Suite
 =======================
 
@@ -3323,11 +3416,151 @@ result[0]=0.000000
   PASS: eval: DOUBLE(SIN(0))
   PASS: DOUBLE(SIN(0)) = 0
 
+== CxExpression setVariableDatabase Tests ==
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its a + sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (y)
+- ParseToTokens: variable (y) not found in intrinsic database
+- ParseToTokens: variable (y) found in user database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(VAR=y) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(VAR=y) 
+- CheckSyntax2: got current token --> TOKEN(VAR=y) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse after setVariableDatabase: x+y
+-----[ EVALUATION ]------------------------------
+  PASS: eval after setVariableDatabase: x+y
+  PASS: x+y = 30 after setVariableDatabase
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its a * sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(2.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=2.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=2.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse x*2 after setVariableDatabase
+-----[ EVALUATION ]------------------------------
+  PASS: eval x*2 after setVariableDatabase
+  PASS: x*2 = 20 after setVariableDatabase
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse x+5
+-----[ EVALUATION ]------------------------------
+  PASS: first eval x+5
+  PASS: first eval x+5 = 15
+  PASS: second eval x+5
+  PASS: second eval x+5 = 15
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+-----[ EVALUATION ]------------------------------
+  PASS: x = 10 with first database
+-----[ EVALUATION ]------------------------------
+  PASS: x = 100 after changing database
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (x)
+- ParseToTokens: variable (x) not found in intrinsic database
+- ParseToTokens: variable (x) found in user database
+- ParseToTokens: its a * sign
+- ParseToTokens: looks like a function or variable name
+- ParseToTokens: its a variable (y)
+- ParseToTokens: variable (y) not found in intrinsic database
+- ParseToTokens: variable (y) found in user database
+- ParseToTokens: its a + sign
+- ParseToTokens: its a number
+- ParseToTokens: its a number(5.000000)
+- ParseToTokens: its the end of expression string 
+- ParseToTokens: parent count match 
+- ParseToTokens: return from parse! 
+- CheckSyntax: got first tokenTOKEN(VAR=x) 
+- CheckSyntax: got next tokenTOKEN(MULT_SIGN) 
+- CheckSyntax: got next tokenTOKEN(VAR=y) 
+- CheckSyntax: got next tokenTOKEN(PLUS_SIGN) 
+- CheckSyntax: got next tokenTOKEN(DOUBLE=5.000000) 
+- CheckSyntax: got next tokenTOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(VAR=x) 
+- CheckSyntax2: got next token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(MULT_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(VAR=y) 
+- CheckSyntax2: got current token --> TOKEN(VAR=y) 
+- CheckSyntax2: got next token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got current token --> TOKEN(PLUS_SIGN) 
+- CheckSyntax2: got next token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got current token --> TOKEN(DOUBLE=5.000000) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+- CheckSyntax2: got current token --> TOKEN(END) 
+- CheckSyntax2: got next token --> TOKEN(END) 
+  PASS: parse x*y+5 with db set before parse
+-----[ EVALUATION ]------------------------------
+  PASS: eval x*y+5
+  PASS: x*y+5 = 10*20+5 = 205
+
 =======================
-Results: 352 passed, 0 failed
+Results: 368 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxexpression'
 
 === cxfile tests ===
-./darwin_arm64/cxfile_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfile'
+./linux_x86_64/cxfile_test
 CxFile Test Suite
 =================
 
@@ -3424,9 +3657,11 @@ CxFile Test Suite
 
 =================
 Results: 67 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfile'
 
 === cxfunctor tests ===
-./darwin_arm64/cxfunctor_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfunctor'
+./linux_x86_64/cxfunctor_test
 CxFunctor Test Suite
 ====================
 
@@ -3533,9 +3768,11 @@ CxFunctor Test Suite
 
 ====================
 Results: 59 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfunctor'
 
 === cxhandle tests ===
-./darwin_arm64/cxhandle_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhandle'
+./linux_x86_64/cxhandle_test
 CxHandle Test Suite
 ===================
 
@@ -3668,9 +3905,11 @@ CxHandle Test Suite
 
 ===================
 Results: 97 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhandle'
 
 === cxhashmap tests ===
-./darwin_arm64/cxhashmap_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhashmap'
+./linux_x86_64/cxhashmap_test
 CxHashmap Test Suite
 ====================
 
@@ -3760,9 +3999,11 @@ CxHashmap Test Suite
 
 ====================
 Results: 62 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhashmap'
 
 === cxjson tests ===
-./darwin_arm64/cxjson_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxjson'
+./linux_x86_64/cxjson_test
 CxJSON Test Suite
 =================
 
@@ -3905,9 +4146,11 @@ CxJSON Test Suite
 
 =================
 Results: 119 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxjson'
 
 === cxlog tests ===
-./darwin_arm64/cxlog_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlog'
+./linux_x86_64/cxlog_test
 CxLogFile Test Suite
 ====================
 
@@ -3976,9 +4219,11 @@ CxLogFile Test Suite
 
 ====================
 Results: 37 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlog'
 
 === cxlogfile tests ===
-./darwin_arm64/cxlogfile_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlogfile'
+./linux_x86_64/cxlogfile_test
 CxLogFile Test Suite
 ====================
 
@@ -4040,9 +4285,11 @@ CxLogFile Test Suite
 
 ====================
 Results: 38 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlogfile'
 
 === cxnet tests ===
-./darwin_arm64/cxnet_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxnet'
+./linux_x86_64/cxnet_test
 CxNet Test Suite
 ================
 
@@ -4119,9 +4366,11 @@ CxNet Test Suite
 
 ================
 Results: 45 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxnet'
 
 === cxprop tests ===
-./darwin_arm64/cxprop_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxprop'
+./linux_x86_64/cxprop_test
 CxProp Test Suite
 =================
 
@@ -4283,9 +4532,11 @@ CxProp Test Suite
 
 =================
 Results: 130 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxprop'
 
 === cxscreen tests ===
-./darwin_arm64/cxscreen_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxscreen'
+./linux_x86_64/cxscreen_test
 CxScreen Test Suite
 ===================
 
@@ -4363,9 +4614,11 @@ CxScreen Test Suite
 
 ===================
 Results: 48 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxscreen'
 
 === cxslist tests ===
-./darwin_arm64/cxslist_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxslist'
+./linux_x86_64/cxslist_test
 CxSList Test Suite
 ==================
 
@@ -4476,9 +4729,11 @@ CxSList Test Suite
 
 ==================
 Results: 89 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxslist'
 
 === cxstar tests ===
-./darwin_arm64/cxstar_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstar'
+./linux_x86_64/cxstar_test
 CxStar Test Suite
 =================
 
@@ -4634,9 +4889,11 @@ CxStar Test Suite
 
 =================
 Results: 127 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstar'
 
 === cxstring tests ===
-./darwin_arm64/cxstring_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstring'
+./linux_x86_64/cxstring_test
 CxString Test Suite
 ===================
 
@@ -4810,9 +5067,11 @@ CxString Test Suite
 
 ===================
 Results: 154 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstring'
 
 === cxthread tests ===
-./darwin_arm64/cxthread_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxthread'
+./linux_x86_64/cxthread_test
 CxThread Test Suite
 ===================
 
@@ -4905,9 +5164,11 @@ CxThread Test Suite
 
 ===================
 Results: 55 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxthread'
 
 === cxtime tests ===
-./darwin_arm64/cxtime_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtime'
+./linux_x86_64/cxtime_test
 CxTime Test Suite
 =================
 
@@ -4932,10 +5193,10 @@ CxTime Test Suite
   PASS: hour accessor
   PASS: minute accessor
   PASS: second accessor
-  PASS: midnight hour
+  FAIL: midnight hour
   PASS: midnight minute
   PASS: midnight second
-  PASS: end of day hour
+  FAIL: end of day hour
   PASS: end of day minute
   PASS: end of day second
   PASS: January is month 1
@@ -4954,7 +5215,7 @@ CxTime Test Suite
   PASS: offsetDays crosses to February
   PASS: offsetDays day is 1
   PASS: offsetHours negative crosses day
-  PASS: offsetHours negative hour
+  FAIL: offsetHours negative hour
 
 == CxTime Compare/Assign Tests ==
   PASS: equal times compare equal
@@ -5025,17 +5286,20 @@ CxTime Test Suite
   PASS: leap year 2020
   PASS: February
   PASS: 29th day
-  PASS: Y2K year
+  FAIL: Y2K year
   PASS: future year 2035
   PASS: January 31
   PASS: April 30
   PASS: epoch seconds round-trip
 
 =================
-Results: 100 passed, 0 failed
+Results: 96 passed, 4 failed
+make[1]: *** [Makefile:146: test] Error 1
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtime'
 
 === cxtz tests ===
-./darwin_arm64/cxtz_test
+make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtz'
+./linux_x86_64/cxtz_test
 CxDateTime Test Suite
 =====================
 
@@ -5120,7 +5384,8 @@ CxDateTime Test Suite
 
 =====================
 Results: 61 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtz'
 
 ========================================
-All tests completed for: darwin_arm64
+All tests completed for: linux_x86_64
 ========================================
