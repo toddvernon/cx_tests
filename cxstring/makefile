@@ -18,7 +18,8 @@ UNAME_S := $(shell uname -s | tr '[A-Z]' '[a-z]' )
 
 # if this is linux
 ifeq ($(UNAME_S),linux)
-   	CPPFLAGS = -D _LINUX_  -g -Wno-deprecated
+	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
+	CPPFLAGS = -D _LINUX_  -g -Wno-deprecated
 endif
 
 #if this is OSX
@@ -28,12 +29,11 @@ ifeq ($(UNAME_S), darwin)
 endif
 
 ifeq ($(UNAME_S), linux)
-	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
-    CCFLAGS = -D _LINUX_
+	CCFLAGS = -D _LINUX_
 endif
 
 ifeq ($(UNAME_S), darwin)
-    CCFLAGS = -D _OSX_
+	CCFLAGS = -D _OSX_
 endif
 
 #if this is SUNOS or SOLARIS
@@ -67,11 +67,6 @@ ifeq ($(UNAME_S),irix)
     ifeq ($(UNAME_R), 6.5)
         CPPFLAGS = -D _IRIX6_ -g
     endif
-endif
-
-#if this is NETBSD
-ifeq ($(UNAME_S),netbsk)
-	CPPFLAGS = -D _NETBSD_ -g
 endif
 
 #if this is NETBSD

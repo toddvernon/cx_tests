@@ -17,27 +17,49 @@ UNAME_S := $(shell uname -s | tr '[A-Z]' '[a-z]' )
 
 # if this is linux
 ifeq ($(UNAME_S),linux)
-   CPPFLAGS += -D _LINUX_  -g -Wno-deprecated
+	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
+	CPPFLAGS += -D _LINUX_  -g -Wno-deprecated
 endif
 
 # if this is darwin
 ifeq ($(UNAME_S),darwin)
-   CPPFLAGS += -D _OSX_  -g -Wno-deprecated
+	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
+	CPPFLAGS += -D _OSX_  -g -Wno-deprecated
 endif
 
-# if this is darwin
+# if this is SUNOS or SOLARIS
 ifeq ($(UNAME_S),sunos)
-   CPPFLAGS += -D _SUNOS_  -g
+	UNAME_R := $(shell uname -r)
+
+	ifeq ($(UNAME_R), 4.1.3)
+		CPPFLAGS += -D _SUNOS_ -g
+	endif
+
+	ifeq ($(UNAME_R), 4.1.4)
+		CPPFLAGS += -D _SUNOS_ -g
+	endif
+
+	ifeq ($(UNAME_R), 5.6)
+		CPPFLAGS += -D _SOLARIS6_ -g
+	endif
+
+	ifeq ($(UNAME_R), 5.7)
+		CPPFLAGS += -D _SOLARIS6_ -g
+	endif
+
+	ifeq ($(UNAME_R), 5.10)
+		CPPFLAGS += -D _SOLARIS10_ -g
+	endif
 endif
 
 
 ## Object & Libraries #########################################
 
-LIB_CX_PLATFORM_LIB_DIR=../../lib/$(UNAME_S)
+LIB_CX_PLATFORM_LIB_DIR=../../lib/$(UNAME_S)_$(ARCH)
 
-APP_OBJECT_DIR=$(UNAME_S)
+APP_OBJECT_DIR=$(UNAME_S)_$(ARCH)
 
-LIB_CX_DIR=../../lib/linux
+LIB_CX_DIR=../../lib/$(UNAME_S)_$(ARCH)
 LIB_CX_BASE_NAME=libcx_base.a
 LIB_CX_NET_NAME=libcx_net.a
 LIB_CX_THREAD_NAME=libcx_thread.a
