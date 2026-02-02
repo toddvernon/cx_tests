@@ -1,10 +1,9 @@
 ========================================
-Running cx_tests for: linux_x86_64
+Running cx_tests for: darwin_arm64
 ========================================
 
 === cxb64 tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxb64'
-./linux_x86_64/cxb64_test
+./darwin_arm64/cxb64_test
 CxB64 Test Suite
 ================
 
@@ -63,11 +62,9 @@ CxB64 Test Suite
 
 ================
 Results: 35 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxb64'
 
 === cxcallback tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxcallback'
-./linux_x86_64/cxcallback_test
+./darwin_arm64/cxcallback_test
 CxCallback Test Suite
 =====================
 
@@ -158,11 +155,9 @@ CxCallback Test Suite
 
 =====================
 Results: 63 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxcallback'
 
 === cxdatetime tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdatetime'
-./linux_x86_64/cxdatetime_test
+./darwin_arm64/cxdatetime_test
 CxDateTime Test Suite
 =====================
 
@@ -256,11 +251,9 @@ CxDateTime Test Suite
 
 =====================
 Results: 72 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdatetime'
 
 === cxdirectory tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdirectory'
-./linux_x86_64/cxdirectory_test
+./darwin_arm64/cxdirectory_test
 CxDirectory Test Suite
 ======================
 
@@ -350,11 +343,9 @@ CxDirectory Test Suite
 
 ======================
 Results: 62 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxdirectory'
 
 === cxeditbuffer tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxeditbuffer'
-./linux_x86_64/cxeditbuffer_test
+./darwin_arm64/cxeditbuffer_test
 CxEditBuffer Test Suite
 =======================
 
@@ -621,11 +612,9 @@ CxEditBuffer Test Suite
 
 =======================
 Results: 233 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxeditbuffer'
 
 === cxexpression tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxexpression'
-./linux_x86_64/cxexpression_test
+./darwin_arm64/cxexpression_test
 CxExpression Test Suite
 =======================
 
@@ -3556,11 +3545,9 @@ result[0]=0.000000
 
 =======================
 Results: 368 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxexpression'
 
 === cxfile tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfile'
-./linux_x86_64/cxfile_test
+./darwin_arm64/cxfile_test
 CxFile Test Suite
 =================
 
@@ -3657,11 +3644,9 @@ CxFile Test Suite
 
 =================
 Results: 67 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfile'
 
 === cxfunctor tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfunctor'
-./linux_x86_64/cxfunctor_test
+./darwin_arm64/cxfunctor_test
 CxFunctor Test Suite
 ====================
 
@@ -3768,11 +3753,9 @@ CxFunctor Test Suite
 
 ====================
 Results: 59 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxfunctor'
 
 === cxhandle tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhandle'
-./linux_x86_64/cxhandle_test
+./darwin_arm64/cxhandle_test
 CxHandle Test Suite
 ===================
 
@@ -3905,11 +3888,9 @@ CxHandle Test Suite
 
 ===================
 Results: 97 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhandle'
 
 === cxhashmap tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhashmap'
-./linux_x86_64/cxhashmap_test
+./darwin_arm64/cxhashmap_test
 CxHashmap Test Suite
 ====================
 
@@ -3999,11 +3980,9 @@ CxHashmap Test Suite
 
 ====================
 Results: 62 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxhashmap'
 
 === cxjson tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxjson'
-./linux_x86_64/cxjson_test
+./darwin_arm64/cxjson_test
 CxJSON Test Suite
 =================
 
@@ -4146,11 +4125,9 @@ CxJSON Test Suite
 
 =================
 Results: 119 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxjson'
 
 === cxlog tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlog'
-./linux_x86_64/cxlog_test
+./darwin_arm64/cxlog_test
 CxLogFile Test Suite
 ====================
 
@@ -4219,11 +4196,9 @@ CxLogFile Test Suite
 
 ====================
 Results: 37 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlog'
 
 === cxlogfile tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlogfile'
-./linux_x86_64/cxlogfile_test
+./darwin_arm64/cxlogfile_test
 CxLogFile Test Suite
 ====================
 
@@ -4285,11 +4260,9 @@ CxLogFile Test Suite
 
 ====================
 Results: 38 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxlogfile'
 
 === cxnet tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxnet'
-./linux_x86_64/cxnet_test
+./darwin_arm64/cxnet_test
 CxNet Test Suite
 ================
 
@@ -4366,11 +4339,9 @@ CxNet Test Suite
 
 ================
 Results: 45 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxnet'
 
 === cxprop tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxprop'
-./linux_x86_64/cxprop_test
+./darwin_arm64/cxprop_test
 CxProp Test Suite
 =================
 
@@ -4532,11 +4503,9 @@ CxProp Test Suite
 
 =================
 Results: 130 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxprop'
 
 === cxscreen tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxscreen'
-./linux_x86_64/cxscreen_test
+./darwin_arm64/cxscreen_test
 CxScreen Test Suite
 ===================
 
@@ -4614,11 +4583,9 @@ CxScreen Test Suite
 
 ===================
 Results: 48 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxscreen'
 
 === cxslist tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxslist'
-./linux_x86_64/cxslist_test
+./darwin_arm64/cxslist_test
 CxSList Test Suite
 ==================
 
@@ -4729,11 +4696,9 @@ CxSList Test Suite
 
 ==================
 Results: 89 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxslist'
 
 === cxstar tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstar'
-./linux_x86_64/cxstar_test
+./darwin_arm64/cxstar_test
 CxStar Test Suite
 =================
 
@@ -4889,11 +4854,9 @@ CxStar Test Suite
 
 =================
 Results: 127 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstar'
 
 === cxstring tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstring'
-./linux_x86_64/cxstring_test
+./darwin_arm64/cxstring_test
 CxString Test Suite
 ===================
 
@@ -5067,11 +5030,9 @@ CxString Test Suite
 
 ===================
 Results: 154 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxstring'
 
 === cxthread tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxthread'
-./linux_x86_64/cxthread_test
+./darwin_arm64/cxthread_test
 CxThread Test Suite
 ===================
 
@@ -5164,11 +5125,9 @@ CxThread Test Suite
 
 ===================
 Results: 55 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxthread'
 
 === cxtime tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtime'
-./linux_x86_64/cxtime_test
+./darwin_arm64/cxtime_test
 CxTime Test Suite
 =================
 
@@ -5193,10 +5152,10 @@ CxTime Test Suite
   PASS: hour accessor
   PASS: minute accessor
   PASS: second accessor
-  FAIL: midnight hour
+  PASS: midnight hour
   PASS: midnight minute
   PASS: midnight second
-  FAIL: end of day hour
+  PASS: end of day hour
   PASS: end of day minute
   PASS: end of day second
   PASS: January is month 1
@@ -5215,7 +5174,7 @@ CxTime Test Suite
   PASS: offsetDays crosses to February
   PASS: offsetDays day is 1
   PASS: offsetHours negative crosses day
-  FAIL: offsetHours negative hour
+  PASS: offsetHours negative hour
 
 == CxTime Compare/Assign Tests ==
   PASS: equal times compare equal
@@ -5286,20 +5245,17 @@ CxTime Test Suite
   PASS: leap year 2020
   PASS: February
   PASS: 29th day
-  FAIL: Y2K year
+  PASS: Y2K year
   PASS: future year 2035
   PASS: January 31
   PASS: April 30
   PASS: epoch seconds round-trip
 
 =================
-Results: 96 passed, 4 failed
-make[1]: *** [Makefile:146: test] Error 1
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtime'
+Results: 100 passed, 0 failed
 
 === cxtz tests ===
-make[1]: Entering directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtz'
-./linux_x86_64/cxtz_test
+./darwin_arm64/cxtz_test
 CxDateTime Test Suite
 =====================
 
@@ -5384,8 +5340,7 @@ CxDateTime Test Suite
 
 =====================
 Results: 61 passed, 0 failed
-make[1]: Leaving directory '/home/tvernon/Dropbox/dev/cx/cx_tests/cxtz'
 
 ========================================
-All tests completed for: linux_x86_64
+All tests completed for: darwin_arm64
 ========================================
