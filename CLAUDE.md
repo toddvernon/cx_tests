@@ -1,10 +1,17 @@
-# CMacs Project Instructions
+# CX Tests Instructions
 
 ## Overview
-CMacs is a uEmacs-like terminal text editor written in C++.
+Unit tests for the CX library.
+
+## Naming Conventions
+When the user refers to:
+- **"cx"** - means all cx repositories together: `cx/cx` (library), `cx/cx_tests` (this test suite), and `cx/cx_apps/cm` (editor app)
+- **"cm"** - means the CMacs editor application at `cx/cx_apps/cm`
+- **"cx library"** or **"cx/cx"** - means specifically the shared library at `cx/cx`
 
 ## Related Repositories
-- **cx library**: `../../../cx/cx/` - shared library with modules: base, commandline, editbuffer, expression, functor, json, keyboard, log, net, screen, thread, tz
+- **cx library**: `../cx/` - shared library with modules: base, commandline, editbuffer, expression, functor, json, keyboard, log, net, screen, thread, tz
+- **CMacs editor**: `../cx_apps/cm/` - terminal text editor application
 
 ## Change Policy
 - **Always show proposed changes before applying them** - describe what will be modified and wait for approval before editing files
