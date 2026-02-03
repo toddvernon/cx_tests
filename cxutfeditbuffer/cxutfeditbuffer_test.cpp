@@ -336,6 +336,106 @@ void test_flatten_buffer(void)
 }
 
 
+void test_kill_accumulation(void)
+{
+    printf("\n--- Testing kill accumulation ---\n");
+
+    // Single kill - just cuts to end of line
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("hello world"));
+        buf.cursorGotoRequest(0, 6);  // position after "hello "
+        CxString cut = buf.cutTextToEndOfLine();
+        TEST_ASSERT(strcmp(cut.data(), "world") == 0, "single kill returns 'world'");
+        TEST_ASSERT(buf.line(0)->charCount() == 6, "line has 6 chars after kill");
+    }
+
+    // Two consecutive kills - first cuts text, second joins line
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("first\nsecond"));
+        buf.cursorGotoRequest(0, 0);
+        CxString cut1 = buf.cutTextToEndOfLine();  // cuts "first"
+        TEST_ASSERT(strcmp(cut1.data(), "first") == 0, "first kill: 'first'");
+        CxString cut2 = buf.cutTextToEndOfLine();  // joins with next line (kills newline)
+        TEST_ASSERT(strcmp(cut2.data(), "first\n") == 0, "second kill accumulates: 'first\\n'");
+        TEST_ASSERT(buf.numberOfLines() == 1, "after two kills: 1 line");
+    }
+
+    // Three consecutive kills - full accumulation
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("AAA\nBBB\nCCC"));
+        buf.cursorGotoRequest(0, 0);
+        CxString cut1 = buf.cutTextToEndOfLine();  // "AAA"
+        CxString cut2 = buf.cutTextToEndOfLine();  // newline (join)
+        CxString cut3 = buf.cutTextToEndOfLine();  // "BBB"
+        TEST_ASSERT(strcmp(cut3.data(), "AAA\nBBB") == 0, "three kills accumulate: 'AAA\\nBBB'");
+    }
+
+    // Kill accumulation resets after cursor movement
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("first\nsecond\nthird"));
+        buf.cursorGotoRequest(0, 0);
+        CxString cut1 = buf.cutTextToEndOfLine();  // "first"
+        buf.cursorRightRequest();  // move cursor - resets accumulation
+        buf.cursorGotoRequest(1, 0);  // move to second line
+        CxString cut2 = buf.cutTextToEndOfLine();  // "second" - fresh start
+        TEST_ASSERT(strcmp(cut2.data(), "second") == 0, "kill after cursor move: 'second' (not accumulated)");
+    }
+
+    // Kill accumulation resets after character insertion
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("hello\nworld"));
+        buf.cursorGotoRequest(0, 0);
+        CxString cut1 = buf.cutTextToEndOfLine();  // "hello"
+        buf.addCharacter('X');  // insert char - resets accumulation
+        buf.cursorGotoRequest(1, 0);
+        CxString cut2 = buf.cutTextToEndOfLine();  // "world" - fresh start
+        TEST_ASSERT(strcmp(cut2.data(), "world") == 0, "kill after insert: 'world' (not accumulated)");
+    }
+
+    // Kill on empty line joins with next
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("first\n\nthird"));  // empty line in middle
+        buf.cursorGotoRequest(1, 0);  // on empty line
+        CxString cut = buf.cutTextToEndOfLine();  // should join
+        TEST_ASSERT(strcmp(cut.data(), "\n") == 0, "kill empty line: newline");
+        TEST_ASSERT(buf.numberOfLines() == 2, "after kill empty: 2 lines");
+    }
+
+    // Multiple kills then paste restores original
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("line1\nline2\nline3"));
+        buf.cursorGotoRequest(0, 0);
+        buf.cutTextToEndOfLine();  // "line1"
+        buf.cutTextToEndOfLine();  // "\n"
+        buf.cutTextToEndOfLine();  // "line2"
+        CxString accumulated = buf.cutTextToEndOfLine();  // "\n"
+        // accumulated should be "line1\nline2\n"
+        TEST_ASSERT(strcmp(accumulated.data(), "line1\nline2\n") == 0, "four kills: 'line1\\nline2\\n'");
+        // Now paste it back
+        buf.pasteFromCutBuffer(accumulated);
+        TEST_ASSERT(buf.numberOfLines() == 3, "after paste: 3 lines");
+    }
+
+    // UTF-8 kill accumulation
+    {
+        CxUTFEditBuffer buf;
+        buf.loadTextFromString(CxString("café\nnaïve"));
+        buf.cursorGotoRequest(0, 0);
+        CxString cut1 = buf.cutTextToEndOfLine();  // "café"
+        CxString cut2 = buf.cutTextToEndOfLine();  // "\n" (join)
+        CxString cut3 = buf.cutTextToEndOfLine();  // "naïve"
+        TEST_ASSERT(strcmp(cut3.data(), "café\nnaïve") == 0, "UTF-8 kills accumulate correctly");
+    }
+}
+
+
 int main(int argc, char **argv)
 {
     printf("=== CxUTFEditBuffer Test Suite ===\n");
@@ -355,6 +455,7 @@ int main(int argc, char **argv)
     test_box_drawing();
     test_emoji();
     test_flatten_buffer();
+    test_kill_accumulation();
 
     printf("\n=================================\n");
     printf("Tests passed: %d\n", testsPassed);

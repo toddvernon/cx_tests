@@ -1276,6 +1276,98 @@ void testMultiLineReplace() {
 
 
 //-----------------------------------------------------------------------------------------
+// Kill accumulation tests - consecutive Ctrl-K operations accumulate into kill buffer
+//-----------------------------------------------------------------------------------------
+void testKillAccumulation() {
+    printf("\n== Kill Accumulation Tests ==\n");
+
+    // Single kill - just cuts to end of line
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("hello world");
+        buffer.cursorGotoRequest(0, 6);  // position after "hello "
+        CxString cut = buffer.cutTextToEndOfLine();
+        check(strcmp(cut.data(), "world") == 0, "single kill returns 'world'");
+        check(strcmp(buffer.line(0)->data(), "hello ") == 0, "line after single kill");
+    }
+
+    // Two consecutive kills - first cuts text, second joins line
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("first\nsecond");
+        buffer.cursorGotoRequest(0, 0);
+        CxString cut1 = buffer.cutTextToEndOfLine();  // cuts "first"
+        check(strcmp(cut1.data(), "first") == 0, "first kill: 'first'");
+        CxString cut2 = buffer.cutTextToEndOfLine();  // joins with next line (kills newline)
+        check(strcmp(cut2.data(), "first\n") == 0, "second kill accumulates: 'first\\n'");
+        check(buffer.numberOfLines() == 1, "after two kills: 1 line");
+    }
+
+    // Three consecutive kills - full accumulation
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("AAA\nBBB\nCCC");
+        buffer.cursorGotoRequest(0, 0);
+        CxString cut1 = buffer.cutTextToEndOfLine();  // "AAA"
+        CxString cut2 = buffer.cutTextToEndOfLine();  // newline (join)
+        CxString cut3 = buffer.cutTextToEndOfLine();  // "BBB"
+        check(strcmp(cut3.data(), "AAA\nBBB") == 0, "three kills accumulate: 'AAA\\nBBB'");
+    }
+
+    // Kill accumulation resets after cursor movement
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("first\nsecond\nthird");
+        buffer.cursorGotoRequest(0, 0);
+        CxString cut1 = buffer.cutTextToEndOfLine();  // "first"
+        buffer.cursorRightRequest();  // move cursor - resets accumulation
+        buffer.cursorGotoRequest(1, 0);  // move to second line
+        CxString cut2 = buffer.cutTextToEndOfLine();  // "second" - fresh start
+        check(strcmp(cut2.data(), "second") == 0, "kill after cursor move: 'second' (not accumulated)");
+    }
+
+    // Kill accumulation resets after character insertion
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("hello\nworld");
+        buffer.cursorGotoRequest(0, 0);
+        CxString cut1 = buffer.cutTextToEndOfLine();  // "hello"
+        buffer.addCharacter('X');  // insert char - resets accumulation
+        buffer.cursorGotoRequest(1, 0);
+        CxString cut2 = buffer.cutTextToEndOfLine();  // "world" - fresh start
+        check(strcmp(cut2.data(), "world") == 0, "kill after insert: 'world' (not accumulated)");
+    }
+
+    // Kill on empty line joins with next
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("first\n\nthird");  // empty line in middle
+        buffer.cursorGotoRequest(1, 0);  // on empty line
+        CxString cut = buffer.cutTextToEndOfLine();  // should join
+        check(strcmp(cut.data(), "\n") == 0, "kill empty line: newline");
+        check(buffer.numberOfLines() == 2, "after kill empty: 2 lines");
+        check(strcmp(buffer.line(1)->data(), "third") == 0, "line 1 is 'third'");
+    }
+
+    // Multiple kills then paste restores original
+    {
+        CxEditBuffer buffer;
+        buffer.loadTextFromString("line1\nline2\nline3");
+        buffer.cursorGotoRequest(0, 0);
+        buffer.cutTextToEndOfLine();  // "line1"
+        buffer.cutTextToEndOfLine();  // "\n"
+        buffer.cutTextToEndOfLine();  // "line2"
+        CxString accumulated = buffer.cutTextToEndOfLine();  // "\n"
+        // accumulated should be "line1\nline2\n"
+        check(strcmp(accumulated.data(), "line1\nline2\n") == 0, "four kills: 'line1\\nline2\\n'");
+        // Now paste it back
+        buffer.pasteFromCutBuffer(accumulated);
+        check(buffer.numberOfLines() == 3, "after paste: 3 lines");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -1296,6 +1388,7 @@ int main(int argc, char **argv) {
     testStatusMethods();
     testPositionEvaluation();
     testTabHandling();
+    testKillAccumulation();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
