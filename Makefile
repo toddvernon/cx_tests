@@ -55,6 +55,13 @@ all:
 		cd cxcallback; make; \
 	fi
 
+# cxcommandcompleter tests (all platforms)
+
+	@if [ -d "./cxcommandcompleter" ]; then \
+		echo "Building cxcommandcompleter tests..."; \
+		cd cxcommandcompleter; make; \
+	fi
+
 # cxdatetime tests (uses tz library - not on sunos or irix)
 
 	@if [ "$(UNAME_S)" != "sunos" ]; then \
@@ -233,6 +240,11 @@ test:
 		cd cxcallback && make test; cd ..; \
 	fi; \
 	\
+	if [ -d "./cxcommandcompleter" ]; then \
+		echo ""; echo "=== cxcommandcompleter tests ==="; \
+		cd cxcommandcompleter && make test; cd ..; \
+	fi; \
+	\
 	if [ "$(UNAME_S)" != "sunos" ]; then \
 		if [ "$(UNAME_S)" != "irix" ]; then \
 			if [ -d "./cxdatetime" ]; then \
@@ -367,6 +379,10 @@ clean:
 		cd cxcallback; make clean; \
 	fi
 
+	@if [ -d "./cxcommandcompleter" ]; then \
+		cd cxcommandcompleter; make clean; \
+	fi
+
 	@if [ -d "./cxdatetime" ]; then \
 		cd cxdatetime; make clean; \
 	fi
@@ -460,8 +476,15 @@ archive:
 		--exclude='*.o' \
 		--exclude='*.a' \
 		--exclude='.git' \
+		--exclude='.claude' \
 		--exclude='.DS_Store' \
 		--exclude='TEST_RESULTS.txt' \
+		--exclude='darwin_*' \
+		--exclude='linux_*' \
+		--exclude='sunos_*' \
+		--exclude='irix_*' \
+		--exclude='netbsd_*' \
+		--exclude='nextstep_*' \
 		--exclude='*.xcodeproj' \
 		--exclude='*.xcworkspace' \
 		--exclude='xcuserdata' \
