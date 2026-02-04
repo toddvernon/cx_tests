@@ -447,3 +447,30 @@ clean:
 		cd cxtz; make clean; \
 	fi
 
+
+########################################################################################
+# Create tar archive for distribution
+#
+########################################################################################
+
+archive:
+	@echo "Creating cxtest_unix.tar..."
+	@test -d ../ARCHIVE || mkdir ../ARCHIVE
+	@tar cvf ../ARCHIVE/cxtest_unix.tar \
+		--exclude='*.o' \
+		--exclude='*.a' \
+		--exclude='.git' \
+		--exclude='.DS_Store' \
+		--exclude='TEST_RESULTS.txt' \
+		--exclude='*.xcodeproj' \
+		--exclude='*.xcworkspace' \
+		--exclude='xcuserdata' \
+		--exclude='DerivedData' \
+		--exclude='*.pbxuser' \
+		--exclude='*.mode1v3' \
+		--exclude='*.mode2v3' \
+		--exclude='*.perspectivev3' \
+		--exclude='*.xcuserstate' \
+		.
+	@echo "Archive created: ../ARCHIVE/cxtest_unix.tar"
+
