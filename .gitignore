@@ -37,3 +37,4 @@ obj/
 **/_*/
 **/*.tar/
 
+TEST_RESULTS.txt
