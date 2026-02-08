@@ -20,7 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <cx/editbuffer/utfstring.h>
+#include <cx/base/utfstring.h>
 
 static int testsPassed = 0;
 static int testsFailed = 0;

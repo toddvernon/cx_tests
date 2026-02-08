@@ -48,6 +48,13 @@ all:
 		cd cxb64; make; \
 	fi
 
+# cxbuildoutput tests (all platforms)
+
+	@if [ -d "./cxbuildoutput" ]; then \
+		echo "Building cxbuildoutput tests..."; \
+		cd cxbuildoutput; make; \
+	fi
+
 # cxcallback tests (all platforms)
 
 	@if [ -d "./cxcallback" ]; then \
@@ -85,6 +92,13 @@ all:
 	@if [ -d "./cxeditbuffer" ]; then \
 		echo "Building cxeditbuffer tests..."; \
 		cd cxeditbuffer; make; \
+	fi
+
+# cxeditline tests (all platforms)
+
+	@if [ -d "./cxeditline" ]; then \
+		echo "Building cxeditline tests..."; \
+		cd cxeditline; make; \
 	fi
 
 # cxexpression tests (all platforms)
@@ -157,6 +171,13 @@ all:
 		cd cxprop; make; \
 	fi
 
+# cxregex tests (all platforms)
+
+	@if [ -d "./cxregex" ]; then \
+		echo "Building cxregex tests..."; \
+		cd cxregex; make; \
+	fi
+
 # cxscreen tests (all platforms)
 
 	@if [ -d "./cxscreen" ]; then \
@@ -214,6 +235,34 @@ all:
 		fi; \
 	fi
 
+# cxutfcharacter tests (all platforms)
+
+	@if [ -d "./cxutfcharacter" ]; then \
+		echo "Building cxutfcharacter tests..."; \
+		cd cxutfcharacter; make; \
+	fi
+
+# cxutfeditbuffer tests (all platforms)
+
+	@if [ -d "./cxutfeditbuffer" ]; then \
+		echo "Building cxutfeditbuffer tests..."; \
+		cd cxutfeditbuffer; make; \
+	fi
+
+# cxutfstring tests (all platforms)
+
+	@if [ -d "./cxutfstring" ]; then \
+		echo "Building cxutfstring tests..."; \
+		cd cxutfstring; make; \
+	fi
+
+# cxutfstringlist tests (all platforms)
+
+	@if [ -d "./cxutfstringlist" ]; then \
+		echo "Building cxutfstringlist tests..."; \
+		cd cxutfstringlist; make; \
+	fi
+
 	@echo "========================================"
 	@echo "All tests built for: $(UNAME_S)_$(ARCH)"
 	@echo "========================================"
@@ -233,6 +282,11 @@ test:
 	if [ -d "./cxb64" ]; then \
 		echo ""; echo "=== cxb64 tests ==="; \
 		cd cxb64 && make test; cd ..; \
+	fi; \
+	\
+	if [ -d "./cxbuildoutput" ]; then \
+		echo ""; echo "=== cxbuildoutput tests ==="; \
+		cd cxbuildoutput && make test; cd ..; \
 	fi; \
 	\
 	if [ -d "./cxcallback" ]; then \
@@ -262,6 +316,11 @@ test:
 	if [ -d "./cxeditbuffer" ]; then \
 		echo ""; echo "=== cxeditbuffer tests ==="; \
 		cd cxeditbuffer && make test; cd ..; \
+	fi; \
+	\
+	if [ -d "./cxeditline" ]; then \
+		echo ""; echo "=== cxeditline tests ==="; \
+		cd cxeditline && make test; cd ..; \
 	fi; \
 	\
 	if [ -d "./cxexpression" ]; then \
@@ -314,6 +373,11 @@ test:
 		cd cxprop && make test; cd ..; \
 	fi; \
 	\
+	if [ -d "./cxregex" ]; then \
+		echo ""; echo "=== cxregex tests ==="; \
+		cd cxregex && make test; cd ..; \
+	fi; \
+	\
 	if [ -d "./cxscreen" ]; then \
 		echo ""; echo "=== cxscreen tests ==="; \
 		cd cxscreen && make test; cd ..; \
@@ -357,6 +421,26 @@ test:
 		fi; \
 	fi; \
 	\
+	if [ -d "./cxutfcharacter" ]; then \
+		echo ""; echo "=== cxutfcharacter tests ==="; \
+		cd cxutfcharacter && make test; cd ..; \
+	fi; \
+	\
+	if [ -d "./cxutfeditbuffer" ]; then \
+		echo ""; echo "=== cxutfeditbuffer tests ==="; \
+		cd cxutfeditbuffer && make test; cd ..; \
+	fi; \
+	\
+	if [ -d "./cxutfstring" ]; then \
+		echo ""; echo "=== cxutfstring tests ==="; \
+		cd cxutfstring && make test; cd ..; \
+	fi; \
+	\
+	if [ -d "./cxutfstringlist" ]; then \
+		echo ""; echo "=== cxutfstringlist tests ==="; \
+		cd cxutfstringlist && make test; cd ..; \
+	fi; \
+	\
 	echo ""; \
 	echo "========================================"; \
 	echo "All tests completed for: $(UNAME_S)_$(ARCH)"; \
@@ -373,6 +457,10 @@ clean:
 
 	@if [ -d "./cxb64" ]; then \
 		cd cxb64; make clean; \
+	fi
+
+	@if [ -d "./cxbuildoutput" ]; then \
+		cd cxbuildoutput; make clean; \
 	fi
 
 	@if [ -d "./cxcallback" ]; then \
@@ -393,6 +481,10 @@ clean:
 
 	@if [ -d "./cxeditbuffer" ]; then \
 		cd cxeditbuffer; make clean; \
+	fi
+
+	@if [ -d "./cxeditline" ]; then \
+		cd cxeditline; make clean; \
 	fi
 
 	@if [ -d "./cxexpression" ]; then \
@@ -435,6 +527,10 @@ clean:
 		cd cxprop; make clean; \
 	fi
 
+	@if [ -d "./cxregex" ]; then \
+		cd cxregex; make clean; \
+	fi
+
 	@if [ -d "./cxscreen" ]; then \
 		cd cxscreen; make clean; \
 	fi
@@ -461,6 +557,22 @@ clean:
 
 	@if [ -d "./cxtz" ]; then \
 		cd cxtz; make clean; \
+	fi
+
+	@if [ -d "./cxutfcharacter" ]; then \
+		cd cxutfcharacter; make clean; \
+	fi
+
+	@if [ -d "./cxutfeditbuffer" ]; then \
+		cd cxutfeditbuffer; make clean; \
+	fi
+
+	@if [ -d "./cxutfstring" ]; then \
+		cd cxutfstring; make clean; \
+	fi
+
+	@if [ -d "./cxutfstringlist" ]; then \
+		cd cxutfstringlist; make clean; \
 	fi
 
 
