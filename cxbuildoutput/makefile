@@ -1,6 +1,6 @@
-## makefile: cxprocess_test ############################################
+## makefile: cxbuildoutput_test ############################################
 
-TEST_APP=	cxprocess_test
+TEST_APP=	cxbuildoutput_test
 CPP=        g++
 SHELL=		/bin/sh
 MOVE=		mv
@@ -82,8 +82,10 @@ APP_OBJECT_DIR=$(UNAME_S)_$(ARCH)
 
 LIB_CX_BASE_NAME=libcx_base.a
 LIB_CX_PROCESS_NAME=libcx_process.a
+LIB_CX_BUILDOUTPUT_NAME=libcx_buildoutput.a
 
 CX_LIBS = \
+	$(LIB_CX_PLATFORM_LIB_DIR)/$(LIB_CX_BUILDOUTPUT_NAME) \
 	$(LIB_CX_PLATFORM_LIB_DIR)/$(LIB_CX_PROCESS_NAME) \
 	$(LIB_CX_PLATFORM_LIB_DIR)/$(LIB_CX_BASE_NAME)
 
