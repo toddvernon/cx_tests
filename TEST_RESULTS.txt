@@ -63,6 +63,56 @@ CxB64 Test Suite
 ================
 Results: 35 passed, 0 failed
 
+=== cxbuildoutput tests ===
+./darwin_arm64/cxbuildoutput_test
+
+=== BuildOutput & CxProcess Tests ===
+
+--- CxProcess::run() tests ---
+test_run_simple_command                            PASS
+test_run_command_with_args                         PASS
+test_run_failing_command                           PASS
+test_run_multiline_output                          PASS
+test_run_empty_command                             PASS
+test_run_captures_stderr                           PASS
+
+--- CxProcess::parseBuildError() tests ---
+test_parse_gcc_error_with_column                   PASS
+test_parse_gcc_error_no_column                     PASS
+test_parse_absolute_path                           PASS
+test_parse_relative_path                           PASS
+test_parse_no_error_pattern                        PASS
+test_parse_empty_line                              PASS
+test_parse_plain_text                              PASS
+test_parse_colon_but_no_number                     PASS
+test_parse_clang_warning                           PASS
+
+--- BuildOutput initial state tests ---
+test_buildoutput_initial_state                     PASS
+test_buildoutput_lineAt_empty                      PASS
+
+--- BuildOutput start/poll tests ---
+test_buildoutput_start_simple                      PASS
+test_buildoutput_start_empty_command               PASS
+test_buildoutput_start_failing_command             PASS
+test_buildoutput_multiline                         PASS
+
+--- BuildOutput line classification tests ---
+test_buildoutput_classify_error                    PASS
+test_buildoutput_classify_warning                  PASS
+test_buildoutput_classify_note                     PASS
+test_buildoutput_classify_command                  PASS
+test_buildoutput_classify_plain                    PASS
+test_buildoutput_mixed_output                      PASS
+
+--- BuildOutput clear/reuse tests ---
+test_buildoutput_clear                             PASS
+test_buildoutput_reuse_after_clear                 PASS
+test_buildoutput_get_command                       PASS
+
+=== Results: 30 passed, 0 failed ===
+
+
 === cxcallback tests ===
 ./darwin_arm64/cxcallback_test
 CxCallback Test Suite
@@ -155,6 +205,66 @@ CxCallback Test Suite
 
 =====================
 Results: 63 passed, 0 failed
+
+=== cxcommandcompleter tests ===
+./darwin_arm64/cxcommandcompleter_test
+
+Completer Test Suite
+====================
+
+--- Matching ---
+test_prefix_match_single_char                      PASS
+test_prefix_match_multiple_chars                   PASS
+test_dehyphenated_match                            PASS
+test_no_match                                      PASS
+
+--- processChar status ---
+test_status_unique                                 PASS
+test_status_multiple                               PASS
+test_status_partial                                PASS
+test_status_next_level                             PASS
+test_status_no_match_processchar                   PASS
+
+--- processEnter status ---
+test_enter_selected_exact                          PASS
+test_enter_selected_unique_prefix                  PASS
+test_enter_no_match                                PASS
+test_enter_multiple_ambiguous                      PASS
+
+--- Auto-completion ---
+test_autocomplete_single_match                     PASS
+test_autocomplete_common_prefix                    PASS
+test_autocomplete_no_common_prefix                 PASS
+test_autocomplete_resolves_ambiguity               PASS
+
+--- userData ---
+test_userdata_returned_on_unique                   PASS
+test_userdata_returned_on_enter                    PASS
+test_userdata_null_when_ambiguous                  PASS
+
+--- Child completers ---
+test_child_completer_transition                    PASS
+test_child_completer_full_flow                     PASS
+
+--- Edge cases ---
+test_empty_completer                               PASS
+test_single_candidate                              PASS
+test_empty_input_enter                             PASS
+test_empty_input_enter_multiple                    PASS
+
+--- Incomplete states ---
+test_incomplete_needs_more_chars                   PASS
+test_tab_at_common_prefix_still_stuck              PASS
+test_tab_completes_when_possible                   PASS
+
+--- findMatches ---
+test_find_matches_returns_names                    PASS
+test_find_matches_respects_limit                   PASS
+
+====================
+Passed: 31
+Failed: 0
+
 
 === cxdatetime tests ===
 ./darwin_arm64/cxdatetime_test
@@ -610,8 +720,114 @@ CxEditBuffer Test Suite
   PASS: cursor never on tab ext during traversal
   PASS: cursor never on tab ext during traversal
 
+== Kill Accumulation Tests ==
+  PASS: single kill returns 'world'
+  PASS: line after single kill
+  PASS: first kill: 'first'
+  PASS: second kill accumulates: 'first\n'
+  PASS: after two kills: 1 line
+  PASS: three kills accumulate: 'AAA\nBBB'
+  PASS: kill after cursor move: 'second' (not accumulated)
+  PASS: kill after insert: 'world' (not accumulated)
+  PASS: kill empty line: newline
+  PASS: after kill empty: 2 lines
+  PASS: line 1 is 'third'
+  PASS: four kills: 'line1\nline2\n'
+  PASS: after paste: 3 lines
+
 =======================
-Results: 233 passed, 0 failed
+Results: 246 passed, 0 failed
+
+=== cxeditline tests ===
+./darwin_arm64/cxeditline_test
+CxEditLine Unit Tests
+=====================
+
+== Constructor Tests ==
+  PASS: ctor: cursor col is 0
+  PASS: ctor: cursor row is 0
+  PASS: ctor: text is empty
+  PASS: ctor with width 40: text empty
+  PASS: ctor with width 120: text empty
+
+== Text Manipulation Tests ==
+  PASS: text() returns empty string initially
+  PASS: appendText adds text
+  PASS: appendText advances cursor
+  PASS: appendText concatenates
+  PASS: cursor at end after multiple appendText
+  PASS: setText clears text
+  PASS: setText resets cursor to 0
+
+== Character Insertion Tests ==
+  PASS: addCharacter(char) adds char
+  PASS: cursor advances after addCharacter
+  PASS: hint indicates cursor right
+  PASS: multiple addCharacter builds string
+  PASS: cursor col is 5 after 5 chars
+  PASS: addCharacter(CxString) works
+  PASS: cursor advances with CxString version
+  PASS: cursor at position 1
+  PASS: insert in middle works
+  PASS: cursor advances after insert
+
+== Cursor Movement Tests ==
+  PASS: cursor at beginning after 5 lefts
+  PASS: cursorRightRequest moves right
+  PASS: hint is CURSOR_HINT_RIGHT
+  PASS: cursor at end
+  PASS: cursor stays at end
+  PASS: hint is NONE at end
+  PASS: cursorLeftRequest moves left
+  PASS: hint is CURSOR_HINT_LEFT
+  PASS: cursor stays at 0
+  PASS: hint is NONE at beginning
+  PASS: cursorUpRequest is no-op
+  PASS: cursorUp hint is NONE
+  PASS: cursorDownRequest is no-op
+  PASS: cursorDown hint is NONE
+
+== Backspace Tests ==
+  PASS: backspace removes last char
+  PASS: cursor moves back after backspace
+  PASS: hint indicates line update
+  PASS: multiple backspaces work
+  PASS: cursor at correct position
+  PASS: backspace at beginning doesn't move cursor
+  PASS: hint is NONE for backspace at start
+  PASS: backspace in middle works
+  PASS: cursor at correct position after middle backspace
+
+== Position Evaluation Tests ==
+  PASS: empty buffer pos 0 is APPEND
+  PASS: pos 0 with text is INSERT
+  PASS: pos 2 with text is INSERT
+  PASS: pos at length is APPEND
+  PASS: pos past length is INVALID
+
+== Tab and Return Tests ==
+  PASS: addTab doesn't change cursor (no-op)
+  PASS: addTab doesn't change text (no-op)
+  PASS: addTab hint is NONE
+  PASS: addReturn doesn't change cursor (no-op)
+  PASS: addReturn doesn't change text (no-op)
+  PASS: addReturn hint is NONE
+
+== Edit Hint Tests ==
+  PASS: addChar returns LINE_PAST_POINT
+  PASS: addChar returns CURSOR_RIGHT
+  PASS: backspace returns LINE_PAST_POINT
+  PASS: cursorLeft returns UPDATE_NONE
+  PASS: cursorRight returns UPDATE_NONE
+
+== Position String Tests ==
+  PASS: positionString INSERT
+  PASS: positionString APPEND
+  PASS: positionString INVALID
+
+=====================
+Results: 64 passed, 0 failed
+=====================
 
 === cxexpression tests ===
 ./darwin_arm64/cxexpression_test
@@ -4504,6 +4720,89 @@ CxProp Test Suite
 =================
 Results: 130 passed, 0 failed
 
+=== cxregex tests ===
+./darwin_arm64/cxregex_test
+CxRegex Unit Tests
+==================
+
+== Basic Match Tests ==
+  PASS: compile simple pattern
+  PASS: isCompiled returns true
+  PASS: match at start
+  PASS: match in middle
+  PASS: no match
+  PASS: compile pattern with .*
+  PASS: match a.*b
+  PASS: match a.*b (zero chars)
+  PASS: match a.*b (multiple chars)
+  PASS: compile digit pattern
+  PASS: match digits in string
+  PASS: no digits
+  PASS: compile anchored pattern
+  PASS: match at start
+  PASS: no match (not at start)
+  PASS: compile end-anchored pattern
+  PASS: match at end
+  PASS: no match (not at end)
+
+== Case Insensitive Tests ==
+  PASS: case sensitive: exact match
+  PASS: case sensitive: lowercase no match
+  PASS: case sensitive: uppercase no match
+  PASS: case insensitive: exact match
+  PASS: case insensitive: lowercase match
+  PASS: case insensitive: uppercase match
+  PASS: case insensitive: mixed case match
+
+== Match Position Tests ==
+  PASS: match with position
+  PASS: start position is 6
+  PASS: length is 5
+  PASS: match digits with position
+  PASS: start position is 3
+  PASS: length is 3
+  PASS: match at start: position is 0
+  PASS: match at start: length is 5
+
+== Error Handling Tests ==
+  PASS: compile invalid pattern returns error
+  PASS: isCompiled returns false
+  PASS: getError returns message
+  PASS: match without compile returns 0
+  PASS: first pattern matches
+  PASS: isCompiled false after reset
+  PASS: second pattern matches
+  PASS: first pattern no longer matches
+
+== Escape For Literal Tests ==
+  PASS: no special chars unchanged
+  PASS: dot escaped
+  PASS: multiple specials escaped
+  PASS: brackets escaped
+  PASS: backslash escaped
+  PASS: escaped pattern matches literal
+  PASS: escaped pattern doesn't match dot-as-any
+
+== Replace Tests ==
+  PASS: simple replace
+  PASS: replace at start
+  PASS: replace with pattern
+  PASS: no match returns original
+  PASS: replace with empty string
+  PASS: case insensitive replace
+
+== Replace All Tests ==
+  PASS: replace all occurrences
+  PASS: replace all digits
+  PASS: no matches returns original
+  PASS: replace all with empty
+  PASS: replace adjacent matches
+  PASS: non-overlapping replace
+
+==================
+Results: 60 passed, 0 failed
+==================
+
 === cxscreen tests ===
 ./darwin_arm64/cxscreen_test
 CxScreen Test Suite
@@ -5340,6 +5639,578 @@ CxDateTime Test Suite
 
 =====================
 Results: 61 passed, 0 failed
+
+=== cxutfcharacter tests ===
+./darwin_arm64/cxutfcharacter_test
+=== CxUTFCharacter Test Suite ===
+
+--- Testing ASCII characters ---
+  PASS: ASCII 'A' consumes 1 byte
+  PASS: ASCII 'A' has 1 byte
+  PASS: ASCII 'A' has display width 1
+  PASS: ASCII 'A' isASCII returns true
+  PASS: ASCII 'A' codepoint is 0x41
+  PASS: fromASCII('Z') creates correct character
+  PASS: fromASCII has display width 1
+  PASS: Space character
+  PASS: Space has display width 1
+
+--- Testing 2-byte UTF-8 ---
+  PASS: U+00E9 (é) consumes 2 bytes
+  PASS: U+00E9 (é) has 2 bytes
+  PASS: U+00E9 (é) has display width 1
+  PASS: U+00E9 (é) is not ASCII
+  PASS: U+00E9 (é) codepoint is correct
+  PASS: U+00F1 (ñ) codepoint is correct
+  PASS: U+00FC (ü) codepoint is correct
+
+--- Testing 3-byte UTF-8 ---
+  PASS: U+4E2D (中) consumes 3 bytes
+  PASS: U+4E2D (中) has 3 bytes
+  PASS: U+4E2D (中) has display width 2 (CJK)
+  PASS: U+4E2D (中) codepoint is correct
+  PASS: U+2500 (─) has 3 bytes
+  PASS: U+2500 (─) has display width 1
+  PASS: U+2500 (─) codepoint is correct
+  PASS: U+2502 (│) codepoint is correct
+  PASS: U+3042 (あ) codepoint is correct
+  PASS: U+3042 (あ) has display width 2 (Japanese)
+
+--- Testing 4-byte UTF-8 ---
+  PASS: U+1F44B (👋) consumes 4 bytes
+  PASS: U+1F44B (👋) has 4 bytes
+  PASS: U+1F44B (👋) has display width 2 (emoji)
+  PASS: U+1F44B (👋) codepoint is correct
+  PASS: U+1F600 (😀) codepoint is correct
+  PASS: U+1F600 (😀) has display width 2
+
+--- Testing combining characters ---
+  PASS: e + combining acute consumes 3 bytes
+  PASS: e + combining acute has 3 bytes total
+  PASS: e + combining acute has display width 1
+  PASS: Base codepoint is 'e'
+  PASS: a + combining ring consumes 3 bytes
+  PASS: a + combining ring has display width 1
+  PASS: o + two combiners consumes 5 bytes
+  PASS: o + two combiners has 5 bytes
+  PASS: o + two combiners has display width 1
+
+--- Testing emoji with skin tone ---
+  PASS: Waving hand + skin tone consumes 8 bytes
+  PASS: Waving hand + skin tone has 8 bytes
+  PASS: Emoji with skin tone has display width 2
+  PASS: Base codepoint is waving hand
+
+--- Testing tabs ---
+  PASS: makeTab creates a tab
+  PASS: Tab with width 4
+  PASS: Tab byte is \t
+  PASS: Tab with width 8
+  PASS: Tab with width 1
+
+--- Testing fromCodepoint ---
+  PASS: fromCodepoint ASCII
+  PASS: ASCII is 1 byte
+  PASS: fromCodepoint 2-byte
+  PASS: 2-byte char has 2 bytes
+  PASS: fromCodepoint 3-byte CJK
+  PASS: CJK char has 3 bytes
+  PASS: CJK has display width 2
+  PASS: fromCodepoint 4-byte emoji
+  PASS: Emoji has 4 bytes
+
+--- Testing equality operators ---
+  PASS: Same character equals
+  PASS: Different characters not equal
+  PASS: Different characters != true
+  PASS: Same characters != false
+  PASS: Same UTF-8 character equals
+
+--- Testing copy and assignment ---
+  PASS: Copy constructor preserves codepoint
+  PASS: Copy constructor preserves byteCount
+  PASS: Copy constructor preserves displayWidth
+  PASS: Assignment preserves codepoint
+  PASS: Assignment creates equal character
+
+--- Testing utility functions ---
+  PASS: ASCII lead byte length is 1
+  PASS: 2-byte lead byte length
+  PASS: 3-byte lead byte length
+  PASS: 4-byte lead byte length
+  PASS: Encode ASCII
+  PASS: Encode 2-byte returns 2
+  PASS: Decode 2-byte roundtrip
+  PASS: Encode 3-byte returns 3
+  PASS: Decode 3-byte roundtrip
+  PASS: Encode 4-byte returns 4
+  PASS: Decode 4-byte roundtrip
+  PASS: U+0301 is combining mark
+  PASS: U+0041 (A) is not combining mark
+  PASS: Skin tone modifier is combining
+  PASS: ASCII has width 1
+  PASS: CJK has width 2
+  PASS: Combining mark has width 0
+
+--- Testing string parsing ---
+  PASS: First char is A
+  PASS: Second char is é
+  PASS: Third char is 中
+  PASS: Total bytes consumed is 6
+
+--- Testing edge cases ---
+  PASS: Empty string consumes 0 bytes
+  PASS: Empty character has 0 bytes
+  PASS: Null pointer consumes 0 bytes
+  PASS: Non-combiner not consumed
+  PASS: Only first char consumed
+
+--- Testing emoji symbol display widths ---
+  PASS: U+2B50 (⭐) codepoint is correct
+  PASS: U+2B50 (⭐) has 3 bytes
+  PASS: U+2B50 (⭐) has display width 2
+  PASS: U+2705 (✅) codepoint is correct
+  PASS: U+2705 (✅) has display width 2
+  PASS: U+26A0 (⚠) codepoint is correct
+  PASS: U+26A0 (⚠) has display width 2
+  PASS: U+2600 (☀) codepoint is correct
+  PASS: U+2600 (☀) has display width 2
+  PASS: U+2764 (❤) codepoint is correct
+  PASS: U+2764 (❤) has display width 2
+  PASS: U+2B1B (⬛) codepoint is correct
+  PASS: U+2B1B (⬛) has display width 2
+  PASS: Star (0x2B50) width via function is 2
+  PASS: Check (0x2705) width via function is 2
+  PASS: Warning (0x26A0) width via function is 2
+  PASS: Sun (0x2600) width via function is 2
+  PASS: Heart (0x2764) width via function is 2
+  PASS: Square (0x2B1B) width via function is 2
+  PASS: Start of Misc Symbols (0x2600) is width 2
+  PASS: End of Misc Symbols (0x26FF) is width 2
+  PASS: Start of Dingbats (0x2700) is width 2
+  PASS: End of Dingbats (0x27BF) is width 2
+  PASS: Start of Misc Symbols & Arrows (0x2B00) is width 2
+  PASS: End of Misc Symbols & Arrows (0x2BFF) is width 2
+
+--- Testing Miscellaneous Technical emoji widths ---
+  PASS: U+231A (⌚) codepoint is correct
+  PASS: U+231A (⌚) has display width 2
+  PASS: U+231B (⌛) codepoint is correct
+  PASS: U+231B (⌛) has display width 2
+  PASS: U+23E9 (⏩) has display width 2
+  PASS: U+23EA (⏪) has display width 2
+  PASS: U+23EB (⏫) has display width 2
+  PASS: U+23EC (⏬) has display width 2
+  PASS: U+23F0 (⏰) codepoint is correct
+  PASS: U+23F0 (⏰) has display width 2
+  PASS: U+23F3 (⏳) has display width 2
+  PASS: U+23F8 (⏸) has display width 2
+  PASS: U+23F9 (⏹) has display width 2
+  PASS: U+23FA (⏺) has display width 2
+  PASS: U+2302 (⌂) has display width 1 (not emoji)
+  PASS: U+2318 (⌘) has display width 1 (not emoji)
+
+--- Testing Geometric Shapes emoji widths ---
+  PASS: U+25AA (▪) has display width 2
+  PASS: U+25AB (▫) has display width 2
+  PASS: U+25B6 (▶) codepoint is correct
+  PASS: U+25B6 (▶) has display width 2
+  PASS: U+25C0 (◀) codepoint is correct
+  PASS: U+25C0 (◀) has display width 2
+  PASS: U+25FB (◻) has display width 2
+  PASS: U+25FC (◼) has display width 2
+  PASS: U+25FD (◽) has display width 2
+  PASS: U+25FE (◾) has display width 2
+  PASS: U+25A0 (■) has display width 1 (not emoji)
+  PASS: U+25A1 (□) has display width 1 (not emoji)
+  PASS: U+25CF (●) has display width 1 (not emoji)
+  PASS: U+25CB (○) has display width 1 (not emoji)
+
+--- Testing extended emoji ranges ---
+  PASS: U+1F000 (🀀) codepoint is correct
+  PASS: U+1F000 (🀀) has 4 bytes
+  PASS: U+1F000 (🀀) has display width 2
+  PASS: Start of Mahjong (0x1F000) is width 2
+  PASS: End of Mahjong (0x1F02F) is width 2
+  PASS: Start of Domino (0x1F030) is width 2
+  PASS: End of Domino (0x1F09F) is width 2
+  PASS: U+1F063 (🁣) codepoint is correct
+  PASS: U+1F063 (🁣) has display width 2
+  PASS: U+1F0A1 (🂡) codepoint is correct
+  PASS: U+1F0A1 (🂡) has display width 2
+  PASS: Start of Playing Cards (0x1F0A0) is width 2
+  PASS: End of Playing Cards (0x1F0FF) is width 2
+  PASS: U+1F170 (🅰) codepoint is correct
+  PASS: U+1F170 (🅰) has display width 2
+  PASS: Regional indicator U (0x1F1FA) is width 2
+  PASS: Regional indicator S (0x1F1F8) is width 2
+  PASS: Start of Enclosed Alphanum (0x1F100) is width 2
+  PASS: End of Enclosed Alphanum (0x1F1FF) is width 2
+  PASS: U+1F21A (🈚) codepoint is correct
+  PASS: U+1F21A (🈚) has display width 2
+  PASS: U+1F232 (🈲) is width 2
+  PASS: Start of Enclosed Ideographic (0x1F200) is width 2
+  PASS: End of Enclosed Ideographic (0x1F2FF) is width 2
+  PASS: 0x1F000 now covered
+  PASS: 0x1F150 now covered
+  PASS: 0x1F250 now covered
+  PASS: 0x1F2FF now covered
+  PASS: 0x1F300 (start of main emoji) is width 2
+  PASS: 0x1F600 (😀) is width 2
+
+=================================
+Tests passed: 180
+Tests failed: 0
+=================================
+
+=== cxutfeditbuffer tests ===
+./darwin_arm64/cxutfeditbuffer_test
+=== CxUTFEditBuffer Test Suite ===
+
+--- Testing basic construction ---
+  PASS: Empty buffer has 0 lines
+  PASS: Cursor starts at row 0
+  PASS: Cursor starts at col 0
+  PASS: New buffer is not touched
+  PASS: New buffer is not read-only
+
+--- Testing add characters ---
+  PASS: After first char, 1 line
+  PASS: Cursor at col 1
+  PASS: Buffer is touched
+  PASS: Cursor at col 2
+  PASS: Line 0 exists
+  PASS: Line has 2 characters
+  PASS: First char is H
+  PASS: Second char is i
+
+--- Testing add return ---
+  PASS: After return, 2 lines
+  PASS: Cursor on row 1
+  PASS: Cursor at col 1
+  PASS: First line has 2 chars
+  PASS: Second line has 1 char
+
+--- Testing cursor navigation ---
+  PASS: Loaded 3 lines
+  PASS: Cursor at 0,0
+  PASS: After right, col 1
+  PASS: At end of line, col 3
+  PASS: Wrapped to row 1, col 0
+  PASS: Down to row 2
+  PASS: Up to row 1
+  PASS: Left wrapped to row 0, col 3
+
+--- Testing UTF-8 navigation ---
+  PASS: 1 line
+  PASS: 3 characters
+  PASS: Start at col 0
+  PASS: After right, col 1 (中)
+  PASS: After right, col 2 (B)
+  PASS: After right, col 3 (end)
+  PASS: Display column is 4 (1+2+1)
+  PASS: After left, col 2
+
+--- Testing backspace ---
+  PASS: After backspace, 2 chars
+  PASS: Cursor at col 1
+  PASS: First is A
+  PASS: Second is C
+
+--- Testing join lines (backspace at start) ---
+  PASS: 2 lines
+  PASS: After join, 1 line
+  PASS: Line has 4 chars
+  PASS: Cursor at col 2 (join point)
+
+--- Testing tabs ---
+  PASS: 3 characters (A, tab, B)
+  PASS: Second char is tab
+  PASS: Cursor at display col 5
+
+--- Testing copy/paste ---
+  PASS: Copied 'ello'
+  PASS: Pasted at end
+
+--- Testing delete text ---
+  PASS: Deleted BCD
+  PASS: Cursor at delete start
+
+--- Testing find ---
+  PASS: Found 'World'
+  PASS: Cursor at col 6
+  PASS: Found second 'Hello'
+  PASS: Cursor at col 12
+
+--- Testing save/load roundtrip ---
+  PASS: File loaded
+  PASS: 3 lines loaded
+  PASS: UTF-8 preserved
+
+--- Testing box drawing characters ---
+  PASS: 1 line
+  PASS: 6 characters
+  PASS: After right, col 1
+  PASS: Last char is │
+
+--- Testing emoji ---
+  PASS: 3 characters
+  PASS: Third is waving hand
+  PASS: Display column is 4 (1+1+2)
+
+--- Testing flatten buffer ---
+  PASS: Flattened correctly
+
+--- Testing kill accumulation ---
+  PASS: single kill returns 'world'
+  PASS: line has 6 chars after kill
+  PASS: first kill: 'first'
+  PASS: second kill accumulates: 'first\n'
+  PASS: after two kills: 1 line
+  PASS: three kills accumulate: 'AAA\nBBB'
+  PASS: kill after cursor move: 'second' (not accumulated)
+  PASS: kill after insert: 'world' (not accumulated)
+  PASS: kill empty line: newline
+  PASS: after kill empty: 2 lines
+  PASS: four kills: 'line1\nline2\n'
+  PASS: after paste: 3 lines
+  PASS: UTF-8 kills accumulate correctly
+
+=================================
+Tests passed: 77
+Tests failed: 0
+=================================
+
+=== cxutfstring tests ===
+./darwin_arm64/cxutfstring_test
+=== CxUTFString Test Suite ===
+
+--- Testing basic construction ---
+  PASS: Empty string has 0 characters
+  PASS: Empty string has 0 display width
+  PASS: Empty string isEmpty returns true
+  PASS: Empty string isASCII returns true
+
+--- Testing ASCII parsing ---
+  PASS: ASCII string has correct character count
+  PASS: ASCII string has correct display width
+  PASS: ASCII string isASCII returns true
+  PASS: Non-empty string isEmpty returns false
+  PASS: First character is H
+  PASS: Last character is o
+  PASS: Out of bounds returns NULL
+  PASS: First char at column 0
+  PASS: Last char at column 4
+  PASS: End of string at column 5
+
+--- Testing UTF-8 parsing ---
+  PASS: UTF-8 string has 5 characters
+  PASS: UTF-8 string has display width 5
+  PASS: UTF-8 string isASCII returns false
+  PASS: First char is H
+  PASS: Second char is é
+  PASS: Third char is l
+
+--- Testing CJK parsing ---
+  PASS: CJK string has 3 characters
+  PASS: CJK string has display width 4 (1+2+1)
+  PASS: A at column 0
+  PASS: 中 at column 1
+  PASS: B at column 3
+  PASS: A has width 1
+  PASS: 中 has width 2
+  PASS: B has width 1
+
+--- Testing charIndexAtDisplayColumn ---
+  PASS: Column 0 -> char 0 (A)
+  PASS: Column 1 -> char 1 (中)
+  PASS: Column 2 -> char 1 (中) - middle of wide char
+  PASS: Column 3 -> char 2 (B)
+  PASS: Column 4 -> char 3 (end)
+  PASS: Column 10 -> char 3 (end)
+
+--- Testing combining characters ---
+  PASS: String with combining has 2 characters
+  PASS: String with combining has display width 2
+  PASS: First grapheme base is 'e'
+  PASS: First grapheme has 3 bytes
+  PASS: Second grapheme is 'x'
+
+--- Testing tabs ---
+  PASS: String with tab has 3 characters
+  PASS: Second character is tab
+  PASS: Tab width is 3 (from col 1 to col 4)
+  PASS: B at column 4
+  PASS: Total display width is 5
+  PASS: Tab at start has width 4
+  PASS: X at column 4
+  PASS: First tab has width 4
+  PASS: Second tab has width 4
+  PASS: Two tabs have total width 8
+
+--- Testing toBytes roundtrip ---
+  PASS: ASCII roundtrip
+  PASS: UTF-8 roundtrip
+  PASS: Tab roundtrip
+
+--- Testing insert single character ---
+  PASS: After insert, 3 characters
+  PASS: First is A
+  PASS: Second is B (inserted)
+  PASS: Third is C
+  PASS: After insert at start, 4 characters
+  PASS: First is Z
+  PASS: After insert at end, 5 characters
+  PASS: Last is Y
+
+--- Testing insert string ---
+  PASS: After insert string, 4 characters
+  PASS: First is A
+  PASS: Second is B
+  PASS: Third is C
+  PASS: Fourth is D
+
+--- Testing remove ---
+  PASS: After remove, 3 characters
+  PASS: First is A
+  PASS: Second is D
+  PASS: Third is E
+  PASS: After remove at start, 2 characters
+  PASS: First is D
+  PASS: After remove at end, 1 character
+  PASS: Only D remains
+  PASS: After remove all, 0 characters
+
+--- Testing append ---
+  PASS: After first append, 1 character
+  PASS: After second append, 2 characters
+  PASS: After append string, 4 characters
+  PASS: Third is C
+  PASS: Fourth is D
+
+--- Testing substring ---
+  PASS: Substring has 3 characters
+  PASS: First is B
+  PASS: Third is D
+  PASS: Substring from start has 2 chars
+  PASS: First is A
+  PASS: Substring at end has 2 chars
+  PASS: Last is E
+  PASS: Substring clamped to 2 chars
+  PASS: Zero-length substring is empty
+
+--- Testing copy and assignment ---
+  PASS: Copy has same char count
+  PASS: Copy has same content
+  PASS: Copy equals original
+  PASS: Assigned has same char count
+  PASS: Assigned equals original
+  PASS: Copy modified
+  PASS: Original unchanged
+
+--- Testing clear ---
+  PASS: Before clear, 5 characters
+  PASS: After clear, 0 characters
+  PASS: After clear, isEmpty returns true
+  PASS: After clear and append, 1 character
+
+--- Testing recalculateTabWidths ---
+  PASS: Initial tab width is 3
+  PASS: Tab width after insert is 2
+  PASS: B at column 4
+
+--- Testing equality ---
+  PASS: Same strings are equal
+  PASS: Different strings are not equal
+  PASS: Different strings != returns true
+  PASS: Same strings != returns false
+
+--- Testing box drawing characters ---
+  PASS: Box drawing string has 6 characters
+  PASS: Box drawing string has display width 6
+  PASS: First char is │
+  PASS: Last char is │
+  PASS: Box drawing roundtrip
+
+--- Testing emoji ---
+  PASS: Emoji string has 3 characters
+  PASS: Emoji string has display width 4 (1+1+2)
+  PASS: Third char is waving hand
+  PASS: Emoji + skin tone is 1 character
+  PASS: Emoji + skin tone has display width 2
+
+--- Testing fromCxString ---
+  PASS: fromCxString parses correctly
+  PASS: First char is H
+
+--- Testing edge cases ---
+  PASS: Empty bytes creates empty string
+  PASS: Null bytes creates empty string
+  PASS: Insert into empty works
+  PASS: Remove from empty is safe
+  PASS: Substring of empty is empty
+
+=================================
+Tests passed: 123
+Tests failed: 0
+=================================
+
+=== cxutfstringlist tests ===
+./darwin_arm64/cxutfstringlist_test
+=== CxUTFStringList Test Suite ===
+
+--- Testing basic operations ---
+  PASS: Empty list has 0 entries
+  PASS: Empty list isEmpty returns true
+  PASS: at(0) on empty returns NULL
+  PASS: After append, 1 entry
+  PASS: After append, not empty
+  PASS: First line has 6 chars
+  PASS: After second append, 2 entries
+  PASS: Second line ends with 2
+
+--- Testing insert ---
+  PASS: After insert, 3 entries
+  PASS: First is First
+  PASS: Second is Second
+  PASS: Third is Third
+  PASS: After insert at start, 4 entries
+  PASS: First is Zero
+  PASS: After insertAfter, 5 entries
+  PASS: Third is After
+
+--- Testing remove ---
+  PASS: After remove, 2 entries
+  PASS: First is A
+  PASS: Second is C
+  PASS: After remove first, 1 entry
+  PASS: First is C
+  PASS: After remove all, 0 entries
+
+--- Testing replace ---
+  PASS: Replaced with New
+
+--- Testing copy and assignment ---
+  PASS: Copy has 2 entries
+  PASS: Copy first line has 6 chars
+  PASS: Copy modified
+  PASS: Original unchanged
+  PASS: Assigned has 2 entries
+
+--- Testing clear ---
+  PASS: Before clear, 2 entries
+  PASS: After clear, 0 entries
+  PASS: After clear, isEmpty
+  PASS: After clear and append, 1 entry
+
+--- Testing preallocated ---
+  PASS: Preallocated list has 0 entries
+  PASS: Can append to preallocated list
+
+=================================
+Tests passed: 34
+Tests failed: 0
+=================================
 
 ========================================
 All tests completed for: darwin_arm64
