@@ -542,6 +542,239 @@ void test_from_cxstring(void)
 
 
 //-------------------------------------------------------------------------------------------------
+// Test fromUTF8Bytes
+//-------------------------------------------------------------------------------------------------
+void test_from_utf8_bytes(void)
+{
+    printf("\n--- Testing fromUTF8Bytes ---\n");
+
+    //---------------------------------------------------------------------------------------------
+    // Tabs are stored as width-1 (no tab-stop expansion)
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s;
+        s.fromUTF8Bytes("A\tB", 3);
+
+        TEST_ASSERT(s.charCount() == 3, "fromUTF8Bytes: A\\tB has 3 characters");
+        TEST_ASSERT(s.at(0)->codepoint() == 'A', "fromUTF8Bytes: first char is A");
+        TEST_ASSERT(s.at(1)->isTab() == 1, "fromUTF8Bytes: second char is tab");
+        TEST_ASSERT(s.at(1)->displayWidth() == 1, "fromUTF8Bytes: tab has width 1 (not expanded)");
+        TEST_ASSERT(s.at(2)->codepoint() == 'B', "fromUTF8Bytes: third char is B");
+        TEST_ASSERT(s.displayWidth() == 3, "fromUTF8Bytes: total width is 3 (1+1+1)");
+
+        // Compare with fromBytes which expands tabs
+        CxUTFString s2;
+        s2.fromBytes("A\tB", 3, 4);
+        TEST_ASSERT(s2.at(1)->displayWidth() == 3, "fromBytes: tab has width 3 (expanded)");
+        TEST_ASSERT(s2.displayWidth() == 5, "fromBytes: total width is 5 (1+3+1)");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Tab at start has width 1
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s;
+        s.fromUTF8Bytes("\tX", 2);
+
+        TEST_ASSERT(s.at(0)->isTab() == 1, "fromUTF8Bytes: tab at start is tab");
+        TEST_ASSERT(s.at(0)->displayWidth() == 1, "fromUTF8Bytes: tab at start has width 1");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Multiple consecutive tabs - each has width 1
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s;
+        s.fromUTF8Bytes("\t\t\t", 3);
+
+        TEST_ASSERT(s.charCount() == 3, "fromUTF8Bytes: 3 tabs has 3 characters");
+        TEST_ASSERT(s.at(0)->displayWidth() == 1, "fromUTF8Bytes: first tab width 1");
+        TEST_ASSERT(s.at(1)->displayWidth() == 1, "fromUTF8Bytes: second tab width 1");
+        TEST_ASSERT(s.at(2)->displayWidth() == 1, "fromUTF8Bytes: third tab width 1");
+        TEST_ASSERT(s.displayWidth() == 3, "fromUTF8Bytes: 3 tabs total width 3");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Newlines preserved as characters
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s;
+        s.fromUTF8Bytes("AB\nCD", 5);
+
+        TEST_ASSERT(s.charCount() == 5, "fromUTF8Bytes: AB\\nCD has 5 characters");
+        TEST_ASSERT(s.at(0)->codepoint() == 'A', "fromUTF8Bytes: first is A");
+        TEST_ASSERT(s.at(1)->codepoint() == 'B', "fromUTF8Bytes: second is B");
+        TEST_ASSERT(s.at(2)->codepoint() == '\n', "fromUTF8Bytes: third is newline");
+        TEST_ASSERT(s.at(3)->codepoint() == 'C', "fromUTF8Bytes: fourth is C");
+        TEST_ASSERT(s.at(4)->codepoint() == 'D', "fromUTF8Bytes: fifth is D");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Carriage return preserved
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s;
+        s.fromUTF8Bytes("A\rB", 3);
+
+        TEST_ASSERT(s.charCount() == 3, "fromUTF8Bytes: A\\rB has 3 characters");
+        TEST_ASSERT(s.at(1)->codepoint() == '\r', "fromUTF8Bytes: middle is CR");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // CRLF as two separate characters
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s;
+        s.fromUTF8Bytes("A\r\nB", 4);
+
+        TEST_ASSERT(s.charCount() == 4, "fromUTF8Bytes: A\\r\\nB has 4 characters");
+        TEST_ASSERT(s.at(1)->codepoint() == '\r', "fromUTF8Bytes: second is CR");
+        TEST_ASSERT(s.at(2)->codepoint() == '\n', "fromUTF8Bytes: third is LF");
+        TEST_ASSERT(s.at(3)->codepoint() == 'B', "fromUTF8Bytes: fourth is B");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // UTF-8 multi-byte characters
+    //---------------------------------------------------------------------------------------------
+    {
+        // "Héllo" with precomposed é (U+00E9)
+        CxUTFString s;
+        s.fromUTF8Bytes("H\xC3\xA9llo", 6);
+
+        TEST_ASSERT(s.charCount() == 5, "fromUTF8Bytes: Héllo has 5 characters");
+        TEST_ASSERT(s.at(1)->codepoint() == 0x00E9, "fromUTF8Bytes: second is é");
+        TEST_ASSERT(s.displayWidth() == 5, "fromUTF8Bytes: Héllo display width 5");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Box-drawing characters
+    //---------------------------------------------------------------------------------------------
+    {
+        // "│cell│" - box drawing (3 bytes each) + ASCII
+        const char *input = "\xE2\x94\x82" "cell" "\xE2\x94\x82";
+        CxUTFString s;
+        s.fromUTF8Bytes(input, 10);
+
+        TEST_ASSERT(s.charCount() == 6, "fromUTF8Bytes: box drawing has 6 characters");
+        TEST_ASSERT(s.at(0)->codepoint() == 0x2502, "fromUTF8Bytes: first is │");
+        TEST_ASSERT(s.at(5)->codepoint() == 0x2502, "fromUTF8Bytes: last is │");
+        TEST_ASSERT(s.displayWidth() == 6, "fromUTF8Bytes: box drawing display width 6");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Mixed content: tabs + box-drawing + newlines
+    //---------------------------------------------------------------------------------------------
+    {
+        const char *input = "A\t\xE2\x94\x82\nB";  // A, tab, │, newline, B
+        CxUTFString s;
+        s.fromUTF8Bytes(input, 7);
+
+        TEST_ASSERT(s.charCount() == 5, "fromUTF8Bytes: mixed content has 5 characters");
+        TEST_ASSERT(s.at(0)->codepoint() == 'A', "fromUTF8Bytes: mixed first is A");
+        TEST_ASSERT(s.at(1)->isTab() == 1, "fromUTF8Bytes: mixed second is tab");
+        TEST_ASSERT(s.at(1)->displayWidth() == 1, "fromUTF8Bytes: mixed tab width 1");
+        TEST_ASSERT(s.at(2)->codepoint() == 0x2502, "fromUTF8Bytes: mixed third is │");
+        TEST_ASSERT(s.at(3)->codepoint() == '\n', "fromUTF8Bytes: mixed fourth is newline");
+        TEST_ASSERT(s.at(4)->codepoint() == 'B', "fromUTF8Bytes: mixed fifth is B");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Edge cases: NULL pointer, empty string, zero length
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s1;
+        s1.fromUTF8Bytes((const char *)0, 0);
+        TEST_ASSERT(s1.charCount() == 0, "fromUTF8Bytes: NULL creates empty string");
+
+        CxUTFString s2;
+        s2.fromUTF8Bytes("", 0);
+        TEST_ASSERT(s2.charCount() == 0, "fromUTF8Bytes: empty creates empty string");
+
+        CxUTFString s3;
+        s3.fromUTF8Bytes("Hello", 0);
+        TEST_ASSERT(s3.charCount() == 0, "fromUTF8Bytes: zero length creates empty string");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Roundtrip: fromUTF8Bytes -> toBytes preserves content
+    //---------------------------------------------------------------------------------------------
+    {
+        // ASCII roundtrip
+        CxUTFString s1;
+        s1.fromUTF8Bytes("Hello", 5);
+        CxString back1 = s1.toBytes();
+        TEST_ASSERT(strcmp(back1.data(), "Hello") == 0, "fromUTF8Bytes: ASCII roundtrip");
+
+        // UTF-8 roundtrip
+        const char *utf8 = "H\xC3\xA9llo \xE4\xB8\xAD";  // "Héllo 中"
+        CxUTFString s2;
+        s2.fromUTF8Bytes(utf8, strlen(utf8));
+        CxString back2 = s2.toBytes();
+        TEST_ASSERT(strcmp(back2.data(), utf8) == 0, "fromUTF8Bytes: UTF-8 roundtrip");
+
+        // Tab roundtrip (tabs come back as \t)
+        CxUTFString s3;
+        s3.fromUTF8Bytes("A\tB\tC", 5);
+        CxString back3 = s3.toBytes();
+        TEST_ASSERT(strcmp(back3.data(), "A\tB\tC") == 0, "fromUTF8Bytes: tab roundtrip");
+
+        // Newline roundtrip
+        CxUTFString s4;
+        s4.fromUTF8Bytes("Line1\nLine2", 11);
+        CxString back4 = s4.toBytes();
+        TEST_ASSERT(strcmp(back4.data(), "Line1\nLine2") == 0, "fromUTF8Bytes: newline roundtrip");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Invalid UTF-8: incomplete sequences should stop parsing (not crash)
+    //---------------------------------------------------------------------------------------------
+    {
+        // Incomplete 2-byte sequence at end
+        CxUTFString s1;
+        s1.fromUTF8Bytes("A\xC3", 2);
+        // Should parse 'A' then stop at incomplete sequence
+        TEST_ASSERT(s1.charCount() >= 1, "fromUTF8Bytes: incomplete 2-byte - at least A parsed");
+        TEST_ASSERT(s1.at(0)->codepoint() == 'A', "fromUTF8Bytes: incomplete 2-byte - first is A");
+
+        // Incomplete 3-byte sequence at end
+        CxUTFString s2;
+        s2.fromUTF8Bytes("AB\xE4\xB8", 4);
+        TEST_ASSERT(s2.charCount() >= 2, "fromUTF8Bytes: incomplete 3-byte - at least AB parsed");
+        TEST_ASSERT(s2.at(0)->codepoint() == 'A', "fromUTF8Bytes: incomplete 3-byte - first is A");
+        TEST_ASSERT(s2.at(1)->codepoint() == 'B', "fromUTF8Bytes: incomplete 3-byte - second is B");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // CJK characters (double-width)
+    //---------------------------------------------------------------------------------------------
+    {
+        // "中文" = two CJK chars, each 3 bytes, display width 2
+        const char *input = "\xE4\xB8\xAD\xE6\x96\x87";
+        CxUTFString s;
+        s.fromUTF8Bytes(input, 6);
+
+        TEST_ASSERT(s.charCount() == 2, "fromUTF8Bytes: CJK has 2 characters");
+        TEST_ASSERT(s.displayWidth() == 4, "fromUTF8Bytes: CJK display width 4 (2+2)");
+        TEST_ASSERT(s.at(0)->codepoint() == 0x4E2D, "fromUTF8Bytes: first is 中");
+        TEST_ASSERT(s.at(1)->codepoint() == 0x6587, "fromUTF8Bytes: second is 文");
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Reuse: calling fromUTF8Bytes on a non-empty string clears first
+    //---------------------------------------------------------------------------------------------
+    {
+        CxUTFString s;
+        s.fromUTF8Bytes("Hello", 5);
+        TEST_ASSERT(s.charCount() == 5, "fromUTF8Bytes: initial has 5 chars");
+
+        s.fromUTF8Bytes("AB", 2);
+        TEST_ASSERT(s.charCount() == 2, "fromUTF8Bytes: reuse clears and parses new content");
+        TEST_ASSERT(s.at(0)->codepoint() == 'A', "fromUTF8Bytes: reuse first is A");
+    }
+}
+
+
+//-------------------------------------------------------------------------------------------------
 // Test edge cases
 //-------------------------------------------------------------------------------------------------
 void test_edge_cases(void)
@@ -600,6 +833,7 @@ int main(int argc, char **argv)
     test_box_drawing();
     test_emoji();
     test_from_cxstring();
+    test_from_utf8_bytes();
     test_edge_cases();
 
     printf("\n=================================\n");
