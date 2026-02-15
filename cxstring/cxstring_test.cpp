@@ -142,6 +142,14 @@ void testOperators() {
         check(a.length() == 11, "operator+= correct length");
     }
 
+    // Append char operator +=
+    {
+        CxString a("abc");
+        a += 'd';
+        check(strcmp(a.data(), "abcd") == 0, "operator+=(char) appends char");
+        check(a.length() == 4, "operator+=(char) correct length");
+    }
+
     // Equality operator ==
     {
         CxString a("test");
