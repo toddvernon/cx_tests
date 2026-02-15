@@ -583,8 +583,10 @@ clean:
 
 archive:
 	@echo "Creating cxtest_unix.tar..."
+	@echo "  (extracts to cx_tests/ when untarred from parent directory)"
 	@test -d ../ARCHIVE || mkdir ../ARCHIVE
 	@tar cvf ../ARCHIVE/cxtest_unix.tar \
+		--transform 's,^\./,cx_tests/,' \
 		--exclude='*.o' \
 		--exclude='*.a' \
 		--exclude='.git' \
