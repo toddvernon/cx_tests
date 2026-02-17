@@ -171,11 +171,13 @@ all:
 		cd cxprop; make; \
 	fi
 
-# cxregex tests (all platforms)
+# cxregex tests (darwin and linux only - regex lib not available on other platforms)
 
-	@if [ -d "./cxregex" ]; then \
-		echo "Building cxregex tests..."; \
-		cd cxregex; make; \
+	@if [ "$(UNAME_S)" = "darwin" ] || [ "$(UNAME_S)" = "linux" ]; then \
+		if [ -d "./cxregex" ]; then \
+			echo "Building cxregex tests..."; \
+			cd cxregex; make; \
+		fi; \
 	fi
 
 # cxscreen tests (all platforms)
@@ -276,174 +278,177 @@ all:
 test:
 	@{ \
 	echo "========================================"; \
-	echo "Running cx_tests for: $(UNAME_S)_$(ARCH)"; \
+	echo "Running cx_tests for: $(UNAME_S)"; \
 	echo "========================================"; \
 	\
 	if [ -d "./cxb64" ]; then \
 		echo ""; echo "=== cxb64 tests ==="; \
-		cd cxb64 && make test; cd ..; \
+		(cd cxb64 && make test); \
 	fi; \
 	\
 	if [ -d "./cxbuildoutput" ]; then \
 		echo ""; echo "=== cxbuildoutput tests ==="; \
-		cd cxbuildoutput && make test; cd ..; \
+		(cd cxbuildoutput && make test); \
 	fi; \
 	\
 	if [ -d "./cxcallback" ]; then \
 		echo ""; echo "=== cxcallback tests ==="; \
-		cd cxcallback && make test; cd ..; \
+		(cd cxcallback && make test); \
 	fi; \
 	\
 	if [ -d "./cxcommandcompleter" ]; then \
 		echo ""; echo "=== cxcommandcompleter tests ==="; \
-		cd cxcommandcompleter && make test; cd ..; \
+		(cd cxcommandcompleter && make test); \
 	fi; \
 	\
 	if [ "$(UNAME_S)" != "sunos" ]; then \
 		if [ "$(UNAME_S)" != "irix" ]; then \
 			if [ -d "./cxdatetime" ]; then \
 				echo ""; echo "=== cxdatetime tests ==="; \
-				cd cxdatetime && make test; cd ..; \
+				(cd cxdatetime && make test); \
 			fi; \
 		fi; \
 	fi; \
 	\
 	if [ -d "./cxdirectory" ]; then \
 		echo ""; echo "=== cxdirectory tests ==="; \
-		cd cxdirectory && make test; cd ..; \
+		(cd cxdirectory && make test); \
 	fi; \
 	\
 	if [ -d "./cxeditbuffer" ]; then \
 		echo ""; echo "=== cxeditbuffer tests ==="; \
-		cd cxeditbuffer && make test; cd ..; \
+		(cd cxeditbuffer && make test); \
 	fi; \
 	\
 	if [ -d "./cxeditline" ]; then \
 		echo ""; echo "=== cxeditline tests ==="; \
-		cd cxeditline && make test; cd ..; \
+		(cd cxeditline && make test); \
 	fi; \
 	\
 	if [ -d "./cxexpression" ]; then \
 		echo ""; echo "=== cxexpression tests ==="; \
-		cd cxexpression && make test; cd ..; \
+		(cd cxexpression && make test); \
 	fi; \
 	\
 	if [ -d "./cxfile" ]; then \
 		echo ""; echo "=== cxfile tests ==="; \
-		cd cxfile && make test; cd ..; \
+		(cd cxfile && make test); \
 	fi; \
 	\
 	if [ -d "./cxfunctor" ]; then \
 		echo ""; echo "=== cxfunctor tests ==="; \
-		cd cxfunctor && make test; cd ..; \
+		(cd cxfunctor && make test); \
 	fi; \
 	\
 	if [ -d "./cxhandle" ]; then \
 		echo ""; echo "=== cxhandle tests ==="; \
-		cd cxhandle && make test; cd ..; \
+		(cd cxhandle && make test); \
 	fi; \
 	\
 	if [ -d "./cxhashmap" ]; then \
 		echo ""; echo "=== cxhashmap tests ==="; \
-		cd cxhashmap && make test; cd ..; \
+		(cd cxhashmap && make test); \
 	fi; \
 	\
 	if [ -d "./cxjson" ]; then \
 		echo ""; echo "=== cxjson tests ==="; \
-		cd cxjson && make test; cd ..; \
+		(cd cxjson && make test); \
 	fi; \
 	\
 	if [ -d "./cxlog" ]; then \
 		echo ""; echo "=== cxlog tests ==="; \
-		cd cxlog && make test; cd ..; \
+		(cd cxlog && make test); \
 	fi; \
 	\
 	if [ -d "./cxlogfile" ]; then \
 		echo ""; echo "=== cxlogfile tests ==="; \
-		cd cxlogfile && make test; cd ..; \
+		(cd cxlogfile && make test); \
 	fi; \
 	\
 	if [ -d "./cxnet" ]; then \
 		echo ""; echo "=== cxnet tests ==="; \
-		cd cxnet && make test; cd ..; \
+		(cd cxnet && make test); \
 	fi; \
 	\
 	if [ -d "./cxprop" ]; then \
 		echo ""; echo "=== cxprop tests ==="; \
-		cd cxprop && make test; cd ..; \
+		(cd cxprop && make test); \
 	fi; \
 	\
-	if [ -d "./cxregex" ]; then \
-		echo ""; echo "=== cxregex tests ==="; \
-		cd cxregex && make test; cd ..; \
+	if [ "$(UNAME_S)" = "darwin" ] || [ "$(UNAME_S)" = "linux" ]; then \
+		if [ -d "./cxregex" ]; then \
+			echo ""; echo "=== cxregex tests ==="; \
+			(cd cxregex && make test); \
+		fi; \
 	fi; \
 	\
 	if [ -d "./cxscreen" ]; then \
 		echo ""; echo "=== cxscreen tests ==="; \
-		cd cxscreen && make test; cd ..; \
+		(cd cxscreen && make test); \
 	fi; \
 	\
 	if [ -d "./cxslist" ]; then \
 		echo ""; echo "=== cxslist tests ==="; \
-		cd cxslist && make test; cd ..; \
+		(cd cxslist && make test); \
 	fi; \
 	\
 	if [ -d "./cxstar" ]; then \
 		echo ""; echo "=== cxstar tests ==="; \
-		cd cxstar && make test; cd ..; \
+		(cd cxstar && make test); \
 	fi; \
 	\
 	if [ "$(UNAME_S)" != "sunos" ]; then \
 		if [ -d "./cxstring" ]; then \
 			echo ""; echo "=== cxstring tests ==="; \
-			cd cxstring && make test; cd ..; \
+			(cd cxstring && make test); \
 		fi; \
 	fi; \
 	\
 	if [ "$(UNAME_S)" != "sunos" ]; then \
 		if [ -d "./cxthread" ]; then \
 			echo ""; echo "=== cxthread tests ==="; \
-			cd cxthread && make test; cd ..; \
+			(cd cxthread && make test); \
 		fi; \
 	fi; \
 	\
 	if [ -d "./cxtime" ]; then \
 		echo ""; echo "=== cxtime tests ==="; \
-		cd cxtime && make test; cd ..; \
+		(cd cxtime && make test); \
 	fi; \
 	\
 	if [ "$(UNAME_S)" != "sunos" ]; then \
 		if [ "$(UNAME_S)" != "irix" ]; then \
 			if [ -d "./cxtz" ]; then \
 				echo ""; echo "=== cxtz tests ==="; \
-				cd cxtz && make test; cd ..; \
+				(cd cxtz && make test); \
 			fi; \
 		fi; \
 	fi; \
 	\
 	if [ -d "./cxutfcharacter" ]; then \
 		echo ""; echo "=== cxutfcharacter tests ==="; \
-		cd cxutfcharacter && make test; cd ..; \
+		(cd cxutfcharacter && make test); \
 	fi; \
 	\
 	if [ -d "./cxutfeditbuffer" ]; then \
 		echo ""; echo "=== cxutfeditbuffer tests ==="; \
-		cd cxutfeditbuffer && make test; cd ..; \
+		(cd cxutfeditbuffer && make test); \
 	fi; \
 	\
 	if [ -d "./cxutfstring" ]; then \
 		echo ""; echo "=== cxutfstring tests ==="; \
-		cd cxutfstring && make test; cd ..; \
+		(cd cxutfstring && make test); \
 	fi; \
 	\
 	if [ -d "./cxutfstringlist" ]; then \
 		echo ""; echo "=== cxutfstringlist tests ==="; \
-		cd cxutfstringlist && make test; cd ..; \
+		(cd cxutfstringlist && make test); \
 	fi; \
 	\
 	echo ""; \
 	echo "========================================"; \
-	echo "All tests completed for: $(UNAME_S)_$(ARCH)"; \
+	echo "Tests completed for: $(UNAME_S)"; \
+	echo "(Check individual results above)"; \
 	echo "========================================"; \
 	} 2>&1 | tee TEST_RESULTS.txt
 

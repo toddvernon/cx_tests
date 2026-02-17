@@ -46,8 +46,31 @@ make
 - If a feature would normally use STL/RAII/modern C++, implement it using existing in-repo utilities.
 
 ## Portability targets
-- Code must compile on: macOS (darwin), Linux, SunOS/Solaris, IRIX.
+- Code must compile on: macOS (darwin), Linux, SunOS/Solaris (including SunOS 4.1.x), IRIX, NetBSD.
 - Assume older compilers. Avoid modern language features (C++11+), unless the codebase already uses them everywhere.
+
+## Writing portable tests
+When tests execute shell commands (e.g., via `CxProcess::run()` or `BuildOutput::start()`), use only commands available on all target platforms including SunOS 4.1.x with original Bourne shell:
+
+**Use:**
+- `echo` for output (exists on all Unix since the 1970s)
+- Multiple commands with semicolons: `echo line1; echo line2; echo line3`
+- Single quotes around strings with special characters: `echo 'file.cpp:10: error'`
+
+**Avoid:**
+- `printf` - not available on SunOS 4.1.x
+- `echo -e` - GNU extension, not portable
+- `echo "foo\nbar"` - escape handling varies between BSD and System V
+- Bash-specific syntax (`$(...)`, `[[...]]`, arrays, etc.)
+
+**Example:**
+```c
+// WRONG - printf not on SunOS 4.1.x
+build.start("printf 'line1\\nline2\\n'");
+
+// CORRECT - echo is universal
+build.start("echo line1; echo line2");
+```
 
 ## Language/feature restrictions (assume old toolchains)
 - Avoid: auto, nullptr, constexpr, lambda, range-for, threads, regex, exceptions (unless already widely used).

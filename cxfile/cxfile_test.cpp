@@ -342,7 +342,10 @@ void testFileStaticMethods() {
         CxString temp1 = CxFile::tempName();
         CxString temp2 = CxFile::tempName();
         check(temp1.length() > 0, "tempName returns non-empty string");
-        check(temp1.index("/tmp/") == 0, "tempName returns /tmp/ path");
+        // Verify file was created (temp dir varies by platform: /tmp/, /var/tmp/, etc.)
+        CxFileAccess::status st1 = CxFileAccess::checkStatus(temp1);
+        check(st1 == CxFileAccess::FOUND_RW || st1 == CxFileAccess::FOUND_R,
+              "tempName creates accessible file");
         check(strcmp(temp1.data(), temp2.data()) != 0, "tempName generates unique names");
         // Clean up the temp files created by mkstemp
         removeFile(temp1);
@@ -353,7 +356,6 @@ void testFileStaticMethods() {
     {
         CxString temp = CxFile::tempName("mytest_XXXXXX");
         check(temp.length() > 0, "tempName with prefix returns non-empty");
-        check(temp.index("/tmp/") == 0, "tempName with prefix returns /tmp/ path");
         check(temp.index("mytest_") != -1, "tempName uses custom prefix");
         // Verify the file was created
         CxFileAccess::status st = CxFileAccess::checkStatus(temp);

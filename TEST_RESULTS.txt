@@ -1,9 +1,10 @@
 ========================================
-Running cx_tests for: darwin_arm64
+Running cx_tests for: linux
 ========================================
 
 === cxb64 tests ===
-./darwin_arm64/cxb64_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxb64'
+./linux_x86_64/cxb64_test
 CxB64 Test Suite
 ================
 
@@ -62,9 +63,11 @@ CxB64 Test Suite
 
 ================
 Results: 35 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxb64'
 
 === cxbuildoutput tests ===
-./darwin_arm64/cxbuildoutput_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxbuildoutput'
+./linux_x86_64/cxbuildoutput_test
 
 === BuildOutput & CxProcess Tests ===
 
@@ -112,9 +115,11 @@ test_buildoutput_get_command                       PASS
 
 === Results: 30 passed, 0 failed ===
 
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxbuildoutput'
 
 === cxcallback tests ===
-./darwin_arm64/cxcallback_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxcallback'
+./linux_x86_64/cxcallback_test
 CxCallback Test Suite
 =====================
 
@@ -205,9 +210,11 @@ CxCallback Test Suite
 
 =====================
 Results: 63 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxcallback'
 
 === cxcommandcompleter tests ===
-./darwin_arm64/cxcommandcompleter_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxcommandcompleter'
+./linux_x86_64/cxcommandcompleter_test
 
 Completer Test Suite
 ====================
@@ -265,9 +272,11 @@ test_find_matches_respects_limit                   PASS
 Passed: 31
 Failed: 0
 
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxcommandcompleter'
 
 === cxdatetime tests ===
-./darwin_arm64/cxdatetime_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxdatetime'
+./linux_x86_64/cxdatetime_test
 CxDateTime Test Suite
 =====================
 
@@ -361,9 +370,11 @@ CxDateTime Test Suite
 
 =====================
 Results: 72 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxdatetime'
 
 === cxdirectory tests ===
-./darwin_arm64/cxdirectory_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxdirectory'
+./linux_x86_64/cxdirectory_test
 CxDirectory Test Suite
 ======================
 
@@ -453,9 +464,11 @@ CxDirectory Test Suite
 
 ======================
 Results: 62 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxdirectory'
 
 === cxeditbuffer tests ===
-./darwin_arm64/cxeditbuffer_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxeditbuffer'
+./linux_x86_64/cxeditbuffer_test
 CxEditBuffer Test Suite
 =======================
 
@@ -737,9 +750,11 @@ CxEditBuffer Test Suite
 
 =======================
 Results: 246 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxeditbuffer'
 
 === cxeditline tests ===
-./darwin_arm64/cxeditline_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxeditline'
+./linux_x86_64/cxeditline_test
 CxEditLine Unit Tests
 =====================
 
@@ -828,9 +843,11 @@ CxEditLine Unit Tests
 =====================
 Results: 64 passed, 0 failed
 =====================
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxeditline'
 
 === cxexpression tests ===
-./darwin_arm64/cxexpression_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxexpression'
+./linux_x86_64/cxexpression_test
 CxExpression Test Suite
 =======================
 
@@ -3761,9 +3778,11 @@ result[0]=0.000000
 
 =======================
 Results: 368 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxexpression'
 
 === cxfile tests ===
-./darwin_arm64/cxfile_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxfile'
+./linux_x86_64/cxfile_test
 CxFile Test Suite
 =================
 
@@ -3807,10 +3826,9 @@ CxFile Test Suite
 
 == CxFile Static Methods Tests ==
   PASS: tempName returns non-empty string
-  PASS: tempName returns /tmp/ path
+  PASS: tempName creates accessible file
   PASS: tempName generates unique names
   PASS: tempName with prefix returns non-empty
-  PASS: tempName with prefix returns /tmp/ path
   PASS: tempName uses custom prefix
   PASS: tempName with prefix creates file
   PASS: tildaExpansion removes tilde
@@ -3859,10 +3877,12 @@ CxFile Test Suite
   PASS: binary data matches
 
 =================
-Results: 67 passed, 0 failed
+Results: 66 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxfile'
 
 === cxfunctor tests ===
-./darwin_arm64/cxfunctor_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxfunctor'
+./linux_x86_64/cxfunctor_test
 CxFunctor Test Suite
 ====================
 
@@ -3969,9 +3989,11 @@ CxFunctor Test Suite
 
 ====================
 Results: 59 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxfunctor'
 
 === cxhandle tests ===
-./darwin_arm64/cxhandle_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxhandle'
+./linux_x86_64/cxhandle_test
 CxHandle Test Suite
 ===================
 
@@ -4104,9 +4126,11 @@ CxHandle Test Suite
 
 ===================
 Results: 97 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxhandle'
 
 === cxhashmap tests ===
-./darwin_arm64/cxhashmap_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxhashmap'
+./linux_x86_64/cxhashmap_test
 CxHashmap Test Suite
 ====================
 
@@ -4196,9 +4220,11 @@ CxHashmap Test Suite
 
 ====================
 Results: 62 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxhashmap'
 
 === cxjson tests ===
-./darwin_arm64/cxjson_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxjson'
+./linux_x86_64/cxjson_test
 CxJSON Test Suite
 =================
 
@@ -4341,9 +4367,11 @@ CxJSON Test Suite
 
 =================
 Results: 119 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxjson'
 
 === cxlog tests ===
-./darwin_arm64/cxlog_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxlog'
+./linux_x86_64/cxlog_test
 CxLogFile Test Suite
 ====================
 
@@ -4412,9 +4440,11 @@ CxLogFile Test Suite
 
 ====================
 Results: 37 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxlog'
 
 === cxlogfile tests ===
-./darwin_arm64/cxlogfile_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxlogfile'
+./linux_x86_64/cxlogfile_test
 CxLogFile Test Suite
 ====================
 
@@ -4476,9 +4506,11 @@ CxLogFile Test Suite
 
 ====================
 Results: 38 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxlogfile'
 
 === cxnet tests ===
-./darwin_arm64/cxnet_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxnet'
+./linux_x86_64/cxnet_test
 CxNet Test Suite
 ================
 
@@ -4491,6 +4523,7 @@ CxNet Test Suite
   PASS: assignment copies port
 
 == CxInetAddress Localhost Tests ==
+  (Note: localhost resolution varies by platform/config)
   PASS: localhost process succeeds
   PASS: localhost address is valid
   PASS: 127.0.0.1 address is valid
@@ -4555,9 +4588,11 @@ CxNet Test Suite
 
 ================
 Results: 45 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxnet'
 
 === cxprop tests ===
-./darwin_arm64/cxprop_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxprop'
+./linux_x86_64/cxprop_test
 CxProp Test Suite
 =================
 
@@ -4719,9 +4754,11 @@ CxProp Test Suite
 
 =================
 Results: 130 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxprop'
 
 === cxregex tests ===
-./darwin_arm64/cxregex_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxregex'
+./linux_x86_64/cxregex_test
 CxRegex Unit Tests
 ==================
 
@@ -4802,9 +4839,11 @@ CxRegex Unit Tests
 ==================
 Results: 60 passed, 0 failed
 ==================
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxregex'
 
 === cxscreen tests ===
-./darwin_arm64/cxscreen_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxscreen'
+./linux_x86_64/cxscreen_test
 CxScreen Test Suite
 ===================
 
@@ -4882,9 +4921,11 @@ CxScreen Test Suite
 
 ===================
 Results: 48 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxscreen'
 
 === cxslist tests ===
-./darwin_arm64/cxslist_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxslist'
+./linux_x86_64/cxslist_test
 CxSList Test Suite
 ==================
 
@@ -4995,9 +5036,11 @@ CxSList Test Suite
 
 ==================
 Results: 89 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxslist'
 
 === cxstar tests ===
-./darwin_arm64/cxstar_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxstar'
+./linux_x86_64/cxstar_test
 CxStar Test Suite
 =================
 
@@ -5153,9 +5196,11 @@ CxStar Test Suite
 
 =================
 Results: 127 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxstar'
 
 === cxstring tests ===
-./darwin_arm64/cxstring_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxstring'
+./linux_x86_64/cxstring_test
 CxString Test Suite
 ===================
 
@@ -5186,6 +5231,8 @@ CxString Test Suite
   PASS: operator+ doesn't modify left operand
   PASS: operator+= appends
   PASS: operator+= correct length
+  PASS: operator+=(char) appends char
+  PASS: operator+=(char) correct length
   PASS: operator== returns true for equal strings
   PASS: operator== returns false for different strings
   PASS: operator!= returns false for equal strings
@@ -5328,10 +5375,12 @@ CxString Test Suite
   PASS: findAndReplaceFirst with startPos replaces correctly
 
 ===================
-Results: 154 passed, 0 failed
+Results: 156 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxstring'
 
 === cxthread tests ===
-./darwin_arm64/cxthread_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxthread'
+./linux_x86_64/cxthread_test
 CxThread Test Suite
 ===================
 
@@ -5424,9 +5473,11 @@ CxThread Test Suite
 
 ===================
 Results: 55 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxthread'
 
 === cxtime tests ===
-./darwin_arm64/cxtime_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxtime'
+./linux_x86_64/cxtime_test
 CxTime Test Suite
 =================
 
@@ -5552,9 +5603,11 @@ CxTime Test Suite
 
 =================
 Results: 100 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxtime'
 
 === cxtz tests ===
-./darwin_arm64/cxtz_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxtz'
+./linux_x86_64/cxtz_test
 CxDateTime Test Suite
 =====================
 
@@ -5639,9 +5692,11 @@ CxDateTime Test Suite
 
 =====================
 Results: 61 passed, 0 failed
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxtz'
 
 === cxutfcharacter tests ===
-./darwin_arm64/cxutfcharacter_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxutfcharacter'
+./linux_x86_64/cxutfcharacter_test
 === CxUTFCharacter Test Suite ===
 
 --- Testing ASCII characters ---
@@ -5862,9 +5917,11 @@ Results: 61 passed, 0 failed
 Tests passed: 180
 Tests failed: 0
 =================================
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxutfcharacter'
 
 === cxutfeditbuffer tests ===
-./darwin_arm64/cxutfeditbuffer_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxutfeditbuffer'
+./linux_x86_64/cxutfeditbuffer_test
 === CxUTFEditBuffer Test Suite ===
 
 --- Testing basic construction ---
@@ -5980,9 +6037,11 @@ Tests failed: 0
 Tests passed: 77
 Tests failed: 0
 =================================
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxutfeditbuffer'
 
 === cxutfstring tests ===
-./darwin_arm64/cxutfstring_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxutfstring'
+./linux_x86_64/cxutfstring_test
 === CxUTFString Test Suite ===
 
 --- Testing basic construction ---
@@ -6143,6 +6202,68 @@ Tests failed: 0
   PASS: fromCxString parses correctly
   PASS: First char is H
 
+--- Testing fromUTF8Bytes ---
+  PASS: fromUTF8Bytes: A\tB has 3 characters
+  PASS: fromUTF8Bytes: first char is A
+  PASS: fromUTF8Bytes: second char is tab
+  PASS: fromUTF8Bytes: tab has width 1 (not expanded)
+  PASS: fromUTF8Bytes: third char is B
+  PASS: fromUTF8Bytes: total width is 3 (1+1+1)
+  PASS: fromBytes: tab has width 3 (expanded)
+  PASS: fromBytes: total width is 5 (1+3+1)
+  PASS: fromUTF8Bytes: tab at start is tab
+  PASS: fromUTF8Bytes: tab at start has width 1
+  PASS: fromUTF8Bytes: 3 tabs has 3 characters
+  PASS: fromUTF8Bytes: first tab width 1
+  PASS: fromUTF8Bytes: second tab width 1
+  PASS: fromUTF8Bytes: third tab width 1
+  PASS: fromUTF8Bytes: 3 tabs total width 3
+  PASS: fromUTF8Bytes: AB\nCD has 5 characters
+  PASS: fromUTF8Bytes: first is A
+  PASS: fromUTF8Bytes: second is B
+  PASS: fromUTF8Bytes: third is newline
+  PASS: fromUTF8Bytes: fourth is C
+  PASS: fromUTF8Bytes: fifth is D
+  PASS: fromUTF8Bytes: A\rB has 3 characters
+  PASS: fromUTF8Bytes: middle is CR
+  PASS: fromUTF8Bytes: A\r\nB has 4 characters
+  PASS: fromUTF8Bytes: second is CR
+  PASS: fromUTF8Bytes: third is LF
+  PASS: fromUTF8Bytes: fourth is B
+  PASS: fromUTF8Bytes: Héllo has 5 characters
+  PASS: fromUTF8Bytes: second is é
+  PASS: fromUTF8Bytes: Héllo display width 5
+  PASS: fromUTF8Bytes: box drawing has 6 characters
+  PASS: fromUTF8Bytes: first is │
+  PASS: fromUTF8Bytes: last is │
+  PASS: fromUTF8Bytes: box drawing display width 6
+  PASS: fromUTF8Bytes: mixed content has 5 characters
+  PASS: fromUTF8Bytes: mixed first is A
+  PASS: fromUTF8Bytes: mixed second is tab
+  PASS: fromUTF8Bytes: mixed tab width 1
+  PASS: fromUTF8Bytes: mixed third is │
+  PASS: fromUTF8Bytes: mixed fourth is newline
+  PASS: fromUTF8Bytes: mixed fifth is B
+  PASS: fromUTF8Bytes: NULL creates empty string
+  PASS: fromUTF8Bytes: empty creates empty string
+  PASS: fromUTF8Bytes: zero length creates empty string
+  PASS: fromUTF8Bytes: ASCII roundtrip
+  PASS: fromUTF8Bytes: UTF-8 roundtrip
+  PASS: fromUTF8Bytes: tab roundtrip
+  PASS: fromUTF8Bytes: newline roundtrip
+  PASS: fromUTF8Bytes: incomplete 2-byte - at least A parsed
+  PASS: fromUTF8Bytes: incomplete 2-byte - first is A
+  PASS: fromUTF8Bytes: incomplete 3-byte - at least AB parsed
+  PASS: fromUTF8Bytes: incomplete 3-byte - first is A
+  PASS: fromUTF8Bytes: incomplete 3-byte - second is B
+  PASS: fromUTF8Bytes: CJK has 2 characters
+  PASS: fromUTF8Bytes: CJK display width 4 (2+2)
+  PASS: fromUTF8Bytes: first is 中
+  PASS: fromUTF8Bytes: second is 文
+  PASS: fromUTF8Bytes: initial has 5 chars
+  PASS: fromUTF8Bytes: reuse clears and parses new content
+  PASS: fromUTF8Bytes: reuse first is A
+
 --- Testing edge cases ---
   PASS: Empty bytes creates empty string
   PASS: Null bytes creates empty string
@@ -6151,12 +6272,14 @@ Tests failed: 0
   PASS: Substring of empty is empty
 
 =================================
-Tests passed: 123
+Tests passed: 183
 Tests failed: 0
 =================================
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxutfstring'
 
 === cxutfstringlist tests ===
-./darwin_arm64/cxutfstringlist_test
+make[1]: Entering directory '/home/tvernon/dev2/cx_tests/cxutfstringlist'
+./linux_x86_64/cxutfstringlist_test
 === CxUTFStringList Test Suite ===
 
 --- Testing basic operations ---
@@ -6211,7 +6334,9 @@ Tests failed: 0
 Tests passed: 34
 Tests failed: 0
 =================================
+make[1]: Leaving directory '/home/tvernon/dev2/cx_tests/cxutfstringlist'
 
 ========================================
-All tests completed for: darwin_arm64
+Tests completed for: linux
+(Check individual results above)
 ========================================

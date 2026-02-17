@@ -69,7 +69,7 @@ TEST(test_run_failing_command)
 TEST(test_run_multiline_output)
 {
     CxProcess proc;
-    int result = proc.run("printf 'line1\\nline2\\nline3\\n'");
+    int result = proc.run("echo line1; echo line2; echo line3");
     ASSERT(result == 0);
     ASSERT(proc.getExitCode() == 0);
 
@@ -91,10 +91,10 @@ TEST(test_run_empty_command)
 TEST(test_run_captures_stderr)
 {
     CxProcess proc;
-    // Command that writes to stderr
-    int result = proc.run("ls /nonexistent_directory_12345");
+    // Command that writes to stderr (cat reliably fails on missing files on all platforms)
+    int result = proc.run("cat /nonexistent_file_12345");
     ASSERT(result == 0);  // run() succeeded
-    ASSERT(proc.getExitCode() != 0);  // ls should fail
+    ASSERT(proc.getExitCode() != 0);  // cat should fail
 
     CxString output = proc.getOutput();
     // stderr should be captured (contains error message)
@@ -304,7 +304,7 @@ TEST(test_buildoutput_multiline)
 {
     BuildOutput build;
 
-    int result = build.start("printf 'line1\\nline2\\nline3\\n'");
+    int result = build.start("echo line1; echo line2; echo line3");
     ASSERT(result == 0);
 
     // Poll until complete
@@ -316,7 +316,7 @@ TEST(test_buildoutput_multiline)
     }
 
     ASSERT(build.isComplete() == 1);
-    ASSERT(build.lineCount() == 3);
+    ASSERT(build.lineCount() == 4);  // 3 lines + "Build Done"
 
     BuildOutputLine *line1 = build.lineAt(0);
     BuildOutputLine *line2 = build.lineAt(1);
@@ -342,7 +342,7 @@ TEST(test_buildoutput_classify_error)
     BuildOutput build;
 
     // Simulate compiler error output
-    int result = build.start("printf 'test.cpp:10:5: error: undefined reference\\n'");
+    int result = build.start("echo 'test.cpp:10:5: error: undefined reference'");
     ASSERT(result == 0);
 
     int maxPolls = 100;
@@ -352,7 +352,7 @@ TEST(test_buildoutput_classify_error)
         maxPolls--;
     }
 
-    ASSERT(build.lineCount() == 1);
+    ASSERT(build.lineCount() == 2);  // 1 line + "Build Done"
     ASSERT(build.errorCount() == 1);
     ASSERT(build.warningCount() == 0);
 
@@ -369,7 +369,7 @@ TEST(test_buildoutput_classify_warning)
 {
     BuildOutput build;
 
-    int result = build.start("printf 'foo.c:20:1: warning: unused variable\\n'");
+    int result = build.start("echo 'foo.c:20:1: warning: unused variable'");
     ASSERT(result == 0);
 
     int maxPolls = 100;
@@ -379,7 +379,7 @@ TEST(test_buildoutput_classify_warning)
         maxPolls--;
     }
 
-    ASSERT(build.lineCount() == 1);
+    ASSERT(build.lineCount() == 2);  // 1 line + "Build Done"
     ASSERT(build.errorCount() == 0);
     ASSERT(build.warningCount() == 1);
 
@@ -395,7 +395,7 @@ TEST(test_buildoutput_classify_note)
 {
     BuildOutput build;
 
-    int result = build.start("printf 'bar.h:5:1: note: candidate function\\n'");
+    int result = build.start("echo 'bar.h:5:1: note: candidate function'");
     ASSERT(result == 0);
 
     int maxPolls = 100;
@@ -405,7 +405,7 @@ TEST(test_buildoutput_classify_note)
         maxPolls--;
     }
 
-    ASSERT(build.lineCount() == 1);
+    ASSERT(build.lineCount() == 2);  // 1 line + "Build Done"
 
     BuildOutputLine *line = build.lineAt(0);
     ASSERT(line != NULL);
@@ -417,7 +417,7 @@ TEST(test_buildoutput_classify_command)
 {
     BuildOutput build;
 
-    int result = build.start("printf 'g++ -c main.cpp -o main.o\\n'");
+    int result = build.start("echo 'g++ -c main.cpp -o main.o'");
     ASSERT(result == 0);
 
     int maxPolls = 100;
@@ -427,7 +427,7 @@ TEST(test_buildoutput_classify_command)
         maxPolls--;
     }
 
-    ASSERT(build.lineCount() == 1);
+    ASSERT(build.lineCount() == 2);  // 1 line + "Build Done"
 
     BuildOutputLine *line = build.lineAt(0);
     ASSERT(line != NULL);
@@ -439,7 +439,7 @@ TEST(test_buildoutput_classify_plain)
 {
     BuildOutput build;
 
-    int result = build.start("printf 'Building target...\\n'");
+    int result = build.start("echo 'Building target...'");
     ASSERT(result == 0);
 
     int maxPolls = 100;
@@ -449,7 +449,7 @@ TEST(test_buildoutput_classify_plain)
         maxPolls--;
     }
 
-    ASSERT(build.lineCount() == 1);
+    ASSERT(build.lineCount() == 2);  // 1 line + "Build Done"
 
     BuildOutputLine *line = build.lineAt(0);
     ASSERT(line != NULL);
@@ -462,10 +462,10 @@ TEST(test_buildoutput_mixed_output)
     BuildOutput build;
 
     // Simulate mixed build output
-    CxString cmd = "printf 'g++ -c test.cpp\\n";
-    cmd += "test.cpp:10:5: error: undefined\\n";
-    cmd += "test.cpp:15:1: warning: unused\\n";
-    cmd += "Build failed\\n'";
+    CxString cmd = "echo 'g++ -c test.cpp'; ";
+    cmd += "echo 'test.cpp:10:5: error: undefined'; ";
+    cmd += "echo 'test.cpp:15:1: warning: unused'; ";
+    cmd += "echo 'Build failed'";
 
     int result = build.start(cmd);
     ASSERT(result == 0);
@@ -477,7 +477,7 @@ TEST(test_buildoutput_mixed_output)
         maxPolls--;
     }
 
-    ASSERT(build.lineCount() == 4);
+    ASSERT(build.lineCount() == 5);  // 4 lines + "Build Done"
     ASSERT(build.errorCount() == 1);
     ASSERT(build.warningCount() == 1);
 
@@ -543,7 +543,7 @@ TEST(test_buildoutput_reuse_after_clear)
         maxPolls--;
     }
 
-    ASSERT(build.lineCount() == 1);
+    ASSERT(build.lineCount() == 2);  // 1 line + "Build Done"
     ASSERT(build.lineAt(0)->text.index("second") >= 0);
     PASS();
 }

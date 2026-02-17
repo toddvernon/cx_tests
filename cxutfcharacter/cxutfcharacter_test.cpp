@@ -456,10 +456,10 @@ void test_emoji_symbol_display_widths(void)
 
     // U+2600 BLACK SUN WITH RAYS (☀) - Miscellaneous Symbols block
     // UTF-8: E2 98 80
-    CxUTFCharacter sun;
-    sun.fromUTF8("\xE2\x98\x80");
-    TEST_ASSERT(sun.codepoint() == 0x2600, "U+2600 (☀) codepoint is correct");
-    TEST_ASSERT(sun.displayWidth() == 2, "U+2600 (☀) has display width 2");
+    CxUTFCharacter sunChar;  // 'sun' is a reserved macro on SunOS
+    sunChar.fromUTF8("\xE2\x98\x80");
+    TEST_ASSERT(sunChar.codepoint() == 0x2600, "U+2600 (☀) codepoint is correct");
+    TEST_ASSERT(sunChar.displayWidth() == 2, "U+2600 (☀) has display width 2");
 
     // U+2764 HEAVY BLACK HEART (❤) - Dingbats block
     // UTF-8: E2 9D A4

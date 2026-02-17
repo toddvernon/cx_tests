@@ -42,22 +42,27 @@ ifeq ($(UNAME_S),sunos)
 
 	ifeq ($(UNAME_R), 4.1.3)
         CPPFLAGS = -D _SUNOS_ -g
+        PLATFORM_LIBS = -lc
 	endif
 
 	ifeq ($(UNAME_R), 4.1.4)
         CPPFLAGS = -D _SUNOS_ -g
+        PLATFORM_LIBS = -lc
 	endif
 
 	ifeq ($(UNAME_R), 5.6)
         CPPFLAGS = -D _SOLARIS6_ -g
+        PLATFORM_LIBS = -lsocket -lnsl
 	endif
 
 	ifeq ($(UNAME_R), 5.7)
         CPPFLAGS = -D _SOLARIS6_ -g
+        PLATFORM_LIBS = -lsocket -lnsl
 	endif
 
     ifeq ($(UNAME_R), 5.10)
         CPPFLAGS = -D _SOLARIS10_  -g
+        PLATFORM_LIBS = -lsocket -lnsl
     endif
 endif
 
