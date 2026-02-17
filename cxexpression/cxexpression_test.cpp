@@ -1202,6 +1202,19 @@ public:
     }
 };
 
+// Alternate variable database with different values for x (used by SetVariableDatabase test)
+class AltVariableDatabase : public CxExpressionVariableDatabase {
+public:
+    returnCode VariableDefined(CxString name) {
+        if (name == "x") return VARIABLE_DEFINED;
+        return VARIABLE_UNDEFINED;
+    }
+    returnCode VariableEvaluate(CxString name, double *result) {
+        if (name == "x") { *result = 100.0; return VARIABLE_DEFINED; }
+        return VARIABLE_UNDEFINED;
+    }
+};
+
 void testExpressionCustomVariables() {
     printf("\n== CxExpression Custom Variable Database Tests ==\n");
 
@@ -1293,18 +1306,6 @@ void testExpressionSetVariableDatabase() {
     // This is the key feature for spreadsheet recalculation
     {
         // Create a second database with different values
-        class AltVariableDatabase : public CxExpressionVariableDatabase {
-        public:
-            returnCode VariableDefined(CxString name) {
-                if (name == "x") return VARIABLE_DEFINED;
-                return VARIABLE_UNDEFINED;
-            }
-            returnCode VariableEvaluate(CxString name, double *result) {
-                if (name == "x") { *result = 100.0; return VARIABLE_DEFINED; }
-                return VARIABLE_UNDEFINED;
-            }
-        };
-
         AltVariableDatabase *altDb = new AltVariableDatabase();
 
         CxExpression expr("x");
