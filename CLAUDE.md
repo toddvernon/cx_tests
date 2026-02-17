@@ -75,6 +75,7 @@ build.start("echo line1; echo line2");
 ## Language/feature restrictions (assume old toolchains)
 - Avoid: auto, nullptr, constexpr, lambda, range-for, threads, regex, exceptions (unless already widely used).
 - Avoid: <iostream>, <string>, <vector>, <map>, <memory>, <algorithm>, <functional>, <type_traits>, etc.
+- DO NOT define classes inside function bodies (local/inner classes). GCC 2.95 crashes generating DWARF2 debug info for local class methods. Always define classes at file scope.
 - Prefer C-style interfaces or existing repo abstractions.
 
 ## Includes & headers
