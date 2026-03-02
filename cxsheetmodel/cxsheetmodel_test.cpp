@@ -114,52 +114,52 @@ void testCoordinateAddressParsing() {
 
     // Simple address
     {
-        CxSheetCellCoordinate coord("A:1");
-        check(coord.getCol() == 0, "parse A:1 - col is 0");
-        check(coord.getRow() == 0, "parse A:1 - row is 0");
-        check(coord.isColAbsolute() == 0, "parse A:1 - col not absolute");
-        check(coord.isRowAbsolute() == 0, "parse A:1 - row not absolute");
+        CxSheetCellCoordinate coord("A1");
+        check(coord.getCol() == 0, "parse A1 - col is 0");
+        check(coord.getRow() == 0, "parse A1 - row is 0");
+        check(coord.isColAbsolute() == 0, "parse A1 - col not absolute");
+        check(coord.isRowAbsolute() == 0, "parse A1 - row not absolute");
     }
 
     // Larger address
     {
-        CxSheetCellCoordinate coord("C:6");
-        check(coord.getCol() == 2, "parse C:6 - col is 2");
-        check(coord.getRow() == 5, "parse C:6 - row is 5");
+        CxSheetCellCoordinate coord("C6");
+        check(coord.getCol() == 2, "parse C6 - col is 2");
+        check(coord.getRow() == 5, "parse C6 - row is 5");
     }
 
     // Double letter column
     {
-        CxSheetCellCoordinate coord("AA:100");
-        check(coord.getCol() == 26, "parse AA:100 - col is 26");
-        check(coord.getRow() == 99, "parse AA:100 - row is 99");
+        CxSheetCellCoordinate coord("AA100");
+        check(coord.getCol() == 26, "parse AA100 - col is 26");
+        check(coord.getRow() == 99, "parse AA100 - row is 99");
     }
 
     // Absolute column
     {
-        CxSheetCellCoordinate coord("$B:5");
-        check(coord.getCol() == 1, "parse $B:5 - col is 1");
-        check(coord.getRow() == 4, "parse $B:5 - row is 4");
-        check(coord.isColAbsolute() == 1, "parse $B:5 - col is absolute");
-        check(coord.isRowAbsolute() == 0, "parse $B:5 - row not absolute");
+        CxSheetCellCoordinate coord("$B5");
+        check(coord.getCol() == 1, "parse $B5 - col is 1");
+        check(coord.getRow() == 4, "parse $B5 - row is 4");
+        check(coord.isColAbsolute() == 1, "parse $B5 - col is absolute");
+        check(coord.isRowAbsolute() == 0, "parse $B5 - row not absolute");
     }
 
     // Absolute row
     {
-        CxSheetCellCoordinate coord("B:$5");
-        check(coord.getCol() == 1, "parse B:$5 - col is 1");
-        check(coord.getRow() == 4, "parse B:$5 - row is 4");
-        check(coord.isColAbsolute() == 0, "parse B:$5 - col not absolute");
-        check(coord.isRowAbsolute() == 1, "parse B:$5 - row is absolute");
+        CxSheetCellCoordinate coord("B$5");
+        check(coord.getCol() == 1, "parse B$5 - col is 1");
+        check(coord.getRow() == 4, "parse B$5 - row is 4");
+        check(coord.isColAbsolute() == 0, "parse B$5 - col not absolute");
+        check(coord.isRowAbsolute() == 1, "parse B$5 - row is absolute");
     }
 
     // Both absolute
     {
-        CxSheetCellCoordinate coord("$C:$6");
-        check(coord.getCol() == 2, "parse $C:$6 - col is 2");
-        check(coord.getRow() == 5, "parse $C:$6 - row is 5");
-        check(coord.isColAbsolute() == 1, "parse $C:$6 - col is absolute");
-        check(coord.isRowAbsolute() == 1, "parse $C:$6 - row is absolute");
+        CxSheetCellCoordinate coord("$C$6");
+        check(coord.getCol() == 2, "parse $C$6 - col is 2");
+        check(coord.getRow() == 5, "parse $C$6 - row is 5");
+        check(coord.isColAbsolute() == 1, "parse $C$6 - col is absolute");
+        check(coord.isRowAbsolute() == 1, "parse $C$6 - row is absolute");
     }
 }
 
@@ -169,13 +169,13 @@ void testCoordinateToAddress() {
     // Simple address
     {
         CxSheetCellCoordinate coord(0, 0);
-        check(coord.toAddress() == "A:1", "toAddress: (0,0) = A:1");
+        check(coord.toAddress() == "A1", "toAddress: (0,0) = A1");
     }
 
     // Larger row/col
     {
         CxSheetCellCoordinate coord(99, 26);
-        check(coord.toAddress() == "AA:100", "toAddress: (99,26) = AA:100");
+        check(coord.toAddress() == "AA100", "toAddress: (99,26) = AA100");
     }
 
     // Absolute address
@@ -183,7 +183,7 @@ void testCoordinateToAddress() {
         CxSheetCellCoordinate coord(5, 2);
         coord.setColAbsolute(1);
         coord.setRowAbsolute(1);
-        check(coord.toAbsoluteAddress() == "$C:$6", "toAbsoluteAddress: $C:$6");
+        check(coord.toAbsoluteAddress() == "$C$6", "toAbsoluteAddress: $C$6");
     }
 }
 
@@ -453,45 +453,45 @@ void testModelCellReferenceFormula() {
 
     CxSheetModel model;
 
-    // Set cell A:1 (0,0) to value 10
+    // Set cell A1 (0,0) to value 10
     {
         CxSheetCell cell(CxDouble(10.0));
         model.setCell(CxSheetCellCoordinate(0, 0), cell);
     }
 
-    // Set cell B:1 (0,1) to value 5
+    // Set cell B1 (0,1) to value 5
     {
         CxSheetCell cell(CxDouble(5.0));
         model.setCell(CxSheetCellCoordinate(0, 1), cell);
     }
 
-    // Set cell C:1 (0,2) to formula "A:1+B:1"
+    // Set cell C1 (0,2) to formula "A1+B1"
     {
         CxSheetCell formulaCell;
-        formulaCell.setFormula(CxString("A:1+B:1"));
+        formulaCell.setFormula(CxString("A1+B1"));
         model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
 
         CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
         check(retrieved.getType() == CxSheetCell::FORMULA, "cell ref formula: type");
-        check(doubleEqual(retrieved.getEvaluatedValue().value, 15.0), "cell ref formula: A:1+B:1 = 10+5 = 15");
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 15.0), "cell ref formula: A1+B1 = 10+5 = 15");
     }
 
-    // Now change A:1 to 20 and verify C:1 recalculates
+    // Now change A1 to 20 and verify C1 recalculates
     {
         CxSheetCell cell(CxDouble(20.0));
         model.setCell(CxSheetCellCoordinate(0, 0), cell);
 
         CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
-        check(doubleEqual(retrieved.getEvaluatedValue().value, 25.0), "recalc: A:1 changed to 20, C:1 = 20+5 = 25");
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 25.0), "recalc: A1 changed to 20, C1 = 20+5 = 25");
     }
 
-    // Change B:1 to 10 and verify again
+    // Change B1 to 10 and verify again
     {
         CxSheetCell cell(CxDouble(10.0));
         model.setCell(CxSheetCellCoordinate(0, 1), cell);
 
         CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
-        check(doubleEqual(retrieved.getEvaluatedValue().value, 30.0), "recalc: B:1 changed to 10, C:1 = 20+10 = 30");
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 30.0), "recalc: B1 changed to 10, C1 = 20+10 = 30");
     }
 }
 
@@ -500,42 +500,42 @@ void testModelChainedFormulas() {
 
     CxSheetModel model;
 
-    // A:1 = 5
+    // A1 = 5
     {
         CxSheetCell cell(CxDouble(5.0));
         model.setCell(CxSheetCellCoordinate(0, 0), cell);
     }
 
-    // B:1 = A:1 * 2  (should be 10)
+    // B1 = A1 * 2  (should be 10)
     {
         CxSheetCell cell;
-        cell.setFormula(CxString("A:1*2"));
+        cell.setFormula(CxString("A1*2"));
         model.setCell(CxSheetCellCoordinate(0, 1), cell);
 
         CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
-        check(doubleEqual(retrieved.getEvaluatedValue().value, 10.0), "chained: B:1 = A:1*2 = 10");
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 10.0), "chained: B1 = A1*2 = 10");
     }
 
-    // C:1 = B:1 + 3  (should be 13)
+    // C1 = B1 + 3  (should be 13)
     {
         CxSheetCell cell;
-        cell.setFormula(CxString("B:1+3"));
+        cell.setFormula(CxString("B1+3"));
         model.setCell(CxSheetCellCoordinate(0, 2), cell);
 
         CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
-        check(doubleEqual(retrieved.getEvaluatedValue().value, 13.0), "chained: C:1 = B:1+3 = 13");
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 13.0), "chained: C1 = B1+3 = 13");
     }
 
-    // Change A:1 to 10, B:1 should become 20, C:1 should become 23
+    // Change A1 to 10, B1 should become 20, C1 should become 23
     {
         CxSheetCell cell(CxDouble(10.0));
         model.setCell(CxSheetCellCoordinate(0, 0), cell);
 
         CxSheetCell b1 = model.getCell(CxSheetCellCoordinate(0, 1));
-        check(doubleEqual(b1.getEvaluatedValue().value, 20.0), "chained recalc: B:1 = 10*2 = 20");
+        check(doubleEqual(b1.getEvaluatedValue().value, 20.0), "chained recalc: B1 = 10*2 = 20");
 
         CxSheetCell c1 = model.getCell(CxSheetCellCoordinate(0, 2));
-        check(doubleEqual(c1.getEvaluatedValue().value, 23.0), "chained recalc: C:1 = 20+3 = 23");
+        check(doubleEqual(c1.getEvaluatedValue().value, 23.0), "chained recalc: C1 = 20+3 = 23");
     }
 }
 
@@ -547,26 +547,26 @@ void testModelCircularReference() {
         CxSheetModel model;
 
         CxSheetCell cell;
-        cell.setFormula(CxString("A:1+1"));
+        cell.setFormula(CxString("A1+1"));
         model.setCell(CxSheetCellCoordinate(0, 0), cell);
 
         CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 0));
         // Should evaluate to 0 due to circular reference
-        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "self-reference: A1=A:1+1 evaluates to 0");
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "self-reference: A1=A1+1 evaluates to 0");
     }
 
     // Test 2: Two-cell circular reference (A1 references B1, B1 references A1)
     {
         CxSheetModel model;
 
-        // Set A1 = B:1 + 1
+        // Set A1 = B1 + 1
         CxSheetCell cellA;
-        cellA.setFormula(CxString("B:1+1"));
+        cellA.setFormula(CxString("B1+1"));
         model.setCell(CxSheetCellCoordinate(0, 0), cellA);
 
-        // Set B1 = A:1 + 1
+        // Set B1 = A1 + 1
         CxSheetCell cellB;
-        cellB.setFormula(CxString("A:1+1"));
+        cellB.setFormula(CxString("A1+1"));
         model.setCell(CxSheetCellCoordinate(0, 1), cellB);
 
         // Both should evaluate to 0 due to circular reference
@@ -576,26 +576,26 @@ void testModelCircularReference() {
         // At least one of them should detect the circular reference
         int circularDetected = doubleEqual(retrievedA.getEvaluatedValue().value, 0.0) ||
                                doubleEqual(retrievedB.getEvaluatedValue().value, 0.0);
-        check(circularDetected, "mutual-reference: A1=B:1+1, B1=A:1+1 detects cycle");
+        check(circularDetected, "mutual-reference: A1=B1+1, B1=A1+1 detects cycle");
     }
 
     // Test 3: Three-cell circular reference chain (A1 -> B1 -> C1 -> A1)
     {
         CxSheetModel model;
 
-        // Set A1 = B:1 + 1
+        // Set A1 = B1 + 1
         CxSheetCell cellA;
-        cellA.setFormula(CxString("B:1+1"));
+        cellA.setFormula(CxString("B1+1"));
         model.setCell(CxSheetCellCoordinate(0, 0), cellA);
 
-        // Set B1 = C:1 + 1
+        // Set B1 = C1 + 1
         CxSheetCell cellB;
-        cellB.setFormula(CxString("C:1+1"));
+        cellB.setFormula(CxString("C1+1"));
         model.setCell(CxSheetCellCoordinate(0, 1), cellB);
 
-        // Set C1 = A:1 + 1 (creates the cycle)
+        // Set C1 = A1 + 1 (creates the cycle)
         CxSheetCell cellC;
-        cellC.setFormula(CxString("A:1+1"));
+        cellC.setFormula(CxString("A1+1"));
         model.setCell(CxSheetCellCoordinate(0, 2), cellC);
 
         // Should detect circular reference
@@ -617,14 +617,14 @@ void testModelCircularReference() {
         // Set A1 = 5
         model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(5.0)));
 
-        // Set B1 = A:1 + 1 (should be 6)
+        // Set B1 = A1 + 1 (should be 6)
         CxSheetCell cellB;
-        cellB.setFormula(CxString("A:1+1"));
+        cellB.setFormula(CxString("A1+1"));
         model.setCell(CxSheetCellCoordinate(0, 1), cellB);
 
-        // Set C1 = B:1 + 1 (should be 7)
+        // Set C1 = B1 + 1 (should be 7)
         CxSheetCell cellC;
-        cellC.setFormula(CxString("B:1+1"));
+        cellC.setFormula(CxString("B1+1"));
         model.setCell(CxSheetCellCoordinate(0, 2), cellC);
 
         CxSheetCell retrievedC = model.getCell(CxSheetCellCoordinate(0, 2));
@@ -657,6 +657,133 @@ void testModelCopyConstructor() {
     {
         CxSheetCell cell = model2.getCell(CxSheetCellCoordinate(0, 0));
         check(doubleEqual(cell.getDouble().value, 100.0), "copy: independent from original");
+    }
+}
+
+void testModelAffectedCells() {
+    printf("\n== CxSheetModel getLastAffectedCells Tests ==\n");
+
+    // Test 1: Single cell change - only that cell is affected
+    {
+        CxSheetModel model;
+
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+
+        CxSList<CxSheetCellCoordinate> affected = model.getLastAffectedCells();
+        check(affected.entries() == 1, "single cell: one cell affected");
+        check(affected.at(0) == CxSheetCellCoordinate(0, 0), "single cell: correct cell");
+    }
+
+    // Test 2: Cell with dependent formula - both cells affected
+    {
+        CxSheetModel model;
+
+        // Set A1 = 10
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+
+        // Set B1 = A1 * 2
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("A1*2"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        // Now change A1 - both A1 and B1 should be affected
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(20.0)));
+
+        CxSList<CxSheetCellCoordinate> affected = model.getLastAffectedCells();
+        check(affected.entries() == 2, "dependent formula: two cells affected");
+
+        // A1 should be first (the changed cell)
+        check(affected.at(0) == CxSheetCellCoordinate(0, 0), "dependent formula: A1 first");
+        // B1 should be second (the dependent)
+        check(affected.at(1) == CxSheetCellCoordinate(0, 1), "dependent formula: B1 second");
+    }
+
+    // Test 3: Chain of dependencies - all cells in order
+    {
+        CxSheetModel model;
+
+        // A1 = 5
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(5.0)));
+
+        // B1 = A1 * 2
+        CxSheetCell cellB;
+        cellB.setFormula(CxString("A1*2"));
+        model.setCell(CxSheetCellCoordinate(0, 1), cellB);
+
+        // C1 = B1 + 3
+        CxSheetCell cellC;
+        cellC.setFormula(CxString("B1+3"));
+        model.setCell(CxSheetCellCoordinate(0, 2), cellC);
+
+        // Change A1 - should affect A1, B1, C1 in that order
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+
+        CxSList<CxSheetCellCoordinate> affected = model.getLastAffectedCells();
+        check(affected.entries() == 3, "chain: three cells affected");
+        check(affected.at(0) == CxSheetCellCoordinate(0, 0), "chain: A1 first");
+        check(affected.at(1) == CxSheetCellCoordinate(0, 1), "chain: B1 second");
+        check(affected.at(2) == CxSheetCellCoordinate(0, 2), "chain: C1 third");
+    }
+
+    // Test 4: Diamond dependency (D1 depends on both B1 and C1, both depend on A1)
+    {
+        CxSheetModel model;
+
+        // A1 = 10
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+
+        // B1 = A1 * 2
+        CxSheetCell cellB;
+        cellB.setFormula(CxString("A1*2"));
+        model.setCell(CxSheetCellCoordinate(0, 1), cellB);
+
+        // C1 = A1 + 5
+        CxSheetCell cellC;
+        cellC.setFormula(CxString("A1+5"));
+        model.setCell(CxSheetCellCoordinate(0, 2), cellC);
+
+        // D1 = B1 + C1
+        CxSheetCell cellD;
+        cellD.setFormula(CxString("B1+C1"));
+        model.setCell(CxSheetCellCoordinate(0, 3), cellD);
+
+        // Verify D1 is correct: B1=20, C1=15, D1=35
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 35.0), "diamond: D1 = 20+15 = 35");
+
+        // Change A1 - should affect A1, B1, C1, D1
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(5.0)));
+
+        CxSList<CxSheetCellCoordinate> affected = model.getLastAffectedCells();
+        check(affected.entries() == 4, "diamond: four cells affected");
+
+        // A1 must be first
+        check(affected.at(0) == CxSheetCellCoordinate(0, 0), "diamond: A1 first");
+
+        // D1 must be last (depends on B1 and C1)
+        check(affected.at(3) == CxSheetCellCoordinate(0, 3), "diamond: D1 last");
+
+        // Verify recalculation is correct: B1=10, C1=10, D1=20
+        retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 20.0), "diamond: D1 = 10+10 = 20");
+    }
+
+    // Test 5: Cell change with no dependents
+    {
+        CxSheetModel model;
+
+        // Set up: A1 = 10, B1 = A1 * 2
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+        CxSheetCell cellB;
+        cellB.setFormula(CxString("A1*2"));
+        model.setCell(CxSheetCellCoordinate(0, 1), cellB);
+
+        // Change B1 to a plain value - only B1 is affected (no dependents)
+        model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(99.0)));
+
+        CxSList<CxSheetCellCoordinate> affected = model.getLastAffectedCells();
+        check(affected.entries() == 1, "no dependents: one cell affected");
+        check(affected.at(0) == CxSheetCellCoordinate(0, 1), "no dependents: B1 only");
     }
 }
 
@@ -720,9 +847,9 @@ void testModelSaveLoad() {
         // Set A1 = 10
         model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
 
-        // Set B1 = A:1 * 2  (formula)
+        // Set B1 = A1 * 2  (formula)
         CxSheetCell formulaCell;
-        formulaCell.setFormula(CxString("A:1*2"));
+        formulaCell.setFormula(CxString("A1*2"));
         model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
 
         // Save
@@ -746,8 +873,8 @@ void testModelSaveLoad() {
         CxSheetCell cell2 = model.getCell(CxSheetCellCoordinate(0, 1));
         check(cell2.getType() == CxSheetCell::FORMULA, "load formula: B1 is formula");
 
-        // Check B1 evaluated value (A:1*2 = 10*2 = 20)
-        check(doubleEqual(cell2.getEvaluatedValue().value, 20.0), "load formula: B1 = A:1*2 = 20");
+        // Check B1 evaluated value (A1*2 = 10*2 = 20)
+        check(doubleEqual(cell2.getEvaluatedValue().value, 20.0), "load formula: B1 = A1*2 = 20");
     }
 
     // Test 5: Load non-existent file
@@ -755,6 +882,24 @@ void testModelSaveLoad() {
         CxSheetModel model;
         int loadResult = model.loadSheet(CxString("/tmp/nonexistent_file_12345.json"));
         check(loadResult == 0, "load: fails for non-existent file");
+    }
+
+    // Test 6: After load, getLastAffectedCells returns all loaded cells
+    {
+        // First save a model with some cells
+        CxSheetModel saveModel;
+        saveModel.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+        saveModel.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxString("Hello")));
+        saveModel.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+        saveModel.saveSheet(CxString(testFile));
+
+        // Load into new model
+        CxSheetModel loadModel;
+        loadModel.loadSheet(CxString(testFile));
+
+        // After load, all loaded cells should be in the affected list
+        CxSList<CxSheetCellCoordinate> affected = loadModel.getLastAffectedCells();
+        check(affected.entries() == 3, "load affected: three cells affected");
     }
 
     // Clean up test file
@@ -787,6 +932,7 @@ int main(int argc, char **argv) {
     testModelCellReferenceFormula();
     testModelChainedFormulas();
     testModelCircularReference();
+    testModelAffectedCells();
     testModelCopyConstructor();
     testModelSaveLoad();
 
