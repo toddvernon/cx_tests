@@ -765,6 +765,96 @@ void testStaticMethods() {
 }
 
 //-----------------------------------------------------------------------------------------
+// Case-insensitive comparison tests
+//-----------------------------------------------------------------------------------------
+void testEqualsIgnoreCase() {
+    printf("\n== equalsIgnoreCase Tests ==\n");
+
+    // Same case - equal
+    {
+        CxString a("hello");
+        CxString b("hello");
+        check(a.equalsIgnoreCase(b), "equalsIgnoreCase: same lowercase strings");
+    }
+
+    // Different case - equal
+    {
+        CxString a("HELLO");
+        CxString b("hello");
+        check(a.equalsIgnoreCase(b), "equalsIgnoreCase: upper vs lower");
+    }
+
+    // Mixed case - equal
+    {
+        CxString a("HeLLo");
+        CxString b("hEllO");
+        check(a.equalsIgnoreCase(b), "equalsIgnoreCase: mixed case");
+    }
+
+    // Different strings - not equal
+    {
+        CxString a("hello");
+        CxString b("world");
+        check(!a.equalsIgnoreCase(b), "equalsIgnoreCase: different strings");
+    }
+
+    // Different lengths - not equal
+    {
+        CxString a("hello");
+        CxString b("helloworld");
+        check(!a.equalsIgnoreCase(b), "equalsIgnoreCase: different lengths");
+    }
+
+    // Empty strings - equal
+    {
+        CxString a("");
+        CxString b("");
+        check(a.equalsIgnoreCase(b), "equalsIgnoreCase: empty strings");
+    }
+
+    // With C string - same case
+    {
+        CxString a("hello");
+        check(a.equalsIgnoreCase("hello"), "equalsIgnoreCase(char*): same case");
+    }
+
+    // With C string - different case
+    {
+        CxString a("HELLO");
+        check(a.equalsIgnoreCase("hello"), "equalsIgnoreCase(char*): upper vs lower");
+    }
+
+    // With C string - mixed case
+    {
+        CxString a("HeLLo WoRLd");
+        check(a.equalsIgnoreCase("hello world"), "equalsIgnoreCase(char*): mixed case with space");
+    }
+
+    // With C string - not equal
+    {
+        CxString a("hello");
+        check(!a.equalsIgnoreCase("world"), "equalsIgnoreCase(char*): different strings");
+    }
+
+    // Function names (the actual use case)
+    {
+        CxString sum1("SUM");
+        CxString sum2("sum");
+        CxString sum3("Sum");
+        check(sum1.equalsIgnoreCase(sum2), "equalsIgnoreCase: SUM vs sum");
+        check(sum1.equalsIgnoreCase(sum3), "equalsIgnoreCase: SUM vs Sum");
+        check(sum2.equalsIgnoreCase(sum3), "equalsIgnoreCase: sum vs Sum");
+    }
+
+    // Numbers and special chars unchanged
+    {
+        CxString a("Test123!");
+        CxString b("test123!");
+        check(a.equalsIgnoreCase(b), "equalsIgnoreCase: with numbers and special chars");
+    }
+}
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -778,6 +868,7 @@ int main(int argc, char **argv) {
     testTokenizing();
     testConversions();
     testStaticMethods();
+    testEqualsIgnoreCase();
 
     printf("\n===================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);

@@ -807,6 +807,127 @@ void test_edge_cases(void)
 
 
 //-------------------------------------------------------------------------------------------------
+// Test equalsIgnoreCase
+//-------------------------------------------------------------------------------------------------
+void test_equals_ignore_case(void)
+{
+    printf("\n--- Testing equalsIgnoreCase ---\n");
+
+    // Same case - equal
+    {
+        CxUTFString a;
+        a.fromBytes("hello", 5, 4);
+        CxUTFString b;
+        b.fromBytes("hello", 5, 4);
+        TEST_ASSERT(a.equalsIgnoreCase(b), "equalsIgnoreCase: same lowercase");
+    }
+
+    // Different case - equal
+    {
+        CxUTFString a;
+        a.fromBytes("HELLO", 5, 4);
+        CxUTFString b;
+        b.fromBytes("hello", 5, 4);
+        TEST_ASSERT(a.equalsIgnoreCase(b), "equalsIgnoreCase: upper vs lower");
+    }
+
+    // Mixed case - equal
+    {
+        CxUTFString a;
+        a.fromBytes("HeLLo", 5, 4);
+        CxUTFString b;
+        b.fromBytes("hEllO", 5, 4);
+        TEST_ASSERT(a.equalsIgnoreCase(b), "equalsIgnoreCase: mixed case");
+    }
+
+    // Different strings - not equal
+    {
+        CxUTFString a;
+        a.fromBytes("hello", 5, 4);
+        CxUTFString b;
+        b.fromBytes("world", 5, 4);
+        TEST_ASSERT(!a.equalsIgnoreCase(b), "equalsIgnoreCase: different strings");
+    }
+
+    // Different lengths - not equal
+    {
+        CxUTFString a;
+        a.fromBytes("hello", 5, 4);
+        CxUTFString b;
+        b.fromBytes("helloworld", 10, 4);
+        TEST_ASSERT(!a.equalsIgnoreCase(b), "equalsIgnoreCase: different lengths");
+    }
+
+    // Empty strings - equal
+    {
+        CxUTFString a;
+        CxUTFString b;
+        TEST_ASSERT(a.equalsIgnoreCase(b), "equalsIgnoreCase: empty strings");
+    }
+
+    // With C string - same case
+    {
+        CxUTFString a;
+        a.fromBytes("hello", 5, 4);
+        TEST_ASSERT(a.equalsIgnoreCase("hello"), "equalsIgnoreCase(char*): same case");
+    }
+
+    // With C string - different case
+    {
+        CxUTFString a;
+        a.fromBytes("HELLO", 5, 4);
+        TEST_ASSERT(a.equalsIgnoreCase("hello"), "equalsIgnoreCase(char*): upper vs lower");
+    }
+
+    // With C string - mixed case with space
+    {
+        CxUTFString a;
+        a.fromBytes("HeLLo WoRLd", 11, 4);
+        TEST_ASSERT(a.equalsIgnoreCase("hello world"), "equalsIgnoreCase(char*): mixed case with space");
+    }
+
+    // With C string - not equal
+    {
+        CxUTFString a;
+        a.fromBytes("hello", 5, 4);
+        TEST_ASSERT(!a.equalsIgnoreCase("world"), "equalsIgnoreCase(char*): different strings");
+    }
+
+    // Function names (the actual use case)
+    {
+        CxUTFString sum1;
+        sum1.fromBytes("SUM", 3, 4);
+        CxUTFString sum2;
+        sum2.fromBytes("sum", 3, 4);
+        CxUTFString sum3;
+        sum3.fromBytes("Sum", 3, 4);
+        TEST_ASSERT(sum1.equalsIgnoreCase(sum2), "equalsIgnoreCase: SUM vs sum");
+        TEST_ASSERT(sum1.equalsIgnoreCase(sum3), "equalsIgnoreCase: SUM vs Sum");
+        TEST_ASSERT(sum2.equalsIgnoreCase(sum3), "equalsIgnoreCase: sum vs Sum");
+    }
+
+    // Numbers and special chars unchanged
+    {
+        CxUTFString a;
+        a.fromBytes("Test123!", 8, 4);
+        CxUTFString b;
+        b.fromBytes("test123!", 8, 4);
+        TEST_ASSERT(a.equalsIgnoreCase(b), "equalsIgnoreCase: with numbers and special chars");
+    }
+
+    // UTF-8: non-ASCII letters (only ASCII case folding applied)
+    {
+        // "Héllo" vs "héllo" - ASCII H/h folds, é stays as-is
+        CxUTFString a;
+        a.fromBytes("H\xC3\xA9llo", 6, 4);
+        CxUTFString b;
+        b.fromBytes("h\xC3\xA9llo", 6, 4);
+        TEST_ASSERT(a.equalsIgnoreCase(b), "equalsIgnoreCase: UTF-8 with ASCII case diff");
+    }
+}
+
+
+//-------------------------------------------------------------------------------------------------
 // Main
 //-------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
@@ -835,6 +956,7 @@ int main(int argc, char **argv)
     test_from_cxstring();
     test_from_utf8_bytes();
     test_edge_cases();
+    test_equals_ignore_case();
 
     printf("\n=================================\n");
     printf("Tests passed: %d\n", testsPassed);

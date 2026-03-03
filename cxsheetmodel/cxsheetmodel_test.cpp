@@ -8,6 +8,7 @@
 #include <cx/base/string.h>
 #include <cx/base/double.h>
 #include <cx/sheetModel/sheetCellCoordinate.h>
+#include <cx/sheetModel/sheetCellRange.h>
 #include <cx/sheetModel/sheetCell.h>
 #include <cx/sheetModel/sheetModel.h>
 
@@ -907,6 +908,294 @@ void testModelSaveLoad() {
 }
 
 //-----------------------------------------------------------------------------------------
+// CxSheetCellRange tests
+//-----------------------------------------------------------------------------------------
+void testRangeBasics() {
+    printf("\n== CxSheetCellRange Basic Tests ==\n");
+
+    // Parse a simple range
+    {
+        CxSheetCellRange range("A1:A4");
+        check(range.isValid() == 1, "parse A1:A4: valid");
+        check(range.cellCount() == 4, "parse A1:A4: 4 cells");
+
+        // Check iteration
+        CxSheetCellCoordinate c0 = range.cellAt(0);
+        check(c0.getRow() == 0 && c0.getCol() == 0, "A1:A4 cellAt(0) = A1");
+
+        CxSheetCellCoordinate c3 = range.cellAt(3);
+        check(c3.getRow() == 3 && c3.getCol() == 0, "A1:A4 cellAt(3) = A4");
+    }
+
+    // Parse a 2D range
+    {
+        CxSheetCellRange range("A1:C2");
+        check(range.isValid() == 1, "parse A1:C2: valid");
+        check(range.cellCount() == 6, "parse A1:C2: 6 cells (3 cols x 2 rows)");
+
+        // Iteration is row-major: A1, B1, C1, A2, B2, C2
+        CxSheetCellCoordinate c0 = range.cellAt(0);
+        check(c0.getRow() == 0 && c0.getCol() == 0, "A1:C2 cellAt(0) = A1");
+
+        CxSheetCellCoordinate c2 = range.cellAt(2);
+        check(c2.getRow() == 0 && c2.getCol() == 2, "A1:C2 cellAt(2) = C1");
+
+        CxSheetCellCoordinate c3 = range.cellAt(3);
+        check(c3.getRow() == 1 && c3.getCol() == 0, "A1:C2 cellAt(3) = A2");
+
+        CxSheetCellCoordinate c5 = range.cellAt(5);
+        check(c5.getRow() == 1 && c5.getCol() == 2, "A1:C2 cellAt(5) = C2");
+    }
+
+    // Parse absolute range
+    {
+        CxSheetCellRange range("$A$1:$B$2");
+        check(range.isValid() == 1, "parse $A$1:$B$2: valid");
+        check(range.cellCount() == 4, "parse $A$1:$B$2: 4 cells");
+    }
+
+    // Inverted range (end before start) should be normalized
+    {
+        CxSheetCellRange range("B2:A1");
+        check(range.isValid() == 1, "parse B2:A1: valid (normalized)");
+        check(range.cellCount() == 4, "parse B2:A1: 4 cells after normalization");
+
+        CxSheetCellCoordinate start = range.getStartCell();
+        check(start.getRow() == 0 && start.getCol() == 0, "B2:A1 normalized start = A1");
+
+        CxSheetCellCoordinate end = range.getEndCell();
+        check(end.getRow() == 1 && end.getCol() == 1, "B2:A1 normalized end = B2");
+    }
+
+    // Invalid ranges
+    {
+        CxSheetCellRange range1("A1");  // No colon
+        check(range1.isValid() == 0, "parse A1: invalid (no colon)");
+
+        CxSheetCellRange range2(":A1");  // Starts with colon
+        check(range2.isValid() == 0, "parse :A1: invalid (starts with colon)");
+
+        CxSheetCellRange range3("A1:");  // Ends with colon
+        check(range3.isValid() == 0, "parse A1:: invalid (ends with colon)");
+    }
+
+    // toAddress
+    {
+        CxSheetCellRange range("B3:D5");
+        CxString addr = range.toAddress();
+        check(addr == "B3:D5", "toAddress: B3:D5");
+    }
+}
+
+void testRangeFunctions() {
+    printf("\n== CxSheetModel Range Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up cells A1:A4 with values 1, 2, 3, 4
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(2.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(3.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(4.0)));
+
+    // Test SUM(A1:A4) = 1+2+3+4 = 10
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(retrieved.getType() == CxSheetCell::FORMULA, "SUM(A1:A4): type is formula");
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 10.0), "SUM(A1:A4) = 10");
+    }
+
+    // Test AVERAGE(A1:A4) = 2.5
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AVERAGE(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 2.5), "AVERAGE(A1:A4) = 2.5");
+    }
+
+    // Test COUNT(A1:A4) = 4
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("COUNT(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 4.0), "COUNT(A1:A4) = 4");
+    }
+
+    // Test MIN(A1:A4) = 1
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("MIN(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "MIN(A1:A4) = 1");
+    }
+
+    // Test MAX(A1:A4) = 4
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("MAX(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 5), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 5));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 4.0), "MAX(A1:A4) = 4");
+    }
+}
+
+void testRangeDependencies() {
+    printf("\n== CxSheetModel Range Dependency Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up cells A1:A4 with values 1, 2, 3, 4
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(2.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(3.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(4.0)));
+
+    // Set B1 = SUM(A1:A4)
+    CxSheetCell formulaCell;
+    formulaCell.setFormula(CxString("SUM(A1:A4)"));
+    model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+    CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+    check(doubleEqual(retrieved.getEvaluatedValue().value, 10.0), "initial SUM = 10");
+
+    // Change A3 (middle of range) from 3 to 10
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(10.0)));
+
+    // SUM should recalculate: 1 + 2 + 10 + 4 = 17
+    retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+    check(doubleEqual(retrieved.getEvaluatedValue().value, 17.0), "after A3 change: SUM = 17");
+
+    // Verify A3 change affects B1 (B1 is in affected cells list)
+    CxSList<CxSheetCellCoordinate> affected = model.getLastAffectedCells();
+    int sumAffected = 0;
+    for (int i = 0; i < (int)affected.entries(); i++) {
+        if (affected.at(i) == CxSheetCellCoordinate(0, 1)) {
+            sumAffected = 1;
+            break;
+        }
+    }
+    check(sumAffected == 1, "B1 (SUM formula) is in affected cells after A3 change");
+}
+
+void testRange2D() {
+    printf("\n== CxSheetModel 2D Range Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up a 2x2 grid: A1=1, B1=2, A2=3, B2=4
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(2.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(3.0)));
+    model.setCell(CxSheetCellCoordinate(1, 1), CxSheetCell(CxDouble(4.0)));
+
+    // SUM(A1:B2) should be 1+2+3+4 = 10
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(A1:B2)"));
+        model.setCell(CxSheetCellCoordinate(2, 0), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(2, 0));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 10.0), "SUM(A1:B2) = 10");
+    }
+}
+
+void testRangeHorizontal() {
+    printf("\n== CxSheetModel Horizontal Range Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up A1=1, B1=2, C1=3 (three cells in a row)
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));  // A1
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(2.0)));  // B1
+    model.setCell(CxSheetCellCoordinate(0, 2), CxSheetCell(CxDouble(3.0)));  // C1
+
+    // SUM(A1:C1) should be 1+2+3 = 6
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(A1:C1)"));
+        model.setCell(CxSheetCellCoordinate(1, 0), formulaCell);  // A2
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(1, 0));
+        printf("  DEBUG: SUM(A1:C1) evaluated value = %f\n", retrieved.getEvaluatedValue().value);
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 6.0), "SUM(A1:C1) = 6");
+    }
+}
+
+void testRangeVertical3() {
+    printf("\n== CxSheetModel Vertical Range (3 cells) Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up A1=1, A2=2, A3=3 (three cells in a column)
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));  // A1
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(2.0)));  // A2
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(3.0)));  // A3
+
+    // SUM(A1:A3) should be 1+2+3 = 6
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(A1:A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);  // B1
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        printf("  DEBUG: SUM(A1:A3) evaluated value = %f\n", retrieved.getEvaluatedValue().value);
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 6.0), "SUM(A1:A3) = 6");
+    }
+}
+
+void testRangeLowercase() {
+    printf("\n== CxSheetModel Case-Insensitive Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up A1=1, A2=2, A3=3
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(2.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(3.0)));
+
+    // Test lowercase sum(A1:A3) - should work (case-insensitive)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("sum(A1:A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 6.0), "sum(A1:A3) = 6 (lowercase)");
+    }
+
+    // Test mixed case Sum(A1:A3)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("Sum(A1:A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 6.0), "Sum(A1:A3) = 6 (mixed case)");
+    }
+
+    // Test all lowercase average
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("average(A1:A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 2.0), "average(A1:A3) = 2 (lowercase)");
+    }
+}
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -935,6 +1224,15 @@ int main(int argc, char **argv) {
     testModelAffectedCells();
     testModelCopyConstructor();
     testModelSaveLoad();
+
+    // Range tests
+    testRangeBasics();
+    testRangeFunctions();
+    testRangeDependencies();
+    testRange2D();
+    testRangeHorizontal();
+    testRangeVertical3();
+    testRangeLowercase();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
