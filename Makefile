@@ -143,6 +143,13 @@ all:
 		cd cxjson; make; \
 	fi
 
+# cxjsonutf tests (all platforms)
+
+	@if [ -d "./cxjsonutf" ]; then \
+		echo "Building cxjsonutf tests..."; \
+		cd cxjsonutf; make; \
+	fi
+
 # cxlog tests (all platforms)
 
 	@if [ -d "./cxlog" ]; then \
@@ -355,6 +362,11 @@ test:
 		(cd cxjson && make test); \
 	fi; \
 	\
+	if [ -d "./cxjsonutf" ]; then \
+		echo ""; echo "=== cxjsonutf tests ==="; \
+		(cd cxjsonutf && make test); \
+	fi; \
+	\
 	if [ -d "./cxlog" ]; then \
 		echo ""; echo "=== cxlog tests ==="; \
 		(cd cxlog && make test); \
@@ -514,6 +526,10 @@ clean:
 
 	@if [ -d "./cxjson" ]; then \
 		cd cxjson; make clean; \
+	fi
+
+	@if [ -d "./cxjsonutf" ]; then \
+		cd cxjsonutf; make clean; \
 	fi
 
 	@if [ -d "./cxlog" ]; then \

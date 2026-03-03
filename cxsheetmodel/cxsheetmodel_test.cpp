@@ -903,6 +903,49 @@ void testModelSaveLoad() {
         check(affected.entries() == 3, "load affected: three cells affected");
     }
 
+    // Test 7: Save and load empty cell with appAttributes (like symbolFill)
+    {
+        CxSheetModel model;
+
+        // Create an empty cell with symbolFill appAttribute
+        CxSheetCell symbolCell;
+        symbolCell.setAppAttribute("symbolFill", "horizontal");
+        model.setCell(CxSheetCellCoordinate(2, 2), symbolCell);  // C3
+
+        // Also add a regular cell for comparison
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(42.0)));
+
+        // Debug: verify cell before save
+        CxSheetCell* beforeSave = model.getCellPtr(CxSheetCellCoordinate(2, 2));
+        check(beforeSave != NULL, "appAttr: cell exists before save");
+        check(beforeSave->getType() == CxSheetCell::EMPTY, "appAttr: cell type is EMPTY before save");
+        check(beforeSave->appAttributes != NULL, "appAttr: appAttributes not NULL before save");
+        check(beforeSave->hasAppAttribute("symbolFill"), "appAttr: has symbolFill before save");
+
+        // Save
+        int saveResult = model.saveSheet(CxString(testFile));
+        check(saveResult == 1, "appAttr: save returns success");
+    }
+
+    // Test 8: Load and verify appAttributes survived
+    {
+        CxSheetModel model;
+
+        int loadResult = model.loadSheet(CxString(testFile));
+        check(loadResult == 1, "appAttr: load returns success");
+
+        // Check the regular cell
+        CxSheetCell cell1 = model.getCell(CxSheetCellCoordinate(0, 0));
+        check(cell1.getType() == CxSheetCell::DOUBLE, "appAttr: A1 is double");
+        check(doubleEqual(cell1.getDouble().value, 42.0), "appAttr: A1 = 42");
+
+        // Check the empty cell with appAttributes
+        CxSheetCell cell2 = model.getCell(CxSheetCellCoordinate(2, 2));
+        check(cell2.getType() == CxSheetCell::EMPTY, "appAttr: C3 is EMPTY type");
+        check(cell2.hasAppAttribute("symbolFill"), "appAttr: C3 has symbolFill");
+        check(cell2.getAppAttributeString("symbolFill") == "horizontal", "appAttr: symbolFill = horizontal");
+    }
+
     // Clean up test file
     remove(testFile);
 }
