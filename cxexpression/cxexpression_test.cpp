@@ -1396,6 +1396,149 @@ void testExpressionCustomFunctions() {
 }
 
 //-----------------------------------------------------------------------------------------
+// Comparison operator tests
+//-----------------------------------------------------------------------------------------
+void testComparisonOperators() {
+    printf("\n== CxExpression Comparison Operator Tests ==\n");
+
+    double result;
+
+    // Less than
+    {
+        CxExpression expr("3<5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 3<5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 3<5");
+        check(doubleEqual(result, 1.0), "3<5 = 1 (true)");
+    }
+    {
+        CxExpression expr("5<3");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5<3");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5<3");
+        check(doubleEqual(result, 0.0), "5<3 = 0 (false)");
+    }
+
+    // Greater than
+    {
+        CxExpression expr("5>3");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5>3");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5>3");
+        check(doubleEqual(result, 1.0), "5>3 = 1 (true)");
+    }
+    {
+        CxExpression expr("3>5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 3>5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 3>5");
+        check(doubleEqual(result, 0.0), "3>5 = 0 (false)");
+    }
+
+    // Less than or equal
+    {
+        CxExpression expr("3<=5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 3<=5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 3<=5");
+        check(doubleEqual(result, 1.0), "3<=5 = 1 (true)");
+    }
+    {
+        CxExpression expr("5<=5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5<=5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5<=5");
+        check(doubleEqual(result, 1.0), "5<=5 = 1 (true, equal)");
+    }
+    {
+        CxExpression expr("5<=3");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5<=3");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5<=3");
+        check(doubleEqual(result, 0.0), "5<=3 = 0 (false)");
+    }
+
+    // Greater than or equal
+    {
+        CxExpression expr("5>=3");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5>=3");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5>=3");
+        check(doubleEqual(result, 1.0), "5>=3 = 1 (true)");
+    }
+    {
+        CxExpression expr("5>=5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5>=5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5>=5");
+        check(doubleEqual(result, 1.0), "5>=5 = 1 (true, equal)");
+    }
+    {
+        CxExpression expr("3>=5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 3>=5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 3>=5");
+        check(doubleEqual(result, 0.0), "3>=5 = 0 (false)");
+    }
+
+    // Equal
+    {
+        CxExpression expr("5=5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5=5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5=5");
+        check(doubleEqual(result, 1.0), "5=5 = 1 (true)");
+    }
+    {
+        CxExpression expr("5=3");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5=3");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5=3");
+        check(doubleEqual(result, 0.0), "5=3 = 0 (false)");
+    }
+
+    // Not equal
+    {
+        CxExpression expr("5<>3");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5<>3");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5<>3");
+        check(doubleEqual(result, 1.0), "5<>3 = 1 (true)");
+    }
+    {
+        CxExpression expr("5<>5");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 5<>5");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 5<>5");
+        check(doubleEqual(result, 0.0), "5<>5 = 0 (false)");
+    }
+
+    // Comparison with arithmetic - comparisons have lower precedence
+    {
+        CxExpression expr("2+3<10");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 2+3<10");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 2+3<10");
+        check(doubleEqual(result, 1.0), "2+3<10 = 1 (5<10 is true)");
+    }
+    {
+        CxExpression expr("2*3>10");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 2*3>10");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 2*3>10");
+        check(doubleEqual(result, 0.0), "2*3>10 = 0 (6>10 is false)");
+    }
+
+    // Comparison with parentheses
+    {
+        CxExpression expr("(5+5)=10");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: (5+5)=10");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: (5+5)=10");
+        check(doubleEqual(result, 1.0), "(5+5)=10 = 1 (true)");
+    }
+
+    // Comparison with negative numbers
+    {
+        CxExpression expr("-5<0");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: -5<0");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: -5<0");
+        check(doubleEqual(result, 1.0), "-5<0 = 1 (true)");
+    }
+
+    // Comparison with decimals
+    {
+        CxExpression expr("3.14>3");
+        check(expr.Parse() == CxExpression::PARSE_SUCCESS, "parse: 3.14>3");
+        check(expr.Evaluate(&result) == CxExpression::EVALUATION_SUCCESS, "eval: 3.14>3");
+        check(doubleEqual(result, 1.0), "3.14>3 = 1 (true)");
+    }
+}
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -1439,6 +1582,9 @@ int main(int argc, char **argv) {
 
     // setVariableDatabase tests (new functionality)
     testExpressionSetVariableDatabase();
+
+    // Comparison operator tests
+    testComparisonOperators();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);

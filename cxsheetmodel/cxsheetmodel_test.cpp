@@ -1195,6 +1195,675 @@ void testRangeLowercase() {
     }
 }
 
+void testIFFunction() {
+    printf("\n== CxSheetModel IF Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up some cells with values
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));  // A1 = 10
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(5.0)));   // A2 = 5
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(0.0)));   // A3 = 0
+
+    // Test IF with true condition (non-zero)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(1, 100, 200)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 100.0), "IF(1, 100, 200) = 100");
+    }
+
+    // Test IF with false condition (zero)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(0, 100, 200)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 200.0), "IF(0, 100, 200) = 200");
+    }
+
+    // Test IF with comparison: A1 > A2 (10 > 5 = true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(A1>A2, A1, A2)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 10.0), "IF(A1>A2, A1, A2) = 10");
+    }
+
+    // Test IF with comparison: A1 < A2 (10 < 5 = false)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(A1<A2, A1, A2)"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 5.0), "IF(A1<A2, A1, A2) = 5");
+    }
+
+    // Test IF with equality: A1 = 10 (true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(A1=10, 1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 5), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 5));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "IF(A1=10, 1, 0) = 1");
+    }
+
+    // Test IF with inequality: A1 <> 5 (true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(A1<>5, 1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 6), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 6));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "IF(A1<>5, 1, 0) = 1");
+    }
+
+    // Test case-insensitive: if (lowercase)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("if(1, 50, 60)"));
+        model.setCell(CxSheetCellCoordinate(0, 7), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 7));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 50.0), "if(1, 50, 60) = 50 (lowercase)");
+    }
+
+    // Test case-insensitive: If (mixed case)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("If(0, 50, 60)"));
+        model.setCell(CxSheetCellCoordinate(0, 8), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 8));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 60.0), "If(0, 50, 60) = 60 (mixed case)");
+    }
+
+    // Test IF with arithmetic in condition: (5+5)=10
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF((5+5)=10, 1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 9), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 9));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "IF((5+5)=10, 1, 0) = 1");
+    }
+
+    // Test IF with zero value in cell (A3=0, should be false)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(A3, 1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 10), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 10));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "IF(A3, 1, 0) = 0 (A3 is 0)");
+    }
+
+    // Test IF with non-zero value in cell (A1=10, should be true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IF(A1, 1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 11), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 11));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "IF(A1, 1, 0) = 1 (A1 is 10)");
+    }
+}
+
+void testANDFunction() {
+    printf("\n== CxSheetModel AND Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up cells: A1=10, A2=5, A3=0
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));  // A1 = 10
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(5.0)));   // A2 = 5
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(0.0)));   // A3 = 0
+
+    // AND(1, 1) = 1 (all true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(1, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "AND(1, 1) = 1");
+    }
+
+    // AND(1, 0) = 0 (one false)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "AND(1, 0) = 0");
+    }
+
+    // AND(0, 0) = 0 (all false)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(0, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "AND(0, 0) = 0");
+    }
+
+    // AND with cell references: AND(A1, A2) = 1 (both non-zero)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(A1, A2)"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "AND(A1, A2) = 1");
+    }
+
+    // AND with zero cell: AND(A1, A3) = 0 (A3 is 0)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(A1, A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 5), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 5));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "AND(A1, A3) = 0");
+    }
+
+    // AND with comparisons: AND(A1>5, A2>2) = 1 (both true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(A1>5, A2>2)"));
+        model.setCell(CxSheetCellCoordinate(0, 6), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 6));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "AND(A1>5, A2>2) = 1");
+    }
+
+    // AND with comparisons: AND(A1>5, A2>10) = 0 (second false)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(A1>5, A2>10)"));
+        model.setCell(CxSheetCellCoordinate(0, 7), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 7));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "AND(A1>5, A2>10) = 0");
+    }
+
+    // AND with multiple args: AND(1, 1, 1, 1) = 1
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(1, 1, 1, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 8), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 8));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "AND(1, 1, 1, 1) = 1");
+    }
+
+    // AND with multiple args with one false: AND(1, 1, 0, 1) = 0
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AND(1, 1, 0, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 9), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 9));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "AND(1, 1, 0, 1) = 0");
+    }
+
+    // Case insensitive: and(1, 1) = 1
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("and(1, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 10), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 10));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "and(1, 1) = 1 (lowercase)");
+    }
+}
+
+void testORFunction() {
+    printf("\n== CxSheetModel OR Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up cells: A1=10, A2=5, A3=0
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));  // A1 = 10
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(5.0)));   // A2 = 5
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(0.0)));   // A3 = 0
+
+    // OR(1, 1) = 1 (all true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(1, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "OR(1, 1) = 1");
+    }
+
+    // OR(1, 0) = 1 (one true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "OR(1, 0) = 1");
+    }
+
+    // OR(0, 0) = 0 (all false)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(0, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "OR(0, 0) = 0");
+    }
+
+    // OR with cell references: OR(A1, A3) = 1 (A1 is non-zero)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(A1, A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "OR(A1, A3) = 1");
+    }
+
+    // OR with zero cells only: OR(A3, A3) = 0 (both zero)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(A3, A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 5), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 5));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "OR(A3, A3) = 0");
+    }
+
+    // OR with comparisons: OR(A1>100, A2>2) = 1 (second true)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(A1>100, A2>2)"));
+        model.setCell(CxSheetCellCoordinate(0, 6), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 6));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "OR(A1>100, A2>2) = 1");
+    }
+
+    // OR with comparisons: OR(A1>100, A2>100) = 0 (both false)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(A1>100, A2>100)"));
+        model.setCell(CxSheetCellCoordinate(0, 7), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 7));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "OR(A1>100, A2>100) = 0");
+    }
+
+    // OR with multiple args: OR(0, 0, 0, 1) = 1
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(0, 0, 0, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 8), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 8));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "OR(0, 0, 0, 1) = 1");
+    }
+
+    // OR with multiple args all false: OR(0, 0, 0, 0) = 0
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("OR(0, 0, 0, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 9), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 9));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0), "OR(0, 0, 0, 0) = 0");
+    }
+
+    // Case insensitive: or(1, 0) = 1
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("or(1, 0)"));
+        model.setCell(CxSheetCellCoordinate(0, 10), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 10));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0), "or(1, 0) = 1 (lowercase)");
+    }
+}
+
+void testFinancialFunctions() {
+    printf("\n== CxSheetModel Financial Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // PMT(rate, nper, pv) - loan payment calculation
+    // Example: $10,000 loan at 5% annual (0.05/12 monthly) for 12 months
+    // PMT(0.05/12, 12, 10000) ≈ 856.07
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("PMT(0.05/12, 12, 10000)"));
+        model.setCell(CxSheetCellCoordinate(0, 0), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 0));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 856.07, 0.01), "PMT(0.05/12, 12, 10000) ≈ 856.07");
+    }
+
+    // PMT with 0% interest
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("PMT(0, 10, 1000)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 100.0), "PMT(0, 10, 1000) = 100");
+    }
+
+    // FV(rate, nper, pmt) - future value
+    // Example: $100/month for 12 months at 5% annual (0.05/12 monthly)
+    // FV(0.05/12, 12, 100) ≈ 1227.89
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("FV(0.05/12, 12, 100)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1227.89, 0.01), "FV(0.05/12, 12, 100) ≈ 1227.89");
+    }
+
+    // FV with 0% interest
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("FV(0, 12, 100)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1200.0), "FV(0, 12, 100) = 1200");
+    }
+
+    // PV(rate, nper, pmt) - present value
+    // Example: $100/month for 12 months at 5% annual (0.05/12 monthly)
+    // PV(0.05/12, 12, 100) ≈ 1168.12
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("PV(0.05/12, 12, 100)"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1168.12, 0.01), "PV(0.05/12, 12, 100) ≈ 1168.12");
+    }
+
+    // PV with 0% interest
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("PV(0, 12, 100)"));
+        model.setCell(CxSheetCellCoordinate(0, 5), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 5));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1200.0), "PV(0, 12, 100) = 1200");
+    }
+
+    // Case insensitive: pmt, fv, pv
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("pmt(0, 10, 1000)"));
+        model.setCell(CxSheetCellCoordinate(0, 6), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 6));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 100.0), "pmt(0, 10, 1000) = 100 (lowercase)");
+    }
+}
+
+void testNPVFunction() {
+    printf("\n== CxSheetModel NPV Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up cash flow values in cells
+    // A1=-1000 (initial investment), A2=300, A3=400, A4=500
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(-1000.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(300.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(400.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(500.0)));
+
+    // NPV with scalar values
+    // NPV(0.1, 100, 200, 300) = 100/1.1 + 200/1.21 + 300/1.331 ≈ 481.59
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("NPV(0.1, 100, 200, 300)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 481.59, 0.01), "NPV(0.1, 100, 200, 300) ≈ 481.59");
+    }
+
+    // NPV with range
+    // NPV(0.1, A2:A4) where A2=300, A3=400, A4=500
+    // = 300/1.1 + 400/1.21 + 500/1.331 ≈ 978.96
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("NPV(0.1, A2:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 978.96, 0.01), "NPV(0.1, A2:A4) ≈ 978.96");
+    }
+
+    // NPV at 0% rate = simple sum
+    // NPV(0, 100, 200, 300) = 100 + 200 + 300 = 600
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("NPV(0, 100, 200, 300)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 600.0), "NPV(0, 100, 200, 300) = 600");
+    }
+
+    // Case insensitive
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("npv(0, 100, 200)"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 300.0), "npv(0, 100, 200) = 300 (lowercase)");
+    }
+}
+
+void testIRRFunction() {
+    printf("\n== CxSheetModel IRR Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up cash flows in cells
+    // A1=-1000 (initial investment), A2=300, A3=400, A4=500
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(-1000.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(300.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(400.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(500.0)));
+
+    // IRR with scalar values
+    // IRR(-1000, 300, 400, 500) ≈ 0.0890 (8.90%)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IRR(-1000, 300, 400, 500)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0890, 0.001), "IRR(-1000, 300, 400, 500) ≈ 0.0890");
+    }
+
+    // IRR with range
+    // IRR(A1:A4) where A1=-1000, A2=300, A3=400, A4=500
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IRR(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 0.0890, 0.001), "IRR(A1:A4) ≈ 0.0890");
+    }
+
+    // IRR where return exactly doubles investment: -100, 200
+    // IRR(-100, 200) = 1.0 (100%)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("IRR(-100, 200)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0, 0.001), "IRR(-100, 200) = 1.0");
+    }
+
+    // Case insensitive
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("irr(-100, 200)"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0, 0.001), "irr(-100, 200) = 1.0 (lowercase)");
+    }
+}
+
+void testDateFunctions() {
+    printf("\n== CxSheetModel Date Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // DATE(year, month, day) - create serial date
+    // DATE(2024, 1, 1) should return serial date for Jan 1, 2024
+    // Excel serial: Jan 1, 2024 = 45292
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("DATE(2024, 1, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 0), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 0));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 45292.0, 1.0), "DATE(2024, 1, 1) ≈ 45292");
+    }
+
+    // DATE(2000, 6, 15) = June 15, 2000
+    // Excel serial: 36692
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("DATE(2000, 6, 15)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 36692.0, 1.0), "DATE(2000, 6, 15) ≈ 36692");
+    }
+
+    // YEAR(serial_date) - extract year
+    // YEAR(DATE(2024, 1, 1)) = 2024
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("YEAR(DATE(2024, 1, 1))"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 2024.0), "YEAR(DATE(2024, 1, 1)) = 2024");
+    }
+
+    // MONTH(serial_date) - extract month
+    // MONTH(DATE(2024, 7, 15)) = 7
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("MONTH(DATE(2024, 7, 15))"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 7.0), "MONTH(DATE(2024, 7, 15)) = 7");
+    }
+
+    // DAY(serial_date) - extract day
+    // DAY(DATE(2024, 7, 25)) = 25
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("DAY(DATE(2024, 7, 25))"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 25.0), "DAY(DATE(2024, 7, 25)) = 25");
+    }
+
+    // NOW() - returns current date/time as serial
+    // Just verify it returns a reasonable value (recent date)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("NOW()"));
+        model.setCell(CxSheetCellCoordinate(0, 5), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 5));
+        double now = retrieved.getEvaluatedValue().value;
+        // Should be > Jan 1, 2024 (45292) and < some future date
+        check(now > 45292.0 && now < 55000.0, "NOW() returns reasonable date");
+    }
+
+    // TODAY() - returns current date (no time)
+    // Should be an integer (no fractional part)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("TODAY()"));
+        model.setCell(CxSheetCellCoordinate(0, 6), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 6));
+        double today = retrieved.getEvaluatedValue().value;
+        // Should be an integer
+        check(doubleEqual(today, floor(today)), "TODAY() returns integer");
+        // Should be reasonable
+        check(today > 45292.0 && today < 55000.0, "TODAY() returns reasonable date");
+    }
+
+    // Case insensitive tests
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("date(2024, 1, 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 7), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 7));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 45292.0, 1.0), "date(2024, 1, 1) (lowercase)");
+    }
+
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("year(DATE(2024, 1, 1))"));
+        model.setCell(CxSheetCellCoordinate(0, 8), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 8));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 2024.0), "year (lowercase)");
+    }
+
+    // Date arithmetic: DATE + 30 days
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("DATE(2024, 1, 1) + 30"));
+        model.setCell(CxSheetCellCoordinate(0, 9), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 9));
+        // Jan 1 + 30 days = Jan 31
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 45322.0, 1.0), "DATE + 30 days");
+    }
+
+    // Extract year from date arithmetic result
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("YEAR(DATE(2024, 12, 31) + 1)"));
+        model.setCell(CxSheetCellCoordinate(0, 10), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 10));
+        // Dec 31, 2024 + 1 = Jan 1, 2025
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 2025.0), "YEAR(DATE + 1) crosses year");
+    }
+}
+
 //-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
@@ -1233,6 +1902,19 @@ int main(int argc, char **argv) {
     testRangeHorizontal();
     testRangeVertical3();
     testRangeLowercase();
+
+    // Logical function tests
+    testIFFunction();
+    testANDFunction();
+    testORFunction();
+
+    // Financial function tests
+    testFinancialFunctions();
+    testNPVFunction();
+    testIRRFunction();
+
+    // Date function tests
+    testDateFunctions();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
