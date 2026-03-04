@@ -11,6 +11,7 @@
 #include <cx/sheetModel/sheetCellRange.h>
 #include <cx/sheetModel/sheetCell.h>
 #include <cx/sheetModel/sheetModel.h>
+#include <cx/sheetModel/sheetInputParser.h>
 #include <cx/json/json_utf_object.h>
 #include <cx/json/json_utf_member.h>
 #include <cx/json/json_utf_number.h>
@@ -2046,6 +2047,218 @@ void testModelAppData() {
 
 
 //-----------------------------------------------------------------------------------------
+// CxSheetInputParser tests - tryParseNumber
+//-----------------------------------------------------------------------------------------
+void testInputParserNumber() {
+    printf("\n== CxSheetInputParser Number Tests ==\n");
+
+    double value;
+    int hasCurrency, hasPercent, hasThousands;
+
+    // Plain integers
+    {
+        int result = CxSheetInputParser::tryParseNumber("123", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '123' parses");
+        check(doubleEqual(value, 123.0), "parseNumber: '123' value");
+        check(hasCurrency == 0, "parseNumber: '123' no currency");
+        check(hasPercent == 0, "parseNumber: '123' no percent");
+        check(hasThousands == 0, "parseNumber: '123' no thousands");
+    }
+
+    // Decimal numbers
+    {
+        int result = CxSheetInputParser::tryParseNumber("123.45", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '123.45' parses");
+        check(doubleEqual(value, 123.45), "parseNumber: '123.45' value");
+    }
+
+    // Negative numbers
+    {
+        int result = CxSheetInputParser::tryParseNumber("-456.78", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '-456.78' parses");
+        check(doubleEqual(value, -456.78), "parseNumber: '-456.78' value");
+    }
+
+    // Thousands separators
+    {
+        int result = CxSheetInputParser::tryParseNumber("1,234.56", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '1,234.56' parses");
+        check(doubleEqual(value, 1234.56), "parseNumber: '1,234.56' value");
+        check(hasThousands == 1, "parseNumber: '1,234.56' has thousands");
+    }
+
+    // Currency
+    {
+        int result = CxSheetInputParser::tryParseNumber("$99.99", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '$99.99' parses");
+        check(doubleEqual(value, 99.99), "parseNumber: '$99.99' value");
+        check(hasCurrency == 1, "parseNumber: '$99.99' has currency");
+    }
+
+    // Currency with thousands
+    {
+        int result = CxSheetInputParser::tryParseNumber("$1,234.56", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '$1,234.56' parses");
+        check(doubleEqual(value, 1234.56), "parseNumber: '$1,234.56' value");
+        check(hasCurrency == 1, "parseNumber: '$1,234.56' has currency");
+        check(hasThousands == 1, "parseNumber: '$1,234.56' has thousands");
+    }
+
+    // Percent
+    {
+        int result = CxSheetInputParser::tryParseNumber("50%", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '50%' parses");
+        check(doubleEqual(value, 0.5), "parseNumber: '50%' value (0.5)");
+        check(hasPercent == 1, "parseNumber: '50%' has percent");
+    }
+
+    // Percent with decimal
+    {
+        int result = CxSheetInputParser::tryParseNumber("12.5%", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '12.5%' parses");
+        check(doubleEqual(value, 0.125), "parseNumber: '12.5%' value (0.125)");
+        check(hasPercent == 1, "parseNumber: '12.5%' has percent");
+    }
+
+    // Leading/trailing whitespace
+    {
+        int result = CxSheetInputParser::tryParseNumber("  42  ", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 1, "parseNumber: '  42  ' parses");
+        check(doubleEqual(value, 42.0), "parseNumber: '  42  ' value");
+    }
+
+    // Invalid: letters
+    {
+        int result = CxSheetInputParser::tryParseNumber("12abc", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 0, "parseNumber: '12abc' fails");
+    }
+
+    // Invalid: multiple decimals
+    {
+        int result = CxSheetInputParser::tryParseNumber("1.2.3", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 0, "parseNumber: '1.2.3' fails");
+    }
+
+    // Invalid: empty
+    {
+        int result = CxSheetInputParser::tryParseNumber("", &value, &hasCurrency, &hasPercent, &hasThousands);
+        check(result == 0, "parseNumber: '' fails");
+    }
+}
+
+//-----------------------------------------------------------------------------------------
+// CxSheetInputParser tests - tryParseDate
+//-----------------------------------------------------------------------------------------
+void testInputParserDate() {
+    printf("\n== CxSheetInputParser Date Tests ==\n");
+
+    double serialDate;
+    CxString dateFormat;
+
+    // US format mm/dd/yyyy
+    {
+        int result = CxSheetInputParser::tryParseDate("10/20/2026", &serialDate, &dateFormat);
+        check(result == 1, "parseDate: '10/20/2026' parses");
+        check(dateFormat == "mm/dd/yyyy", "parseDate: '10/20/2026' format is mm/dd/yyyy");
+        // Verify it round-trips
+        CxString formatted = CxSheetInputParser::formatDate(serialDate, dateFormat);
+        check(formatted == "10/20/2026", "parseDate: '10/20/2026' round-trips");
+    }
+
+    // ISO format yyyy-mm-dd
+    {
+        int result = CxSheetInputParser::tryParseDate("2026-10-20", &serialDate, &dateFormat);
+        check(result == 1, "parseDate: '2026-10-20' parses");
+        check(dateFormat == "yyyy-mm-dd", "parseDate: '2026-10-20' format is yyyy-mm-dd");
+        CxString formatted = CxSheetInputParser::formatDate(serialDate, dateFormat);
+        check(formatted == "2026-10-20", "parseDate: '2026-10-20' round-trips");
+    }
+
+    // Dash format mm-dd-yyyy
+    {
+        int result = CxSheetInputParser::tryParseDate("10-20-2026", &serialDate, &dateFormat);
+        check(result == 1, "parseDate: '10-20-2026' parses");
+        check(dateFormat == "mm-dd-yyyy", "parseDate: '10-20-2026' format is mm-dd-yyyy");
+        CxString formatted = CxSheetInputParser::formatDate(serialDate, dateFormat);
+        check(formatted == "10-20-2026", "parseDate: '10-20-2026' round-trips");
+    }
+
+    // Two-digit year (20xx assumed for < 30)
+    {
+        int result = CxSheetInputParser::tryParseDate("1/15/26", &serialDate, &dateFormat);
+        check(result == 1, "parseDate: '1/15/26' parses");
+        CxString formatted = CxSheetInputParser::formatDate(serialDate, dateFormat);
+        check(formatted == "01/15/2026", "parseDate: '1/15/26' expands to 2026");
+    }
+
+    // Whitespace handling
+    {
+        int result = CxSheetInputParser::tryParseDate("  3/5/2025  ", &serialDate, &dateFormat);
+        check(result == 1, "parseDate: '  3/5/2025  ' parses with whitespace");
+    }
+
+    // Invalid: bad month
+    {
+        int result = CxSheetInputParser::tryParseDate("13/20/2026", &serialDate, &dateFormat);
+        check(result == 0, "parseDate: '13/20/2026' fails (bad month)");
+    }
+
+    // Invalid: not a date
+    {
+        int result = CxSheetInputParser::tryParseDate("hello", &serialDate, &dateFormat);
+        check(result == 0, "parseDate: 'hello' fails");
+    }
+
+    // Invalid: empty
+    {
+        int result = CxSheetInputParser::tryParseDate("", &serialDate, &dateFormat);
+        check(result == 0, "parseDate: '' fails");
+    }
+}
+
+//-----------------------------------------------------------------------------------------
+// CxSheetInputParser tests - formatDate
+//-----------------------------------------------------------------------------------------
+void testInputParserFormatDate() {
+    printf("\n== CxSheetInputParser Format Date Tests ==\n");
+
+    // Create a known date: January 1, 2000
+    double serial = CxSheetInputParser::dateToSerial(2000, 1, 1);
+
+    {
+        CxString result = CxSheetInputParser::formatDate(serial, "mm/dd/yyyy");
+        check(result == "01/01/2000", "formatDate: mm/dd/yyyy");
+    }
+
+    {
+        CxString result = CxSheetInputParser::formatDate(serial, "yyyy-mm-dd");
+        check(result == "2000-01-01", "formatDate: yyyy-mm-dd");
+    }
+
+    {
+        CxString result = CxSheetInputParser::formatDate(serial, "mm-dd-yyyy");
+        check(result == "01-01-2000", "formatDate: mm-dd-yyyy");
+    }
+
+    // Test date components round-trip
+    {
+        int year, month, day;
+        CxSheetInputParser::serialToComponents(serial, &year, &month, &day);
+        check(year == 2000, "serialToComponents: year 2000");
+        check(month == 1, "serialToComponents: month 1");
+        check(day == 1, "serialToComponents: day 1");
+    }
+
+    // Test a different date: October 20, 2026
+    {
+        double serial2 = CxSheetInputParser::dateToSerial(2026, 10, 20);
+        CxString result = CxSheetInputParser::formatDate(serial2, "mm/dd/yyyy");
+        check(result == "10/20/2026", "formatDate: Oct 20, 2026");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -2097,6 +2310,11 @@ int main(int argc, char **argv) {
 
     // Date function tests
     testDateFunctions();
+
+    // Input parser tests
+    testInputParserNumber();
+    testInputParserDate();
+    testInputParserFormatDate();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
