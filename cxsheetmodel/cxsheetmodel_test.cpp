@@ -2259,6 +2259,131 @@ void testInputParserFormatDate() {
 
 
 //-----------------------------------------------------------------------------------------
+// CxSheetInputParser tests - error messages
+//-----------------------------------------------------------------------------------------
+void testInputParserErrorMessages() {
+    printf("\n== CxSheetInputParser Error Message Tests ==\n");
+
+    double value;
+    int hasCurrency, hasPercent, hasThousands;
+    CxString errorMsg;
+
+    // Number parsing errors
+    {
+        int result = CxSheetInputParser::tryParseNumber("", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        check(result == 0, "parseNumber empty: fails");
+        check(errorMsg.length() > 0, "parseNumber empty: has error message");
+        check(errorMsg == "Empty input", "parseNumber empty: correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseNumber("$", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        check(result == 0, "parseNumber '$': fails");
+        check(errorMsg == "Expected number after $", "parseNumber '$': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseNumber("-", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        check(result == 0, "parseNumber '-': fails");
+        check(errorMsg == "Expected number after -", "parseNumber '-': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseNumber("abc", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        check(result == 0, "parseNumber 'abc': fails");
+        check(errorMsg == "Expected number", "parseNumber 'abc': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseNumber("12.34.56", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        check(result == 0, "parseNumber '12.34.56': fails");
+        check(errorMsg == "Multiple decimal points not allowed", "parseNumber '12.34.56': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseNumber("12.34,56", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        check(result == 0, "parseNumber '12.34,56': fails");
+        check(errorMsg == "Comma not allowed after decimal point", "parseNumber '12.34,56': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseNumber("123xyz", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        check(result == 0, "parseNumber '123xyz': fails");
+        check(errorMsg == "Unexpected character 'x'", "parseNumber '123xyz': correct message");
+    }
+
+    // Date parsing errors
+    double serialDate;
+    CxString dateFormat;
+
+    {
+        int result = CxSheetInputParser::tryParseDate("", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate empty: fails");
+        check(errorMsg == "Empty input", "parseDate empty: correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("abc", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate 'abc': fails");
+        check(errorMsg == "Expected month or year", "parseDate 'abc': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("10", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate '10': fails");
+        check(errorMsg == "Expected date separator (/ or -)", "parseDate '10': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("10.20.2026", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate '10.20.2026': fails");
+        check(errorMsg == "Invalid separator '.', expected / or -", "parseDate '10.20.2026': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("10/20-2026", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate '10/20-2026': fails");
+        check(errorMsg == "Date separators must match", "parseDate '10/20-2026': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("13/20/2026", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate '13/20/2026': fails");
+        check(errorMsg == "Invalid month 13 (must be 1-12)", "parseDate '13/20/2026': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("10/32/2026", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate '10/32/2026': fails");
+        check(errorMsg == "Invalid day 32 (must be 1-31)", "parseDate '10/32/2026': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("10/20/1899", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate '10/20/1899': fails");
+        check(errorMsg == "Invalid year 1899 (must be 1900-9999)", "parseDate '10/20/1899': correct message");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("10/20/2026abc", &serialDate, &dateFormat, &errorMsg);
+        check(result == 0, "parseDate '10/20/2026abc': fails");
+        check(errorMsg == "Unexpected character 'a' after date", "parseDate '10/20/2026abc': correct message");
+    }
+
+    // Verify NULL errorMsg doesn't crash
+    {
+        int result = CxSheetInputParser::tryParseNumber("abc", &value, &hasCurrency, &hasPercent, &hasThousands, NULL);
+        check(result == 0, "parseNumber with NULL errorMsg: fails safely");
+    }
+
+    {
+        int result = CxSheetInputParser::tryParseDate("abc", &serialDate, &dateFormat, NULL);
+        check(result == 0, "parseDate with NULL errorMsg: fails safely");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -2315,6 +2440,7 @@ int main(int argc, char **argv) {
     testInputParserNumber();
     testInputParserDate();
     testInputParserFormatDate();
+    testInputParserErrorMessages();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
