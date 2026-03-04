@@ -11,6 +11,9 @@
 #include <cx/sheetModel/sheetCellRange.h>
 #include <cx/sheetModel/sheetCell.h>
 #include <cx/sheetModel/sheetModel.h>
+#include <cx/json/json_utf_object.h>
+#include <cx/json/json_utf_member.h>
+#include <cx/json/json_utf_number.h>
 
 //-----------------------------------------------------------------------------------------
 // Test harness
@@ -1908,6 +1911,141 @@ void testDateFunctions() {
 }
 
 //-----------------------------------------------------------------------------------------
+// AppData tests
+//-----------------------------------------------------------------------------------------
+void testModelAppData() {
+    printf("\n== CxSheetModel AppData Tests ==\n");
+
+    const char* testFile = "/tmp/cxsheetmodel_appdata_test.json";
+
+    // Test 1: getAppData returns NULL initially
+    {
+        CxSheetModel model;
+        CxJSONUTFObject *appData = model.getAppData();
+        check(appData == NULL, "appData: initially NULL");
+    }
+
+    // Test 2: setAppData/getAppData round trip
+    {
+        CxSheetModel model;
+
+        // Create app data with a "columns" entry
+        CxJSONUTFObject *appData = new CxJSONUTFObject();
+        CxJSONUTFObject *columns = new CxJSONUTFObject();
+        CxJSONUTFNumber *widthA = new CxJSONUTFNumber(15.0);
+        CxJSONUTFNumber *widthB = new CxJSONUTFNumber(25.0);
+        columns->append(new CxJSONUTFMember("A", widthA));
+        columns->append(new CxJSONUTFMember("B", widthB));
+        appData->append(new CxJSONUTFMember("columns", columns));
+
+        model.setAppData(appData);
+
+        // Retrieve and verify
+        CxJSONUTFObject *retrieved = model.getAppData();
+        check(retrieved != NULL, "appData: getAppData returns non-NULL after set");
+
+        CxJSONUTFMember *colMember = retrieved->find("columns");
+        check(colMember != NULL, "appData: has columns member");
+
+        if (colMember) {
+            CxJSONUTFObject *cols = (CxJSONUTFObject *)colMember->object();
+            CxJSONUTFMember *aMember = cols->find("A");
+            check(aMember != NULL, "appData: has A column entry");
+            if (aMember) {
+                CxJSONUTFNumber *aWidth = (CxJSONUTFNumber *)aMember->object();
+                check(doubleEqual(aWidth->get(), 15.0), "appData: A width is 15");
+            }
+        }
+    }
+
+    // Test 3: AppData preserved through save/load
+    {
+        CxSheetModel model;
+
+        // Set some cells
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(42.0)));
+        model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxString("Test")));
+
+        // Create and set app data
+        CxJSONUTFObject *appData = new CxJSONUTFObject();
+        CxJSONUTFObject *columns = new CxJSONUTFObject();
+        columns->append(new CxJSONUTFMember("A", new CxJSONUTFNumber(12.0)));
+        columns->append(new CxJSONUTFMember("B", new CxJSONUTFNumber(30.0)));
+        columns->append(new CxJSONUTFMember("C", new CxJSONUTFNumber(8.0)));
+        appData->append(new CxJSONUTFMember("columns", columns));
+        model.setAppData(appData);
+
+        // Save
+        int saveResult = model.saveSheet(CxString(testFile));
+        check(saveResult == 1, "appData save: returns success");
+    }
+
+    // Test 4: Load and verify appData preserved
+    {
+        CxSheetModel model;
+        int loadResult = model.loadSheet(CxString(testFile));
+        check(loadResult == 1, "appData load: returns success");
+
+        // Verify cells loaded
+        CxSheetCell cell1 = model.getCell(CxSheetCellCoordinate(0, 0));
+        check(cell1.getType() == CxSheetCell::DOUBLE, "appData load: cell A1 is double");
+        check(doubleEqual(cell1.getDouble().value, 42.0), "appData load: cell A1 value");
+
+        // Verify appData preserved
+        CxJSONUTFObject *appData = model.getAppData();
+        check(appData != NULL, "appData load: appData preserved");
+
+        if (appData) {
+            CxJSONUTFMember *colMember = appData->find("columns");
+            check(colMember != NULL, "appData load: columns preserved");
+
+            if (colMember) {
+                CxJSONUTFObject *cols = (CxJSONUTFObject *)colMember->object();
+                check(cols->entries() == 3, "appData load: 3 column entries");
+
+                CxJSONUTFMember *aMember = cols->find("A");
+                CxJSONUTFMember *bMember = cols->find("B");
+                CxJSONUTFMember *cMember = cols->find("C");
+
+                check(aMember != NULL, "appData load: A column present");
+                check(bMember != NULL, "appData load: B column present");
+                check(cMember != NULL, "appData load: C column present");
+
+                if (aMember) {
+                    CxJSONUTFNumber *aWidth = (CxJSONUTFNumber *)aMember->object();
+                    check(doubleEqual(aWidth->get(), 12.0), "appData load: A width is 12");
+                }
+                if (bMember) {
+                    CxJSONUTFNumber *bWidth = (CxJSONUTFNumber *)bMember->object();
+                    check(doubleEqual(bWidth->get(), 30.0), "appData load: B width is 30");
+                }
+                if (cMember) {
+                    CxJSONUTFNumber *cWidth = (CxJSONUTFNumber *)cMember->object();
+                    check(doubleEqual(cWidth->get(), 8.0), "appData load: C width is 8");
+                }
+            }
+        }
+    }
+
+    // Test 5: setAppData(NULL) clears app data
+    {
+        CxSheetModel model;
+
+        // Set app data
+        CxJSONUTFObject *appData = new CxJSONUTFObject();
+        appData->append(new CxJSONUTFMember("test", new CxJSONUTFNumber(99.0)));
+        model.setAppData(appData);
+
+        check(model.getAppData() != NULL, "appData: non-NULL before clear");
+
+        // Clear it
+        model.setAppData(NULL);
+        check(model.getAppData() == NULL, "appData: NULL after setAppData(NULL)");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -1936,6 +2074,7 @@ int main(int argc, char **argv) {
     testModelAffectedCells();
     testModelCopyConstructor();
     testModelSaveLoad();
+    testModelAppData();
 
     // Range tests
     testRangeBasics();
