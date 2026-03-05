@@ -2384,6 +2384,283 @@ void testInputParserErrorMessages() {
 
 
 //-----------------------------------------------------------------------------------------
+// detectInputIntent tests
+//-----------------------------------------------------------------------------------------
+void testDetectInputIntent() {
+    printf("\n== CxSheetInputParser detectInputIntent Tests ==\n");
+
+    // Date intent - has / or - between digits
+    check((CxSheetInputParser::detectInputIntent("10/20/2026") & INTENT_DATE) != 0,
+          "date intent: '10/20/2026' has INTENT_DATE");
+    check((CxSheetInputParser::detectInputIntent("2026-10-20") & INTENT_DATE) != 0,
+          "date intent: '2026-10-20' has INTENT_DATE");
+    check((CxSheetInputParser::detectInputIntent("13/20/2026") & INTENT_DATE) != 0,
+          "date intent: '13/20/2026' (invalid) still has INTENT_DATE");
+
+    // Currency intent - starts with $
+    check((CxSheetInputParser::detectInputIntent("$100") & INTENT_CURRENCY) != 0,
+          "currency intent: '$100' has INTENT_CURRENCY");
+    check((CxSheetInputParser::detectInputIntent("$1,234.56") & INTENT_CURRENCY) != 0,
+          "currency intent: '$1,234.56' has INTENT_CURRENCY");
+    check((CxSheetInputParser::detectInputIntent("$abc") & INTENT_CURRENCY) != 0,
+          "currency intent: '$abc' (invalid) still has INTENT_CURRENCY");
+
+    // Percent intent - ends with %
+    check((CxSheetInputParser::detectInputIntent("50%") & INTENT_PERCENT) != 0,
+          "percent intent: '50%' has INTENT_PERCENT");
+    check((CxSheetInputParser::detectInputIntent("12.5%") & INTENT_PERCENT) != 0,
+          "percent intent: '12.5%' has INTENT_PERCENT");
+    check((CxSheetInputParser::detectInputIntent("abc%") & INTENT_PERCENT) != 0,
+          "percent intent: 'abc%' (invalid) still has INTENT_PERCENT");
+
+    // Number intent - all numeric-like characters
+    check((CxSheetInputParser::detectInputIntent("123.45") & INTENT_NUMBER) != 0,
+          "number intent: '123.45' has INTENT_NUMBER");
+    check((CxSheetInputParser::detectInputIntent("1,234") & INTENT_NUMBER) != 0,
+          "number intent: '1,234' has INTENT_NUMBER");
+    check((CxSheetInputParser::detectInputIntent("-42") & INTENT_NUMBER) != 0,
+          "number intent: '-42' has INTENT_NUMBER");
+    check((CxSheetInputParser::detectInputIntent("+99") & INTENT_NUMBER) != 0,
+          "number intent: '+99' has INTENT_NUMBER");
+
+    // Text - no numeric intent
+    check(CxSheetInputParser::detectInputIntent("hello") == INTENT_NONE,
+          "text: 'hello' has no intent");
+    check(CxSheetInputParser::detectInputIntent("abc123") == INTENT_NONE,
+          "text: 'abc123' has no intent");
+    check(CxSheetInputParser::detectInputIntent("") == INTENT_NONE,
+          "empty: '' has no intent");
+
+    // Combined intents
+    int dollarPercent = CxSheetInputParser::detectInputIntent("$50%");
+    check((dollarPercent & INTENT_CURRENCY) != 0 && (dollarPercent & INTENT_PERCENT) != 0,
+          "combined: '$50%' has both INTENT_CURRENCY and INTENT_PERCENT");
+}
+
+
+//-----------------------------------------------------------------------------------------
+// parseAndClassify tests
+//-----------------------------------------------------------------------------------------
+void testParseAndClassify() {
+    printf("\n== CxSheetInputParser parseAndClassify Tests ==\n");
+
+    // Empty input -> EMPTY cell
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("");
+        check(r.success == 1, "empty: succeeds");
+        check(r.cellType == 0, "empty: EMPTY type");
+    }
+
+    // Plain text
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("hello");
+        check(r.success == 1, "text: succeeds");
+        check(r.cellType == 1, "text: TEXT type");
+        check(r.textValue == "hello", "text: value preserved");
+    }
+
+    // Mixed alphanumeric text
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("abc123xyz");
+        check(r.success == 1, "mixed text: succeeds");
+        check(r.cellType == 1, "mixed text: TEXT type");
+        check(r.textValue == "abc123xyz", "mixed text: value preserved");
+    }
+
+    // Plain number
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("123.45");
+        check(r.success == 1, "number: succeeds");
+        check(r.cellType == 2, "number: DOUBLE type");
+        check(doubleEqual(r.doubleValue, 123.45), "number: correct value");
+        check(r.hasCurrency == 0, "number: no currency flag");
+        check(r.hasPercent == 0, "number: no percent flag");
+    }
+
+    // Integer
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("42");
+        check(r.success == 1, "integer: succeeds");
+        check(r.cellType == 2, "integer: DOUBLE type");
+        check(doubleEqual(r.doubleValue, 42.0), "integer: correct value");
+    }
+
+    // Negative number
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("-99.5");
+        check(r.success == 1, "negative: succeeds");
+        check(r.cellType == 2, "negative: DOUBLE type");
+        check(doubleEqual(r.doubleValue, -99.5), "negative: correct value");
+    }
+
+    // Currency
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("$1,234.56");
+        check(r.success == 1, "currency: succeeds");
+        check(r.cellType == 2, "currency: DOUBLE type");
+        check(doubleEqual(r.doubleValue, 1234.56), "currency: correct value");
+        check(r.hasCurrency == 1, "currency: flag set");
+        check(r.hasThousands == 1, "currency: thousands flag set");
+    }
+
+    // Simple currency
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("$100");
+        check(r.success == 1, "simple currency: succeeds");
+        check(r.hasCurrency == 1, "simple currency: flag set");
+        check(doubleEqual(r.doubleValue, 100.0), "simple currency: correct value");
+    }
+
+    // Percent
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("50%");
+        check(r.success == 1, "percent: succeeds");
+        check(r.cellType == 2, "percent: DOUBLE type");
+        check(r.hasPercent == 1, "percent: flag set");
+        check(doubleEqual(r.doubleValue, 0.5), "percent: value /100");
+    }
+
+    // Decimal percent
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("12.5%");
+        check(r.success == 1, "decimal percent: succeeds");
+        check(r.hasPercent == 1, "decimal percent: flag set");
+        check(doubleEqual(r.doubleValue, 0.125), "decimal percent: value /100");
+    }
+
+    // Number with thousands
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("1,000,000");
+        check(r.success == 1, "millions: succeeds");
+        check(r.hasThousands == 1, "millions: thousands flag set");
+        check(doubleEqual(r.doubleValue, 1000000.0), "millions: correct value");
+    }
+
+    // Date mm/dd/yyyy
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("10/20/2026");
+        check(r.success == 1, "date mm/dd/yyyy: succeeds");
+        check(r.cellType == 2, "date: DOUBLE type (serial)");
+        check(r.dateFormat == "mm/dd/yyyy", "date: format detected");
+        check(r.doubleValue > 40000, "date: has serial value");  // sanity check
+    }
+
+    // Date yyyy-mm-dd (ISO)
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("2026-10-20");
+        check(r.success == 1, "date ISO: succeeds");
+        check(r.dateFormat == "yyyy-mm-dd", "date ISO: format detected");
+    }
+
+    // Invalid date - should fail with error
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("13/20/2026");
+        check(r.success == 0, "bad date month: fails");
+        check(r.errorMsg.length() > 0, "bad date month: has error message");
+    }
+
+    // Invalid date day
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("10/35/2026");
+        check(r.success == 0, "bad date day: fails");
+        check(r.errorMsg.length() > 0, "bad date day: has error message");
+    }
+
+    // Invalid currency - should fail with error
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("$abc");
+        check(r.success == 0, "bad currency: fails");
+        check(r.errorMsg.length() > 0, "bad currency: has error message");
+    }
+
+    // Invalid percent - should fail with error
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("abc%");
+        check(r.success == 0, "bad percent: fails");
+        check(r.errorMsg.length() > 0, "bad percent: has error message");
+    }
+
+    // Multiple decimals - should fail
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("34.4.4");
+        check(r.success == 0, "multi-decimal: fails");
+        check(r.errorMsg.length() > 0, "multi-decimal: has error message");
+    }
+
+    // Alphanumeric starting with digits - treated as text (not numeric intent)
+    {
+        CxSheetInputParseResult r = CxSheetInputParser::parseAndClassify("123x");
+        check(r.success == 1, "123x: succeeds as text");
+        check(r.cellType == 1, "123x: TEXT type");
+        check(r.textValue == "123x", "123x: value preserved");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
+// applyParsingAttributes tests
+//-----------------------------------------------------------------------------------------
+void testApplyParsingAttributes() {
+    printf("\n== CxSheetInputParser applyParsingAttributes Tests ==\n");
+
+    // Test date format attribute
+    {
+        CxSheetCell cell;
+        CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("10/20/2026");
+        CxSheetInputParser::applyParsingAttributes(&cell, result);
+        check(cell.hasAppAttribute("dateFormat"), "date: has dateFormat attribute");
+        check(cell.getAppAttributeString("dateFormat") == "mm/dd/yyyy",
+              "date: dateFormat is mm/dd/yyyy");
+    }
+
+    // Test currency attribute
+    {
+        CxSheetCell cell;
+        CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("$100");
+        CxSheetInputParser::applyParsingAttributes(&cell, result);
+        check(cell.hasAppAttribute("currency"), "currency: has currency attribute");
+        check(cell.getAppAttributeString("currency") == "true", "currency: attribute is 'true'");
+    }
+
+    // Test percent attribute
+    {
+        CxSheetCell cell;
+        CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("50%");
+        CxSheetInputParser::applyParsingAttributes(&cell, result);
+        check(cell.hasAppAttribute("percent"), "percent: has percent attribute");
+        check(cell.getAppAttributeString("percent") == "true", "percent: attribute is 'true'");
+    }
+
+    // Test thousands attribute
+    {
+        CxSheetCell cell;
+        CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("$1,234,567");
+        CxSheetInputParser::applyParsingAttributes(&cell, result);
+        check(cell.hasAppAttribute("thousands"), "thousands: has thousands attribute");
+        check(cell.hasAppAttribute("currency"), "thousands: also has currency");
+    }
+
+    // Test plain number - no attributes
+    {
+        CxSheetCell cell;
+        CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("42");
+        CxSheetInputParser::applyParsingAttributes(&cell, result);
+        check(!cell.hasAppAttribute("dateFormat"), "plain number: no dateFormat");
+        check(!cell.hasAppAttribute("currency"), "plain number: no currency");
+        check(!cell.hasAppAttribute("percent"), "plain number: no percent");
+        check(!cell.hasAppAttribute("thousands"), "plain number: no thousands");
+    }
+
+    // Test NULL cell - should not crash
+    {
+        CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("$100");
+        CxSheetInputParser::applyParsingAttributes(NULL, result);
+        check(1, "NULL cell: does not crash");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -2441,6 +2718,11 @@ int main(int argc, char **argv) {
     testInputParserDate();
     testInputParserFormatDate();
     testInputParserErrorMessages();
+
+    // New parseAndClassify tests
+    testDetectInputIntent();
+    testParseAndClassify();
+    testApplyParsingAttributes();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
