@@ -2619,7 +2619,7 @@ void testApplyParsingAttributes() {
         CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("$100");
         CxSheetInputParser::applyParsingAttributes(&cell, result);
         check(cell.hasAppAttribute("currency"), "currency: has currency attribute");
-        check(cell.getAppAttributeString("currency") == "true", "currency: attribute is 'true'");
+        check(cell.getAppAttributeBool("currency", false) == true, "currency: attribute is true");
     }
 
     // Test percent attribute
@@ -2628,7 +2628,7 @@ void testApplyParsingAttributes() {
         CxSheetInputParseResult result = CxSheetInputParser::parseAndClassify("50%");
         CxSheetInputParser::applyParsingAttributes(&cell, result);
         check(cell.hasAppAttribute("percent"), "percent: has percent attribute");
-        check(cell.getAppAttributeString("percent") == "true", "percent: attribute is 'true'");
+        check(cell.getAppAttributeBool("percent", false) == true, "percent: attribute is true");
     }
 
     // Test thousands attribute
