@@ -2661,6 +2661,645 @@ void testApplyParsingAttributes() {
 
 
 //-----------------------------------------------------------------------------------------
+// Insert/Delete Row tests
+//-----------------------------------------------------------------------------------------
+void testInsertRowBasic() {
+    printf("\n== Insert Row Basic Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up: A1=10, A2=20, A3=30
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+
+    // Insert row at row 1 (before A2)
+    model.insertRow(1);
+
+    // A1 should be unchanged
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(0, 0));
+        check(c.getType() == CxSheetCell::DOUBLE, "insert row: A1 still double");
+        check(doubleEqual(c.getEvaluatedValue().value, 10.0), "insert row: A1 = 10");
+    }
+
+    // A2 should now be empty (inserted row)
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(1, 0));
+        check(c.getType() == CxSheetCell::EMPTY, "insert row: A2 is empty (inserted)");
+    }
+
+    // A3 should be old A2 = 20
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(2, 0));
+        check(c.getType() == CxSheetCell::DOUBLE, "insert row: A3 is double");
+        check(doubleEqual(c.getEvaluatedValue().value, 20.0), "insert row: A3 = 20 (shifted from A2)");
+    }
+
+    // A4 should be old A3 = 30
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(3, 0));
+        check(c.getType() == CxSheetCell::DOUBLE, "insert row: A4 is double");
+        check(doubleEqual(c.getEvaluatedValue().value, 30.0), "insert row: A4 = 30 (shifted from A3)");
+    }
+}
+
+void testDeleteRowBasic() {
+    printf("\n== Delete Row Basic Tests ==\n");
+
+    CxSheetModel model;
+
+    // Set up: A1=10, A2=20, A3=30, A4=40
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(40.0)));
+
+    // Delete row 1 (A2=20)
+    model.deleteRow(1);
+
+    // A1 unchanged
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(0, 0));
+        check(doubleEqual(c.getEvaluatedValue().value, 10.0), "delete row: A1 = 10");
+    }
+
+    // A2 should now be old A3 = 30
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(1, 0));
+        check(doubleEqual(c.getEvaluatedValue().value, 30.0), "delete row: A2 = 30 (shifted from A3)");
+    }
+
+    // A3 should now be old A4 = 40
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(2, 0));
+        check(doubleEqual(c.getEvaluatedValue().value, 40.0), "delete row: A3 = 40 (shifted from A4)");
+    }
+
+    // A4 should be empty (no orphan)
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(3, 0));
+        check(c.getType() == CxSheetCell::EMPTY, "delete row: A4 is empty (no orphan)");
+    }
+}
+
+void testDeleteRowNoOrphans() {
+    printf("\n== Delete Row No Orphan Cells ==\n");
+
+    CxSheetModel model;
+
+    // Set up a grid: 5 rows x 3 columns with values
+    for (int r = 0; r < 5; r++) {
+        for (int c = 0; c < 3; c++) {
+            double val = (r + 1) * 10.0 + (c + 1);
+            model.setCell(CxSheetCellCoordinate(r, c), CxSheetCell(CxDouble(val)));
+        }
+    }
+
+    // Delete row 2 (middle row, values 31, 32, 33)
+    model.deleteRow(2);
+
+    // Row 0 and 1 unchanged
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 0)).getEvaluatedValue().value, 11.0),
+          "no orphan: A1 = 11");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 21.0),
+          "no orphan: A2 = 21");
+
+    // Row 2 should be old row 3 (41, 42, 43)
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 0)).getEvaluatedValue().value, 41.0),
+          "no orphan: A3 = 41 (shifted from row 4)");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 1)).getEvaluatedValue().value, 42.0),
+          "no orphan: B3 = 42 (shifted from row 4)");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 2)).getEvaluatedValue().value, 43.0),
+          "no orphan: C3 = 43 (shifted from row 4)");
+
+    // Row 3 should be old row 4 (51, 52, 53)
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 0)).getEvaluatedValue().value, 51.0),
+          "no orphan: A4 = 51 (shifted from row 5)");
+
+    // Row 4 should be completely empty — no orphan cells
+    check(model.getCell(CxSheetCellCoordinate(4, 0)).getType() == CxSheetCell::EMPTY,
+          "no orphan: A5 empty");
+    check(model.getCell(CxSheetCellCoordinate(4, 1)).getType() == CxSheetCell::EMPTY,
+          "no orphan: B5 empty");
+    check(model.getCell(CxSheetCellCoordinate(4, 2)).getType() == CxSheetCell::EMPTY,
+          "no orphan: C5 empty");
+}
+
+void testInsertRowFormulaAdjust() {
+    printf("\n== Insert Row Formula Adjustment ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, A2=20, A3=A1+A2 (=30)
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("A1+A2"));
+        model.setCell(CxSheetCellCoordinate(2, 0), f);
+    }
+
+    // Verify before insert
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 0)).getEvaluatedValue().value, 30.0),
+          "before insert: A3 = A1+A2 = 30");
+
+    // Insert row at row 1 (before A2). A2 shifts to A3, A3(formula) shifts to A4
+    model.insertRow(1);
+
+    // A4 should now have formula A1+A3 (refs shifted) = 10+20 = 30
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(3, 0));
+        check(c.getType() == CxSheetCell::FORMULA, "insert formula: A4 is formula");
+        check(doubleEqual(c.getEvaluatedValue().value, 30.0), "insert formula: A4 = 30");
+    }
+}
+
+void testDeleteRowFormulaAdjust() {
+    printf("\n== Delete Row Formula Adjustment ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, A2=text, A3=20, A4=A1+A3 (=30)
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxString("filler")));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(20.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("A1+A3"));
+        model.setCell(CxSheetCellCoordinate(3, 0), f);
+    }
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 0)).getEvaluatedValue().value, 30.0),
+          "before delete: A4 = A1+A3 = 30");
+
+    // Delete row 1 (the filler). A3 shifts to A2, A4(formula) shifts to A3
+    model.deleteRow(1);
+
+    // A3 should now have formula A1+A2 = 10+20 = 30
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(2, 0));
+        check(c.getType() == CxSheetCell::FORMULA, "delete formula: A3 is formula");
+        check(doubleEqual(c.getEvaluatedValue().value, 30.0), "delete formula: A3 = A1+A2 = 30");
+    }
+
+    // A4 should be empty
+    check(model.getCell(CxSheetCellCoordinate(3, 0)).getType() == CxSheetCell::EMPTY,
+          "delete formula: A4 is empty (no orphan)");
+}
+
+void testDeleteRowRangeFormulaShrink() {
+    printf("\n== Delete Row Range Formula Shrink ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, A2=20, A3=30, A4=40, A5=50
+    // A6=SUM(A1:A5) = 150
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(40.0)));
+    model.setCell(CxSheetCellCoordinate(4, 0), CxSheetCell(CxDouble(50.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(A1:A5)"));
+        model.setCell(CxSheetCellCoordinate(5, 0), f);
+    }
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(5, 0)).getEvaluatedValue().value, 150.0),
+          "range shrink: SUM(A1:A5) = 150");
+
+    // Delete row 2 (A3=30). Range should shrink to SUM(A1:A4), value = 120
+    model.deleteRow(2);
+
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(4, 0));
+        check(c.getType() == CxSheetCell::FORMULA, "range shrink: A5 is formula");
+        check(doubleEqual(c.getEvaluatedValue().value, 120.0),
+              "range shrink: SUM shrinks, value = 10+20+40+50 = 120");
+    }
+
+    // No orphan at original row 5
+    check(model.getCell(CxSheetCellCoordinate(5, 0)).getType() == CxSheetCell::EMPTY,
+          "range shrink: A6 is empty (no orphan)");
+}
+
+void testSuccessiveDeletesRangeShrinkToOne() {
+    printf("\n== Successive Deletes - Range Shrinks to Single Cell ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, A2=20, A3=30, A4=40, A5=50
+    // B1=SUM(A1:A5) = 150
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(40.0)));
+    model.setCell(CxSheetCellCoordinate(4, 0), CxSheetCell(CxDouble(50.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(A1:A5)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), f);
+    }
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 1)).getEvaluatedValue().value, 150.0),
+          "successive: initial SUM(A1:A5) = 150");
+
+    // Delete row 4 (A5=50): SUM(A1:A4) = 100
+    model.deleteRow(4);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 1)).getEvaluatedValue().value, 100.0),
+          "successive: after del row 4, SUM = 100");
+
+    // Verify no orphan at row 4
+    check(model.getCell(CxSheetCellCoordinate(4, 0)).getType() == CxSheetCell::EMPTY,
+          "successive: row 4 empty after first delete");
+
+    // Delete row 3 (A4=40): SUM(A1:A3) = 60
+    model.deleteRow(3);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 1)).getEvaluatedValue().value, 60.0),
+          "successive: after del row 3, SUM = 60");
+
+    check(model.getCell(CxSheetCellCoordinate(3, 0)).getType() == CxSheetCell::EMPTY,
+          "successive: row 3 empty after second delete");
+
+    // Delete row 2 (A3=30): SUM(A1:A2) = 30
+    model.deleteRow(2);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 1)).getEvaluatedValue().value, 30.0),
+          "successive: after del row 2, SUM = 30");
+
+    check(model.getCell(CxSheetCellCoordinate(2, 0)).getType() == CxSheetCell::EMPTY,
+          "successive: row 2 empty after third delete");
+
+    // Delete row 1 (A2=20): range collapses to SUM(A1:A1) = 10
+    model.deleteRow(1);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 1)).getEvaluatedValue().value, 10.0),
+          "successive: after del row 1, SUM collapses to single cell = 10");
+
+    check(model.getCell(CxSheetCellCoordinate(1, 1)).getType() == CxSheetCell::EMPTY,
+          "successive: no orphan B2 after fourth delete");
+
+    // Delete row 0 (A1=10): now the last cell in the range is deleted
+    // The formula cell (B1) was also at row 0, so it gets deleted too
+    model.deleteRow(0);
+
+    // Everything should be empty
+    check(model.getCell(CxSheetCellCoordinate(0, 0)).getType() == CxSheetCell::EMPTY,
+          "successive: A1 empty after final delete");
+    check(model.getCell(CxSheetCellCoordinate(0, 1)).getType() == CxSheetCell::EMPTY,
+          "successive: B1 empty after final delete");
+}
+
+void testSuccessiveDeletesFromMiddle() {
+    printf("\n== Successive Deletes From Middle ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, A2=20, A3=30, A4=40, A5=50
+    // A7=SUM(A1:A5) = 150  (formula below the data, not in the range)
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(40.0)));
+    model.setCell(CxSheetCellCoordinate(4, 0), CxSheetCell(CxDouble(50.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(A1:A5)"));
+        model.setCell(CxSheetCellCoordinate(6, 0), f);
+    }
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(6, 0)).getEvaluatedValue().value, 150.0),
+          "middle: initial SUM(A1:A5) = 150");
+
+    // Delete row 2 (A3=30) repeatedly from the middle.
+    // After: A1=10, A2=20, A3=40, A4=50, A6=SUM(A1:A4)=120
+    model.deleteRow(2);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(5, 0)).getEvaluatedValue().value, 120.0),
+          "middle: delete row 2 first time, SUM = 120");
+
+    // Delete row 2 again (now A3=40)
+    // After: A1=10, A2=20, A3=50, A5=SUM(A1:A3)=80
+    model.deleteRow(2);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(4, 0)).getEvaluatedValue().value, 80.0),
+          "middle: delete row 2 second time, SUM = 80");
+
+    // Delete row 2 again (now A3=50)
+    // After: A1=10, A2=20, A4=SUM(A1:A2)=30
+    model.deleteRow(2);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 0)).getEvaluatedValue().value, 30.0),
+          "middle: delete row 2 third time, SUM = 30");
+
+    // Delete row 2 again (now A3 is the formula row after shift, but wait —
+    // let's check what's at row 2 now)
+    // State: A1=10 (row 0), A2=20 (row 1), formula at row 3 → SUM(A1:A2)
+    // Row 2 should be empty (gap between data and formula)
+    check(model.getCell(CxSheetCellCoordinate(2, 0)).getType() == CxSheetCell::EMPTY,
+          "middle: row 2 is empty gap");
+
+    // Delete the empty row 2 — formula shifts from row 3 to row 2
+    model.deleteRow(2);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 0)).getEvaluatedValue().value, 30.0),
+          "middle: delete empty row, formula shifts to row 2, SUM = 30");
+
+    // No orphan at row 3
+    check(model.getCell(CxSheetCellCoordinate(3, 0)).getType() == CxSheetCell::EMPTY,
+          "middle: no orphan at row 3");
+}
+
+//-----------------------------------------------------------------------------------------
+// Insert/Delete Column tests
+//-----------------------------------------------------------------------------------------
+void testInsertColumnBasic() {
+    printf("\n== Insert Column Basic Tests ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, B1=20, C1=30
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(0, 2), CxSheetCell(CxDouble(30.0)));
+
+    // Insert column at col 1 (before B1)
+    model.insertColumn(1);
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 0)).getEvaluatedValue().value, 10.0),
+          "insert col: A1 = 10");
+    check(model.getCell(CxSheetCellCoordinate(0, 1)).getType() == CxSheetCell::EMPTY,
+          "insert col: B1 is empty (inserted)");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 2)).getEvaluatedValue().value, 20.0),
+          "insert col: C1 = 20 (shifted from B)");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 3)).getEvaluatedValue().value, 30.0),
+          "insert col: D1 = 30 (shifted from C)");
+}
+
+void testDeleteColumnBasic() {
+    printf("\n== Delete Column Basic Tests ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, B1=20, C1=30, D1=40
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(0, 2), CxSheetCell(CxDouble(30.0)));
+    model.setCell(CxSheetCellCoordinate(0, 3), CxSheetCell(CxDouble(40.0)));
+
+    // Delete column 1 (B1=20)
+    model.deleteColumn(1);
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 0)).getEvaluatedValue().value, 10.0),
+          "delete col: A1 = 10");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 1)).getEvaluatedValue().value, 30.0),
+          "delete col: B1 = 30 (shifted from C)");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 2)).getEvaluatedValue().value, 40.0),
+          "delete col: C1 = 40 (shifted from D)");
+    check(model.getCell(CxSheetCellCoordinate(0, 3)).getType() == CxSheetCell::EMPTY,
+          "delete col: D1 is empty (no orphan)");
+}
+
+void testDeleteColumnFormulaAdjust() {
+    printf("\n== Delete Column Formula Adjustment ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, B1=filler, C1=20, D1=A1+C1 (=30)
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxString("filler")));
+    model.setCell(CxSheetCellCoordinate(0, 2), CxSheetCell(CxDouble(20.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("A1+C1"));
+        model.setCell(CxSheetCellCoordinate(0, 3), f);
+    }
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 3)).getEvaluatedValue().value, 30.0),
+          "col formula: D1 = A1+C1 = 30");
+
+    // Delete col 1 (B). C1→B1, D1→C1. Formula adjusts: A1+B1 = 10+20 = 30
+    model.deleteColumn(1);
+
+    {
+        CxSheetCell c = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(c.getType() == CxSheetCell::FORMULA, "col formula: C1 is formula after delete");
+        check(doubleEqual(c.getEvaluatedValue().value, 30.0), "col formula: C1 = A1+B1 = 30");
+    }
+
+    check(model.getCell(CxSheetCellCoordinate(0, 3)).getType() == CxSheetCell::EMPTY,
+          "col formula: D1 is empty (no orphan)");
+}
+
+void testSuccessiveDeleteColumns() {
+    printf("\n== Successive Column Deletes with Range ==\n");
+
+    CxSheetModel model;
+
+    // Row 1: A1=10, B1=20, C1=30, D1=40, E1=50
+    // Row 2: A2=SUM(A1:E1) = 150
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(0, 2), CxSheetCell(CxDouble(30.0)));
+    model.setCell(CxSheetCellCoordinate(0, 3), CxSheetCell(CxDouble(40.0)));
+    model.setCell(CxSheetCellCoordinate(0, 4), CxSheetCell(CxDouble(50.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(A1:E1)"));
+        model.setCell(CxSheetCellCoordinate(1, 0), f);
+    }
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 150.0),
+          "col successive: initial SUM(A1:E1) = 150");
+
+    // Delete col 4 (E1=50): SUM(A1:D1) = 100
+    model.deleteColumn(4);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 100.0),
+          "col successive: after del col E, SUM = 100");
+
+    // Delete col 3 (D1=40): SUM(A1:C1) = 60
+    model.deleteColumn(3);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 60.0),
+          "col successive: after del col D, SUM = 60");
+
+    // Delete col 2 (C1=30): SUM(A1:B1) = 30
+    model.deleteColumn(2);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 30.0),
+          "col successive: after del col C, SUM = 30");
+
+    // Delete col 1 (B1=20): SUM(A1:A1) = 10
+    model.deleteColumn(1);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 10.0),
+          "col successive: range collapses to single cell, SUM = 10");
+
+    // No orphan cells in columns B-E
+    check(model.getCell(CxSheetCellCoordinate(0, 1)).getType() == CxSheetCell::EMPTY,
+          "col successive: B1 empty");
+    check(model.getCell(CxSheetCellCoordinate(0, 2)).getType() == CxSheetCell::EMPTY,
+          "col successive: C1 empty");
+}
+
+void testInsertDeleteInterleaved() {
+    printf("\n== Insert and Delete Interleaved ==\n");
+
+    CxSheetModel model;
+
+    // A1=100, A2=200, A3=SUM(A1:A2) = 300
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(100.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(200.0)));
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(A1:A2)"));
+        model.setCell(CxSheetCellCoordinate(2, 0), f);
+    }
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 0)).getEvaluatedValue().value, 300.0),
+          "interleaved: initial SUM = 300");
+
+    // Insert row at 1: A1=100, A2=empty, A3=200, A4=SUM(A1:A3) = 300
+    model.insertRow(1);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 0)).getEvaluatedValue().value, 300.0),
+          "interleaved: after insert, SUM = 300");
+
+    // Set the inserted row: A2=50
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(50.0)));
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 0)).getEvaluatedValue().value, 350.0),
+          "interleaved: A2=50 added to range, SUM = 350");
+
+    // Delete row 2 (A3=200): A1=100, A2=50, A3=SUM(A1:A2) = 150
+    model.deleteRow(2);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 0)).getEvaluatedValue().value, 150.0),
+          "interleaved: after delete, SUM = 150");
+
+    // No orphan at row 3
+    check(model.getCell(CxSheetCellCoordinate(3, 0)).getType() == CxSheetCell::EMPTY,
+          "interleaved: no orphan at row 3");
+}
+
+void testDeleteRowAtZero() {
+    printf("\n== Delete Row at Row 0 ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, A2=20, A3=30
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+
+    model.deleteRow(0);
+
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 0)).getEvaluatedValue().value, 20.0),
+          "delete row 0: A1 = 20");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 30.0),
+          "delete row 0: A2 = 30");
+    check(model.getCell(CxSheetCellCoordinate(2, 0)).getType() == CxSheetCell::EMPTY,
+          "delete row 0: A3 empty (no orphan)");
+}
+
+void testInsertRowAtZero() {
+    printf("\n== Insert Row at Row 0 ==\n");
+
+    CxSheetModel model;
+
+    // A1=10, A2=20
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+
+    model.insertRow(0);
+
+    check(model.getCell(CxSheetCellCoordinate(0, 0)).getType() == CxSheetCell::EMPTY,
+          "insert row 0: A1 empty (inserted)");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getEvaluatedValue().value, 10.0),
+          "insert row 0: A2 = 10 (shifted)");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 0)).getEvaluatedValue().value, 20.0),
+          "insert row 0: A3 = 20 (shifted)");
+}
+
+void testDeleteAllRowsSuccessively() {
+    printf("\n== Delete All Rows Successively ==\n");
+
+    CxSheetModel model;
+
+    // 3 rows of data
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+
+    // Delete row 0 three times — each time the first row
+    model.deleteRow(0);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 0)).getEvaluatedValue().value, 20.0),
+          "delete all: first delete, A1 = 20");
+
+    model.deleteRow(0);
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 0)).getEvaluatedValue().value, 30.0),
+          "delete all: second delete, A1 = 30");
+
+    model.deleteRow(0);
+    check(model.getCell(CxSheetCellCoordinate(0, 0)).getType() == CxSheetCell::EMPTY,
+          "delete all: third delete, A1 empty - all data gone");
+    check(model.getCell(CxSheetCellCoordinate(1, 0)).getType() == CxSheetCell::EMPTY,
+          "delete all: no orphan at A2");
+    check(model.getCell(CxSheetCellCoordinate(2, 0)).getType() == CxSheetCell::EMPTY,
+          "delete all: no orphan at A3");
+}
+
+void testDeleteRowMultiColumn() {
+    printf("\n== Delete Row with Multiple Columns ==\n");
+
+    CxSheetModel model;
+
+    // 3x3 grid with formula row
+    // A1=1, B1=2, C1=3
+    // A2=4, B2=5, C2=6
+    // A3=7, B3=8, C3=9
+    // A4=SUM(A1:A3), B4=SUM(B1:B3), C4=SUM(C1:C3)
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 3; c++) {
+            double val = r * 3 + c + 1;
+            model.setCell(CxSheetCellCoordinate(r, c), CxSheetCell(CxDouble(val)));
+        }
+    }
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(A1:A3)"));
+        model.setCell(CxSheetCellCoordinate(3, 0), f);
+    }
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(B1:B3)"));
+        model.setCell(CxSheetCellCoordinate(3, 1), f);
+    }
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(C1:C3)"));
+        model.setCell(CxSheetCellCoordinate(3, 2), f);
+    }
+
+    // Verify initial sums: A4=12, B4=15, C4=18
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 0)).getEvaluatedValue().value, 12.0),
+          "multi-col: initial SUM(A1:A3) = 12");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 1)).getEvaluatedValue().value, 15.0),
+          "multi-col: initial SUM(B1:B3) = 15");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(3, 2)).getEvaluatedValue().value, 18.0),
+          "multi-col: initial SUM(C1:C3) = 18");
+
+    // Delete row 1 (A2=4, B2=5, C2=6)
+    model.deleteRow(1);
+
+    // Sums should be: A3=1+7=8, B3=2+8=10, C3=3+9=12
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 0)).getEvaluatedValue().value, 8.0),
+          "multi-col: after delete, SUM(A) = 8");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 1)).getEvaluatedValue().value, 10.0),
+          "multi-col: after delete, SUM(B) = 10");
+    check(doubleEqual(model.getCell(CxSheetCellCoordinate(2, 2)).getEvaluatedValue().value, 12.0),
+          "multi-col: after delete, SUM(C) = 12");
+
+    // No orphans at row 3
+    check(model.getCell(CxSheetCellCoordinate(3, 0)).getType() == CxSheetCell::EMPTY,
+          "multi-col: no orphan A4");
+    check(model.getCell(CxSheetCellCoordinate(3, 1)).getType() == CxSheetCell::EMPTY,
+          "multi-col: no orphan B4");
+    check(model.getCell(CxSheetCellCoordinate(3, 2)).getType() == CxSheetCell::EMPTY,
+          "multi-col: no orphan C4");
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -2723,6 +3362,27 @@ int main(int argc, char **argv) {
     testDetectInputIntent();
     testParseAndClassify();
     testApplyParsingAttributes();
+
+    // Insert/delete row tests
+    testInsertRowBasic();
+    testDeleteRowBasic();
+    testDeleteRowNoOrphans();
+    testInsertRowFormulaAdjust();
+    testDeleteRowFormulaAdjust();
+    testDeleteRowRangeFormulaShrink();
+    testSuccessiveDeletesRangeShrinkToOne();
+    testSuccessiveDeletesFromMiddle();
+    testInsertDeleteInterleaved();
+    testDeleteRowAtZero();
+    testInsertRowAtZero();
+    testDeleteAllRowsSuccessively();
+    testDeleteRowMultiColumn();
+
+    // Insert/delete column tests
+    testInsertColumnBasic();
+    testDeleteColumnBasic();
+    testDeleteColumnFormulaAdjust();
+    testSuccessiveDeleteColumns();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
