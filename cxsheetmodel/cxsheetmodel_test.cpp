@@ -3300,6 +3300,206 @@ void testDeleteRowMultiColumn() {
 
 
 //-----------------------------------------------------------------------------------------
+// ROUND, ROUNDUP, ROUNDDOWN function tests
+//-----------------------------------------------------------------------------------------
+void testRoundFunctions() {
+    printf("\n== ROUND / ROUNDUP / ROUNDDOWN Function Tests ==\n");
+
+    CxSheetModel model;
+
+    // Put a value in A1 for cell-reference tests
+    CxSheetCell valCell;
+    valCell.setDouble(CxDouble(2.15));
+    model.setCell(CxSheetCellCoordinate(0, 0), valCell);
+
+    // --- ROUND ---
+    // ROUND(2.15, 1) = 2.2
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUND(2.15,1)"));
+        model.setCell(CxSheetCellCoordinate(1, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(1, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 2.2), "ROUND(2.15,1) = 2.2");
+    }
+
+    // ROUND(2.149, 1) = 2.1
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUND(2.149,1)"));
+        model.setCell(CxSheetCellCoordinate(2, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(2, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 2.1), "ROUND(2.149,1) = 2.1");
+    }
+
+    // ROUND(-1.475, 2) = -1.48
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUND(-1.475,2)"));
+        model.setCell(CxSheetCellCoordinate(3, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(3, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, -1.48, 0.001), "ROUND(-1.475,2) = -1.48");
+    }
+
+    // ROUND(21.5, 0) = 22
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUND(21.5,0)"));
+        model.setCell(CxSheetCellCoordinate(4, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(4, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 22.0), "ROUND(21.5,0) = 22");
+    }
+
+    // ROUND(626.3, -1) = 630 (negative digits rounds to tens)
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUND(626.3,-1)"));
+        model.setCell(CxSheetCellCoordinate(5, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(5, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 630.0), "ROUND(626.3,-1) = 630");
+    }
+
+    // ROUND(1.98, -1) = 0 (rounding 1.98 to nearest 10)
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUND(1.98,-1)"));
+        model.setCell(CxSheetCellCoordinate(6, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(6, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 0.0), "ROUND(1.98,-1) = 0");
+    }
+
+    // --- ROUNDUP ---
+    // ROUNDUP(3.2, 0) = 4 (rounds away from zero)
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDUP(3.2,0)"));
+        model.setCell(CxSheetCellCoordinate(7, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(7, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 4.0), "ROUNDUP(3.2,0) = 4");
+    }
+
+    // ROUNDUP(76.9, 0) = 77
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDUP(76.9,0)"));
+        model.setCell(CxSheetCellCoordinate(8, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(8, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 77.0), "ROUNDUP(76.9,0) = 77");
+    }
+
+    // ROUNDUP(3.14159, 3) = 3.142
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDUP(3.14159,3)"));
+        model.setCell(CxSheetCellCoordinate(9, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(9, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 3.142), "ROUNDUP(3.14159,3) = 3.142");
+    }
+
+    // ROUNDUP(-3.14159, 1) = -3.2 (away from zero for negatives)
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDUP(-3.14159,1)"));
+        model.setCell(CxSheetCellCoordinate(10, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(10, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, -3.2), "ROUNDUP(-3.14159,1) = -3.2");
+    }
+
+    // ROUNDUP(31415.92654, -2) = 31500
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDUP(31415.92654,-2)"));
+        model.setCell(CxSheetCellCoordinate(11, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(11, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 31500.0), "ROUNDUP(31415.92654,-2) = 31500");
+    }
+
+    // --- ROUNDDOWN ---
+    // ROUNDDOWN(3.2, 0) = 3 (truncates toward zero)
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDDOWN(3.2,0)"));
+        model.setCell(CxSheetCellCoordinate(12, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(12, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 3.0), "ROUNDDOWN(3.2,0) = 3");
+    }
+
+    // ROUNDDOWN(76.9, 0) = 76
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDDOWN(76.9,0)"));
+        model.setCell(CxSheetCellCoordinate(13, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(13, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 76.0), "ROUNDDOWN(76.9,0) = 76");
+    }
+
+    // ROUNDDOWN(3.14159, 3) = 3.141
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDDOWN(3.14159,3)"));
+        model.setCell(CxSheetCellCoordinate(14, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(14, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 3.141), "ROUNDDOWN(3.14159,3) = 3.141");
+    }
+
+    // ROUNDDOWN(-3.14159, 1) = -3.1 (toward zero for negatives)
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDDOWN(-3.14159,1)"));
+        model.setCell(CxSheetCellCoordinate(15, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(15, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, -3.1), "ROUNDDOWN(-3.14159,1) = -3.1");
+    }
+
+    // ROUNDDOWN(31415.92654, -2) = 31400
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDDOWN(31415.92654,-2)"));
+        model.setCell(CxSheetCellCoordinate(16, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(16, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 31400.0), "ROUNDDOWN(31415.92654,-2) = 31400");
+    }
+
+    // --- Cell reference test ---
+    // ROUNDUP(A1, 1) where A1=2.15 -> 2.2
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDUP(A1,1)"));
+        model.setCell(CxSheetCellCoordinate(17, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(17, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 2.2), "ROUNDUP(A1,1) with A1=2.15 = 2.2");
+    }
+
+    // ROUNDDOWN(A1, 1) where A1=2.15 -> 2.1
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUNDDOWN(A1,1)"));
+        model.setCell(CxSheetCellCoordinate(18, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(18, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 2.1), "ROUNDDOWN(A1,1) with A1=2.15 = 2.1");
+    }
+
+    // --- Zero value test ---
+    // ROUND(0, 2) = 0
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("ROUND(0,2)"));
+        model.setCell(CxSheetCellCoordinate(19, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(19, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 0.0), "ROUND(0,2) = 0");
+    }
+
+    // --- Case insensitivity ---
+    {
+        CxSheetCell f;
+        f.setFormula(CxString("roundup(3.7,0)"));
+        model.setCell(CxSheetCellCoordinate(20, 0), f);
+        CxSheetCell r = model.getCell(CxSheetCellCoordinate(20, 0));
+        check(doubleEqual(r.getEvaluatedValue().value, 4.0), "roundup (lowercase) = 4");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -3383,6 +3583,9 @@ int main(int argc, char **argv) {
     testDeleteColumnBasic();
     testDeleteColumnFormulaAdjust();
     testSuccessiveDeleteColumns();
+
+    // ROUND function tests
+    testRoundFunctions();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
