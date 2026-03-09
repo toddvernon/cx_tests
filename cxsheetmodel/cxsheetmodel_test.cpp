@@ -1135,6 +1135,271 @@ void testRangeDependencies() {
     check(sumAffected == 1, "B1 (SUM formula) is in affected cells after A3 change");
 }
 
+void testNestedFormulaWithRange() {
+    printf("\n== CxSheetModel Nested Formula with Range Tests ==\n");
+
+    // This test verifies that when a formula references another formula cell
+    // that uses a range function (like SUM), the range is correctly expanded
+    // during nested evaluation.
+    //
+    // Bug scenario (fixed):
+    // - D38 = 0.5, D39 = 0.5
+    // - D41 = SUM(D38:D39) = 1.0
+    // - D73 = D41 (should be 1.0, was returning 0.0 before fix)
+    //
+    // The issue was that when evaluating D73, the function database's range list
+    // was set for D73 (empty), and wasn't updated when nested-evaluating D41's
+    // formula, causing SUM to not expand the range.
+
+    CxSheetModel model;
+
+    // Set up source values: row 37 col 3 (D38) and row 38 col 3 (D39)
+    // Note: coordinates are 0-indexed, so D38 = (37, 3), D39 = (38, 3)
+    model.setCell(CxSheetCellCoordinate(37, 3), CxSheetCell(CxDouble(0.5)));
+    model.setCell(CxSheetCellCoordinate(38, 3), CxSheetCell(CxDouble(0.5)));
+
+    // D41 = SUM(D38:D39), which is row 40 col 3
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(D38:D39)"));
+        model.setCell(CxSheetCellCoordinate(40, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(40, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0),
+              "D41 = SUM(D38:D39) = 1.0");
+    }
+
+    // D73 = D41, which is row 72 col 3
+    // This is the critical test - a formula that references another formula
+    // that uses a range function
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("D41"));
+        model.setCell(CxSheetCellCoordinate(72, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(72, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 1.0),
+              "D73 = D41 = 1.0 (nested formula referencing SUM)");
+    }
+
+    // Also test with a more complex chain: E1 = D73 + 1
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("D73+1"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 2.0),
+              "E1 = D73 + 1 = 2.0 (chain through nested SUM)");
+    }
+
+    // Test that changes propagate correctly
+    {
+        // Change D38 from 0.5 to 0.7
+        model.setCell(CxSheetCellCoordinate(37, 3), CxSheetCell(CxDouble(0.7)));
+
+        // D41 should now be 0.7 + 0.5 = 1.2
+        CxSheetCell d41 = model.getCell(CxSheetCellCoordinate(40, 3));
+        check(doubleEqual(d41.getEvaluatedValue().value, 1.2),
+              "after D38 change: D41 = 1.2");
+
+        // D73 should also be 1.2
+        CxSheetCell d73 = model.getCell(CxSheetCellCoordinate(72, 3));
+        check(doubleEqual(d73.getEvaluatedValue().value, 1.2),
+              "after D38 change: D73 = 1.2 (propagated through nested SUM)");
+
+        // E1 should be 2.2
+        CxSheetCell e1 = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(e1.getEvaluatedValue().value, 2.2),
+              "after D38 change: E1 = 2.2 (propagated through chain)");
+    }
+}
+
+void testNestedFormulaMultipleRanges() {
+    printf("\n== CxSheetModel Nested Formula Multiple Ranges Tests ==\n");
+
+    // Test: Formula referencing multiple formulas that each use range functions
+    // E.g., F1 = D41 + D50 where D41 = SUM(A1:A3) and D50 = SUM(B1:B3)
+    // This tests that the range list is correctly updated for EACH nested eval
+
+    CxSheetModel model;
+
+    // A1:A3 = 1, 2, 3 (sum = 6)
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(2.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(3.0)));
+
+    // B1:B3 = 10, 20, 30 (sum = 60)
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 1), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 1), CxSheetCell(CxDouble(30.0)));
+
+    // C1 = SUM(A1:A3) = 6
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(A1:A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+    }
+
+    // D1 = SUM(B1:B3) = 60
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(B1:B3)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+    }
+
+    // E1 = C1 + D1 (references TWO formulas that use ranges)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("C1+D1"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 66.0),
+              "E1 = C1 + D1 = 6 + 60 = 66 (two nested range formulas)");
+    }
+}
+
+void testNestedFormulaOtherRangeFunctions() {
+    printf("\n== CxSheetModel Nested Formula Other Range Functions Tests ==\n");
+
+    // Test that AVERAGE, COUNT, MIN, MAX all work with nested evaluation
+
+    CxSheetModel model;
+
+    // A1:A4 = 10, 20, 30, 40
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(10.0)));
+    model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(20.0)));
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(30.0)));
+    model.setCell(CxSheetCellCoordinate(3, 0), CxSheetCell(CxDouble(40.0)));
+
+    // B1 = AVERAGE(A1:A4) = 25
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("AVERAGE(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), formulaCell);
+    }
+
+    // C1 = B1 (nested reference to AVERAGE)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("B1"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 25.0),
+              "C1 = B1 = AVERAGE(A1:A4) = 25 (nested AVERAGE)");
+    }
+
+    // D1 = MIN(A1:A4) = 10
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("MIN(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+    }
+
+    // E1 = D1 (nested reference to MIN)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("D1"));
+        model.setCell(CxSheetCellCoordinate(0, 4), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 4));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 10.0),
+              "E1 = D1 = MIN(A1:A4) = 10 (nested MIN)");
+    }
+
+    // F1 = MAX(A1:A4) = 40
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("MAX(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 5), formulaCell);
+    }
+
+    // G1 = F1 (nested reference to MAX)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("F1"));
+        model.setCell(CxSheetCellCoordinate(0, 6), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 6));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 40.0),
+              "G1 = F1 = MAX(A1:A4) = 40 (nested MAX)");
+    }
+
+    // H1 = COUNT(A1:A4) = 4
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("COUNT(A1:A4)"));
+        model.setCell(CxSheetCellCoordinate(0, 7), formulaCell);
+    }
+
+    // I1 = H1 (nested reference to COUNT)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("H1"));
+        model.setCell(CxSheetCellCoordinate(0, 8), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 8));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 4.0),
+              "I1 = H1 = COUNT(A1:A4) = 4 (nested COUNT)");
+    }
+}
+
+void testNestedFormulaRangeContainsFormula() {
+    printf("\n== CxSheetModel Range Contains Formula Tests ==\n");
+
+    // Test: SUM(A1:A3) where A2 itself is a formula that uses a range
+    // This tests nested evaluation within range expansion
+
+    CxSheetModel model;
+
+    // B1:B3 = 100, 200, 300 (sum = 600)
+    model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(100.0)));
+    model.setCell(CxSheetCellCoordinate(1, 1), CxSheetCell(CxDouble(200.0)));
+    model.setCell(CxSheetCellCoordinate(2, 1), CxSheetCell(CxDouble(300.0)));
+
+    // A1 = 1
+    model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+
+    // A2 = SUM(B1:B3) = 600 (this is a formula INSIDE a range we'll sum)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(B1:B3)"));
+        model.setCell(CxSheetCellCoordinate(1, 0), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(1, 0));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 600.0),
+              "A2 = SUM(B1:B3) = 600");
+    }
+
+    // A3 = 3
+    model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(3.0)));
+
+    // C1 = SUM(A1:A3) = 1 + 600 + 3 = 604
+    // This sums a range that CONTAINS a formula cell
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("SUM(A1:A3)"));
+        model.setCell(CxSheetCellCoordinate(0, 2), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 604.0),
+              "C1 = SUM(A1:A3) = 1 + 600 + 3 = 604 (range contains formula)");
+    }
+
+    // D1 = C1 (nested reference to the outer SUM)
+    {
+        CxSheetCell formulaCell;
+        formulaCell.setFormula(CxString("C1"));
+        model.setCell(CxSheetCellCoordinate(0, 3), formulaCell);
+
+        CxSheetCell retrieved = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(doubleEqual(retrieved.getEvaluatedValue().value, 604.0),
+              "D1 = C1 = 604 (nested ref to SUM containing formula)");
+    }
+}
+
 void testRange2D() {
     printf("\n== CxSheetModel 2D Range Tests ==\n");
 
@@ -3534,6 +3799,10 @@ int main(int argc, char **argv) {
     testRangeBasics();
     testRangeFunctions();
     testRangeDependencies();
+    testNestedFormulaWithRange();
+    testNestedFormulaMultipleRanges();
+    testNestedFormulaOtherRangeFunctions();
+    testNestedFormulaRangeContainsFormula();
     testRange2D();
     testRangeHorizontal();
     testRangeVertical3();
