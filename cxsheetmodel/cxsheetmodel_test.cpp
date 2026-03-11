@@ -2318,11 +2318,11 @@ void testInputParserNumber() {
     printf("\n== CxSheetInputParser Number Tests ==\n");
 
     double value;
-    int hasCurrency, hasPercent, hasThousands;
+    int hasCurrency, hasPercent, hasThousands, decimalDigits;
 
     // Plain integers
     {
-        int result = CxSheetInputParser::tryParseNumber("123", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("123", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '123' parses");
         check(doubleEqual(value, 123.0), "parseNumber: '123' value");
         check(hasCurrency == 0, "parseNumber: '123' no currency");
@@ -2332,21 +2332,21 @@ void testInputParserNumber() {
 
     // Decimal numbers
     {
-        int result = CxSheetInputParser::tryParseNumber("123.45", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("123.45", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '123.45' parses");
         check(doubleEqual(value, 123.45), "parseNumber: '123.45' value");
     }
 
     // Negative numbers
     {
-        int result = CxSheetInputParser::tryParseNumber("-456.78", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("-456.78", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '-456.78' parses");
         check(doubleEqual(value, -456.78), "parseNumber: '-456.78' value");
     }
 
     // Thousands separators
     {
-        int result = CxSheetInputParser::tryParseNumber("1,234.56", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("1,234.56", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '1,234.56' parses");
         check(doubleEqual(value, 1234.56), "parseNumber: '1,234.56' value");
         check(hasThousands == 1, "parseNumber: '1,234.56' has thousands");
@@ -2354,7 +2354,7 @@ void testInputParserNumber() {
 
     // Currency
     {
-        int result = CxSheetInputParser::tryParseNumber("$99.99", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("$99.99", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '$99.99' parses");
         check(doubleEqual(value, 99.99), "parseNumber: '$99.99' value");
         check(hasCurrency == 1, "parseNumber: '$99.99' has currency");
@@ -2362,7 +2362,7 @@ void testInputParserNumber() {
 
     // Currency with thousands
     {
-        int result = CxSheetInputParser::tryParseNumber("$1,234.56", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("$1,234.56", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '$1,234.56' parses");
         check(doubleEqual(value, 1234.56), "parseNumber: '$1,234.56' value");
         check(hasCurrency == 1, "parseNumber: '$1,234.56' has currency");
@@ -2371,7 +2371,7 @@ void testInputParserNumber() {
 
     // Percent
     {
-        int result = CxSheetInputParser::tryParseNumber("50%", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("50%", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '50%' parses");
         check(doubleEqual(value, 0.5), "parseNumber: '50%' value (0.5)");
         check(hasPercent == 1, "parseNumber: '50%' has percent");
@@ -2379,7 +2379,7 @@ void testInputParserNumber() {
 
     // Percent with decimal
     {
-        int result = CxSheetInputParser::tryParseNumber("12.5%", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("12.5%", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '12.5%' parses");
         check(doubleEqual(value, 0.125), "parseNumber: '12.5%' value (0.125)");
         check(hasPercent == 1, "parseNumber: '12.5%' has percent");
@@ -2387,26 +2387,26 @@ void testInputParserNumber() {
 
     // Leading/trailing whitespace
     {
-        int result = CxSheetInputParser::tryParseNumber("  42  ", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("  42  ", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 1, "parseNumber: '  42  ' parses");
         check(doubleEqual(value, 42.0), "parseNumber: '  42  ' value");
     }
 
     // Invalid: letters
     {
-        int result = CxSheetInputParser::tryParseNumber("12abc", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("12abc", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 0, "parseNumber: '12abc' fails");
     }
 
     // Invalid: multiple decimals
     {
-        int result = CxSheetInputParser::tryParseNumber("1.2.3", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("1.2.3", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 0, "parseNumber: '1.2.3' fails");
     }
 
     // Invalid: empty
     {
-        int result = CxSheetInputParser::tryParseNumber("", &value, &hasCurrency, &hasPercent, &hasThousands);
+        int result = CxSheetInputParser::tryParseNumber("", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits);
         check(result == 0, "parseNumber: '' fails");
     }
 }
@@ -2530,49 +2530,49 @@ void testInputParserErrorMessages() {
     printf("\n== CxSheetInputParser Error Message Tests ==\n");
 
     double value;
-    int hasCurrency, hasPercent, hasThousands;
+    int hasCurrency, hasPercent, hasThousands, decimalDigits;
     CxString errorMsg;
 
     // Number parsing errors
     {
-        int result = CxSheetInputParser::tryParseNumber("", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        int result = CxSheetInputParser::tryParseNumber("", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, &errorMsg);
         check(result == 0, "parseNumber empty: fails");
         check(errorMsg.length() > 0, "parseNumber empty: has error message");
         check(errorMsg == "Empty input", "parseNumber empty: correct message");
     }
 
     {
-        int result = CxSheetInputParser::tryParseNumber("$", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        int result = CxSheetInputParser::tryParseNumber("$", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, &errorMsg);
         check(result == 0, "parseNumber '$': fails");
         check(errorMsg == "Expected number after $", "parseNumber '$': correct message");
     }
 
     {
-        int result = CxSheetInputParser::tryParseNumber("-", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        int result = CxSheetInputParser::tryParseNumber("-", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, &errorMsg);
         check(result == 0, "parseNumber '-': fails");
         check(errorMsg == "Expected number after -", "parseNumber '-': correct message");
     }
 
     {
-        int result = CxSheetInputParser::tryParseNumber("abc", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        int result = CxSheetInputParser::tryParseNumber("abc", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, &errorMsg);
         check(result == 0, "parseNumber 'abc': fails");
         check(errorMsg == "Expected number", "parseNumber 'abc': correct message");
     }
 
     {
-        int result = CxSheetInputParser::tryParseNumber("12.34.56", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        int result = CxSheetInputParser::tryParseNumber("12.34.56", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, &errorMsg);
         check(result == 0, "parseNumber '12.34.56': fails");
         check(errorMsg == "Multiple decimal points not allowed", "parseNumber '12.34.56': correct message");
     }
 
     {
-        int result = CxSheetInputParser::tryParseNumber("12.34,56", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        int result = CxSheetInputParser::tryParseNumber("12.34,56", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, &errorMsg);
         check(result == 0, "parseNumber '12.34,56': fails");
         check(errorMsg == "Comma not allowed after decimal point", "parseNumber '12.34,56': correct message");
     }
 
     {
-        int result = CxSheetInputParser::tryParseNumber("123xyz", &value, &hasCurrency, &hasPercent, &hasThousands, &errorMsg);
+        int result = CxSheetInputParser::tryParseNumber("123xyz", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, &errorMsg);
         check(result == 0, "parseNumber '123xyz': fails");
         check(errorMsg == "Unexpected character 'x'", "parseNumber '123xyz': correct message");
     }
@@ -2637,7 +2637,7 @@ void testInputParserErrorMessages() {
 
     // Verify NULL errorMsg doesn't crash
     {
-        int result = CxSheetInputParser::tryParseNumber("abc", &value, &hasCurrency, &hasPercent, &hasThousands, NULL);
+        int result = CxSheetInputParser::tryParseNumber("abc", &value, &hasCurrency, &hasPercent, &hasThousands, &decimalDigits, NULL);
         check(result == 0, "parseNumber with NULL errorMsg: fails safely");
     }
 
@@ -3765,6 +3765,292 @@ void testRoundFunctions() {
 
 
 //-----------------------------------------------------------------------------------------
+// adjustFormulaForCopy tests
+//-----------------------------------------------------------------------------------------
+void testAdjustFormulaForCopy() {
+    printf("\n== adjustFormulaForCopy Tests ==\n");
+
+    CxSheetModel model;
+
+    // Basic row shift
+    CxString r1 = model.adjustFormulaForCopy("A1+B1", 1, 0);
+    check(r1 == "A2+B2", "row delta +1: A1+B1 -> A2+B2");
+
+    // Basic column shift
+    CxString r2 = model.adjustFormulaForCopy("A1+B1", 0, 1);
+    check(r2 == "B1+C1", "col delta +1: A1+B1 -> B1+C1");
+
+    // Both row and column
+    CxString r3 = model.adjustFormulaForCopy("A1+B2", 2, 3);
+    check(r3 == "D3+E4", "row+col delta: A1+B2 -> D3+E4");
+
+    // Absolute ref not shifted
+    CxString r4 = model.adjustFormulaForCopy("$A$1+B1", 1, 1);
+    check(r4 == "$A$1+C2", "absolute ref unchanged, relative shifted");
+
+    // Mixed absolute: $A1 (col absolute, row relative)
+    CxString r5 = model.adjustFormulaForCopy("$A1+B$1", 1, 1);
+    check(r5 == "$A2+C$1", "mixed absolute: col-abs row shifts, row-abs col shifts");
+
+    // Range adjustment
+    CxString r6 = model.adjustFormulaForCopy("SUM(A1:A10)", 5, 0);
+    check(r6 == "SUM(A6:A15)", "range row shift: A1:A10 -> A6:A15");
+
+    // Range with column shift
+    CxString r7 = model.adjustFormulaForCopy("SUM(A1:C1)", 0, 2);
+    check(r7 == "SUM(C1:E1)", "range col shift: A1:C1 -> C1:E1");
+
+    // No shift (delta 0,0)
+    CxString r8 = model.adjustFormulaForCopy("A1+B2", 0, 0);
+    check(r8 == "A1+B2", "zero delta: unchanged");
+
+    // Boundary: don't match A1 inside A10
+    CxString r9 = model.adjustFormulaForCopy("A10+A1", 1, 0);
+    check(r9 == "A11+A2", "boundary: A10 and A1 adjusted independently");
+
+    // Negative clamp
+    CxString r10 = model.adjustFormulaForCopy("B2", -5, -5);
+    check(r10 == "A1", "negative clamp to row 0 col 0");
+}
+
+
+//-----------------------------------------------------------------------------------------
+// moveCells tests
+//-----------------------------------------------------------------------------------------
+void testMoveCells() {
+    printf("\n== moveCells Tests ==\n");
+
+    // Issue 1: formulas referencing moved cells update
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));  // A1=1
+        model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(2.0)));  // B1=2
+
+        CxSheetCell f;
+        f.setFormula(CxString("A1+B1"));
+        model.setCell(CxSheetCellCoordinate(0, 2), f);  // C1=A1+B1
+
+        // Verify initial state
+        check(doubleEqual(model.getCell(CxSheetCellCoordinate(0, 2)).getEvaluatedValue().value, 3.0),
+              "issue1: C1 initially 3");
+
+        // Move A1 to A2
+        CxSList<CxSheetCellCoordinate> oldC, newC;
+        oldC.append(CxSheetCellCoordinate(0, 0));
+        newC.append(CxSheetCellCoordinate(1, 0));
+        model.moveCells(oldC, newC);
+
+        // C1 should now reference A2+B1, still equal 3
+        CxSheetCell c1 = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(c1.getFormulaText() == "A2+B1", "issue1: C1 formula updated to A2+B1");
+        check(doubleEqual(c1.getEvaluatedValue().value, 3.0), "issue1: C1 still evaluates to 3");
+
+        // A1 should be empty, A2 should have value 1
+        check(model.getCell(CxSheetCellCoordinate(0, 0)).getType() == CxSheetCell::EMPTY,
+              "issue1: A1 cleared");
+        check(doubleEqual(model.getCell(CxSheetCellCoordinate(1, 0)).getDouble().value, 1.0),
+              "issue1: A2 has value 1");
+    }
+
+    // Issue 2: moved formula keeps its references
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));  // A1=1
+        model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(2.0)));  // B1=2
+
+        CxSheetCell f;
+        f.setFormula(CxString("A1+B1"));
+        model.setCell(CxSheetCellCoordinate(0, 2), f);  // C1=A1+B1
+
+        // Move C1 to D1
+        CxSList<CxSheetCellCoordinate> oldC, newC;
+        oldC.append(CxSheetCellCoordinate(0, 2));
+        newC.append(CxSheetCellCoordinate(0, 3));
+        model.moveCells(oldC, newC);
+
+        // D1 should still have =A1+B1 (not =B1+C1)
+        CxSheetCell d1 = model.getCell(CxSheetCellCoordinate(0, 3));
+        check(d1.getFormulaText() == "A1+B1", "issue2: D1 formula is A1+B1 (not shifted)");
+        check(doubleEqual(d1.getEvaluatedValue().value, 3.0), "issue2: D1 evaluates to 3");
+    }
+
+    // Absolute references update when referenced cell moves
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(5.0)));  // A1=5
+        model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(3.0)));  // B1=3
+
+        CxSheetCell f;
+        f.setFormula(CxString("$A$1+B1"));
+        model.setCell(CxSheetCellCoordinate(0, 2), f);  // C1=$A$1+B1
+
+        // Move A1 to A2
+        CxSList<CxSheetCellCoordinate> oldC, newC;
+        oldC.append(CxSheetCellCoordinate(0, 0));
+        newC.append(CxSheetCellCoordinate(1, 0));
+        model.moveCells(oldC, newC);
+
+        CxSheetCell c1 = model.getCell(CxSheetCellCoordinate(0, 2));
+        check(c1.getFormulaText() == "$A$2+B1",
+              "absolute ref updates when referenced cell moves: $A$1 -> $A$2");
+    }
+
+    // Multi-cell move
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));  // A1=1
+        model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(2.0)));  // A2=2
+
+        CxSheetCell f1, f2;
+        f1.setFormula(CxString("A1"));
+        f2.setFormula(CxString("A2"));
+        model.setCell(CxSheetCellCoordinate(0, 1), f1);  // B1=A1
+        model.setCell(CxSheetCellCoordinate(1, 1), f2);  // B2=A2
+
+        // Move A1:A2 to C1:C2
+        CxSList<CxSheetCellCoordinate> oldC, newC;
+        oldC.append(CxSheetCellCoordinate(0, 0));
+        oldC.append(CxSheetCellCoordinate(1, 0));
+        newC.append(CxSheetCellCoordinate(0, 2));
+        newC.append(CxSheetCellCoordinate(1, 2));
+        model.moveCells(oldC, newC);
+
+        check(model.getCell(CxSheetCellCoordinate(0, 1)).getFormulaText() == "C1",
+              "multi-cell: B1 updated A1->C1");
+        check(model.getCell(CxSheetCellCoordinate(1, 1)).getFormulaText() == "C2",
+              "multi-cell: B2 updated A2->C2");
+    }
+
+    // getLastAffectedCells populated after moveCells
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));  // A1=1
+        model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(2.0)));  // B1=2
+
+        CxSheetCell f;
+        f.setFormula(CxString("A1+B1"));
+        model.setCell(CxSheetCellCoordinate(0, 2), f);  // C1=A1+B1
+
+        CxSList<CxSheetCellCoordinate> oldC, newC;
+        oldC.append(CxSheetCellCoordinate(0, 0));
+        newC.append(CxSheetCellCoordinate(1, 0));
+        model.moveCells(oldC, newC);
+
+        CxSList<CxSheetCellCoordinate> affected = model.getLastAffectedCells();
+        check(affected.entries() > 0, "moveCells: getLastAffectedCells is non-empty");
+    }
+
+    // Range reference in formula when referenced cell moves
+    {
+        CxSheetModel model;
+        for (int i = 0; i < 5; i++) {
+            model.setCell(CxSheetCellCoordinate(i, 0), CxSheetCell(CxDouble((double)(i+1))));
+        }
+
+        CxSheetCell f;
+        f.setFormula(CxString("SUM(A1:A5)"));
+        model.setCell(CxSheetCellCoordinate(0, 1), f);  // B1=SUM(A1:A5)
+
+        // Move A5 to A6
+        CxSList<CxSheetCellCoordinate> oldC, newC;
+        oldC.append(CxSheetCellCoordinate(4, 0));
+        newC.append(CxSheetCellCoordinate(5, 0));
+        model.moveCells(oldC, newC);
+
+        CxSheetCell b1 = model.getCell(CxSheetCellCoordinate(0, 1));
+        check(b1.getFormulaText() == "SUM(A1:A6)",
+              "range ref: SUM(A1:A5) -> SUM(A1:A6) when A5 moves to A6");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
+// fillDown tests
+//-----------------------------------------------------------------------------------------
+void testFillDown() {
+    printf("\n== fillDown Tests ==\n");
+
+    // Fill plain values
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(42.0)));  // A1=42
+
+        model.fillDown(0, 3, 0, 0);  // Fill A1 down to A4
+
+        for (int row = 0; row <= 3; row++) {
+            CxSheetCell c = model.getCell(CxSheetCellCoordinate(row, 0));
+            check(doubleEqual(c.getDouble().value, 42.0), "fill value row");
+        }
+    }
+
+    // Fill formula with row adjustment
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+        model.setCell(CxSheetCellCoordinate(1, 0), CxSheetCell(CxDouble(2.0)));
+        model.setCell(CxSheetCellCoordinate(2, 0), CxSheetCell(CxDouble(3.0)));
+
+        CxSheetCell f;
+        f.setFormula(CxString("A1*2"));
+        model.setCell(CxSheetCellCoordinate(0, 1), f);
+
+        model.fillDown(0, 2, 1, 1);  // Fill B1 down to B3
+
+        check(model.getCell(CxSheetCellCoordinate(0, 1)).getFormulaText() == "A1*2",
+              "fillDown: B1 unchanged");
+        check(model.getCell(CxSheetCellCoordinate(1, 1)).getFormulaText() == "A2*2",
+              "fillDown: B2 = A2*2");
+        check(model.getCell(CxSheetCellCoordinate(2, 1)).getFormulaText() == "A3*2",
+              "fillDown: B3 = A3*2");
+    }
+
+    // Absolute reference not adjusted
+    {
+        CxSheetModel model;
+        CxSheetCell f;
+        f.setFormula(CxString("$A$1*2"));
+        model.setCell(CxSheetCellCoordinate(0, 1), f);
+
+        model.fillDown(0, 2, 1, 1);
+
+        check(model.getCell(CxSheetCellCoordinate(1, 1)).getFormulaText() == "$A$1*2",
+              "fillDown: absolute ref $A$1 not adjusted");
+        check(model.getCell(CxSheetCellCoordinate(2, 1)).getFormulaText() == "$A$1*2",
+              "fillDown: absolute ref $A$1 still not adjusted");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
+// fillRight tests
+//-----------------------------------------------------------------------------------------
+void testFillRight() {
+    printf("\n== fillRight Tests ==\n");
+
+    // Fill formula with column adjustment
+    {
+        CxSheetModel model;
+        model.setCell(CxSheetCellCoordinate(0, 0), CxSheetCell(CxDouble(1.0)));
+        model.setCell(CxSheetCellCoordinate(0, 1), CxSheetCell(CxDouble(2.0)));
+        model.setCell(CxSheetCellCoordinate(0, 2), CxSheetCell(CxDouble(3.0)));
+
+        CxSheetCell f;
+        f.setFormula(CxString("A1*2"));
+        model.setCell(CxSheetCellCoordinate(1, 0), f);
+
+        model.fillRight(1, 1, 0, 2);  // Fill A2 right to C2
+
+        check(model.getCell(CxSheetCellCoordinate(1, 0)).getFormulaText() == "A1*2",
+              "fillRight: A2 unchanged");
+        check(model.getCell(CxSheetCellCoordinate(1, 1)).getFormulaText() == "B1*2",
+              "fillRight: B2 = B1*2");
+        check(model.getCell(CxSheetCellCoordinate(1, 2)).getFormulaText() == "C1*2",
+              "fillRight: C2 = C1*2");
+    }
+}
+
+
+//-----------------------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------------------
 int main(int argc, char **argv) {
@@ -3855,6 +4141,12 @@ int main(int argc, char **argv) {
 
     // ROUND function tests
     testRoundFunctions();
+
+    // Formula copy/move/fill tests
+    testAdjustFormulaForCopy();
+    testMoveCells();
+    testFillDown();
+    testFillRight();
 
     printf("\n=======================\n");
     printf("Results: %d passed, %d failed\n", testsPassed, testsFailed);
