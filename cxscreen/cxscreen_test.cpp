@@ -278,6 +278,13 @@ void testAnsiForegroundColor() {
         CxString s = color.resetTerminalString();
         check(s == "\033[39m", "resetTerminalString -> ESC[39m");
     }
+
+    // NONE color returns empty terminalString
+    {
+        CxAnsiForegroundColor color(CxAnsiColor::NONE);
+        CxString s = color.terminalString();
+        check(s.length() == 0, "NONE terminalString is empty");
+    }
 }
 
 //-----------------------------------------------------------------------------------------
@@ -303,6 +310,13 @@ void testAnsiBackgroundColor() {
         CxAnsiBackgroundColor color("blue");
         CxString s = color.resetTerminalString();
         check(s == "\033[49m", "resetTerminalString -> ESC[49m");
+    }
+
+    // NONE color returns empty terminalString
+    {
+        CxAnsiBackgroundColor color(CxAnsiColor::NONE);
+        CxString s = color.terminalString();
+        check(s.length() == 0, "NONE terminalString is empty");
     }
 }
 
@@ -358,6 +372,13 @@ void testXterm256ForegroundColor() {
         CxString s = color.resetTerminalString();
         check(s == "\033[39m", "resetTerminalString -> ESC[39m");
     }
+
+    // NONE color returns empty terminalString
+    {
+        CxXterm256ForegroundColor color("NONE");
+        CxString s = color.terminalString();
+        check(s.length() == 0, "NONE terminalString is empty");
+    }
 }
 
 //-----------------------------------------------------------------------------------------
@@ -383,6 +404,13 @@ void testXterm256BackgroundColor() {
         CxXterm256BackgroundColor color("Green");
         CxString s = color.resetTerminalString();
         check(s == "\033[49m", "resetTerminalString -> ESC[49m");
+    }
+
+    // NONE color returns empty terminalString
+    {
+        CxXterm256BackgroundColor color("NONE");
+        CxString s = color.terminalString();
+        check(s.length() == 0, "NONE terminalString is empty");
     }
 }
 
