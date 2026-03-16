@@ -626,8 +626,7 @@ archive:
 	@echo "Creating cxtest_unix.tar..."
 	@echo "  (extracts to cx_tests/ when untarred from parent directory)"
 	@test -d ../ARCHIVE || mkdir ../ARCHIVE
-	@tar cvf ../ARCHIVE/cxtest_unix.tar \
-		--transform 's,^\./,cx_tests/,' \
+	@cd .. && tar cvf ARCHIVE/cxtest_unix.tar \
 		--exclude='*.o' \
 		--exclude='*.a' \
 		--exclude='.git' \
@@ -649,6 +648,6 @@ archive:
 		--exclude='*.mode2v3' \
 		--exclude='*.perspectivev3' \
 		--exclude='*.xcuserstate' \
-		.
+		cx_tests
 	@echo "Archive created: ../ARCHIVE/cxtest_unix.tar"
 
