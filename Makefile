@@ -157,6 +157,15 @@ all:
 		cd cxlog; make; \
 	fi
 
+# cxmouse tests (darwin and linux only - modern terminals required)
+
+	@if [ "$(UNAME_S)" = "darwin" ] || [ "$(UNAME_S)" = "linux" ]; then \
+		if [ -d "./cxmouse" ]; then \
+			echo "Building cxmouse tests..."; \
+			cd cxmouse; make; \
+		fi; \
+	fi
+
 # cxlogfile tests (all platforms)
 
 	@if [ -d "./cxlogfile" ]; then \
@@ -372,6 +381,13 @@ test:
 		(cd cxlog && make test); \
 	fi; \
 	\
+	if [ "$(UNAME_S)" = "darwin" ] || [ "$(UNAME_S)" = "linux" ]; then \
+		if [ -d "./cxmouse" ]; then \
+			echo ""; echo "=== cxmouse tests ==="; \
+			(cd cxmouse && make test); \
+		fi; \
+	fi; \
+	\
 	if [ -d "./cxlogfile" ]; then \
 		echo ""; echo "=== cxlogfile tests ==="; \
 		(cd cxlogfile && make test); \
@@ -534,6 +550,10 @@ clean:
 
 	@if [ -d "./cxlog" ]; then \
 		cd cxlog; make clean; \
+	fi
+
+	@if [ -d "./cxmouse" ]; then \
+		cd cxmouse; make clean; \
 	fi
 
 	@if [ -d "./cxlogfile" ]; then \
