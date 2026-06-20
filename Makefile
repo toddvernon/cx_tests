@@ -180,6 +180,13 @@ all:
 		cd cxnet; make; \
 	fi
 
+# cxprocess tests (all platforms)
+
+	@if [ -d "./cxprocess" ]; then \
+		echo "Building cxprocess tests..."; \
+		cd cxprocess; make; \
+	fi
+
 # cxprop tests (all platforms)
 
 	@if [ -d "./cxprop" ]; then \
