@@ -8,27 +8,8 @@
 # Figure out the OS
 #
 ########################################################################################
-UNAME_S := $(shell uname -s | tr '[A-Z]' '[a-z]' )
-
-ifeq ($(UNAME_S), linux)
-	UNAME_R := $(shell uname -r | tr '[A-Z]' '[a-z]' )
-	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
-endif
-
-#if this is OSX
-ifeq ($(UNAME_S), darwin)
-	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
-endif
-
-#if this is SUNOS or SOLARIS
-ifeq ($(UNAME_S),sunos)
-    UNAME_R := $(shell uname -r)
-endif
-
-#if this is IRIX
-ifeq ($(UNAME_S),irix)
-	UNAME_R := $(shell uname -r)
-endif
+# Platform detection + flags live in cx/platform.mk (single source of truth).
+include ../cx/platform.mk
 
 
 ########################################################################################
@@ -38,7 +19,7 @@ endif
 
 all:
 	@echo "========================================"
-	@echo "Building cx_tests for: $(UNAME_S)_$(ARCH)"
+	@echo "Building cx_tests for: $(PLATFORM)"
 	@echo "========================================"
 
 # cxb64 tests (all platforms)
@@ -289,7 +270,7 @@ all:
 	fi
 
 	@echo "========================================"
-	@echo "All tests built for: $(UNAME_S)_$(ARCH)"
+	@echo "All tests built for: $(PLATFORM)"
 	@echo "========================================"
 
 

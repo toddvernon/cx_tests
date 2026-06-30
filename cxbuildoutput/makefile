@@ -13,72 +13,14 @@ INC=        -I../..
 ## Platform ###################################################
 
 
-# get the OS
-UNAME_S := $(shell uname -s | tr '[A-Z]' '[a-z]' )
-
-# if this is linux
-ifeq ($(UNAME_S),linux)
-	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
-	CPPFLAGS = -D _LINUX_  -g -Wno-deprecated
-endif
-
-#if this is OSX
-ifeq ($(UNAME_S), darwin)
-	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
-	CPPFLAGS = -D _OSX_ -g -Wno-deprecated
-endif
-
-ifeq ($(UNAME_S), linux)
-	CCFLAGS = -D _LINUX_
-endif
-
-ifeq ($(UNAME_S), darwin)
-	CCFLAGS = -D _OSX_
-endif
-
-#if this is SUNOS or SOLARIS
-ifeq ($(UNAME_S),sunos)
-    UNAME_R := $(shell uname -r)
-
-	ifeq ($(UNAME_R), 4.1.3)
-        CPPFLAGS = -D _SUNOS_ -g
-	endif
-
-	ifeq ($(UNAME_R), 4.1.4)
-        CPPFLAGS = -D _SUNOS_ -g
-	endif
-
-	ifeq ($(UNAME_R), 5.6)
-        CPPFLAGS = -D _SOLARIS6_ -g
-	endif
-
-	ifeq ($(UNAME_R), 5.7)
-        CPPFLAGS = -D _SOLARIS6_ -g
-	endif
-
-    ifeq ($(UNAME_R), 5.10)
-        CPPFLAGS = -D _SOLARIS10_  -g
-    endif
-endif
-
-#if this is IRIX
-ifeq ($(UNAME_S),irix)
-    UNAME_R := $(shell uname -r)
-    ifeq ($(UNAME_R), 6.5)
-        CPPFLAGS = -D _IRIX6_ -g
-    endif
-endif
-
-#if this is NETBSD
-ifeq ($(UNAME_S),netbsd)
-	CPPFLAGS = -D _NETBSD_ -g
-endif
+# Platform detection + flags live in cx/platform.mk (single source of truth).
+include ../../cx/platform.mk
 
 ## Object & Libraries #########################################
 
-LIB_CX_PLATFORM_LIB_DIR=../../lib/$(UNAME_S)_$(ARCH)
+LIB_CX_PLATFORM_LIB_DIR=../../lib/$(PLATFORM)
 
-APP_OBJECT_DIR=$(UNAME_S)_$(ARCH)
+APP_OBJECT_DIR=$(PLATFORM)
 
 LIB_CX_BASE_NAME=libcx_base.a
 LIB_CX_PROCESS_NAME=libcx_process.a

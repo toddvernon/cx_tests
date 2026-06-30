@@ -13,34 +13,14 @@ INC=        -I../..
 ## Platform ###################################################
 
 
-# get the OS
-UNAME_S := $(shell uname -s | tr '[A-Z]' '[a-z]' )
-
-# if this is linux
-ifeq ($(UNAME_S),linux)
-   	CPPFLAGS = -D _LINUX_  -g -Wno-deprecated
-endif
-
-#if this is OSX
-ifeq ($(UNAME_S), darwin)
-	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
-	CPPFLAGS = -D _OSX_ -g -Wno-deprecated
-endif
-
-ifeq ($(UNAME_S), linux)
-	ARCH := $(shell uname -m | tr '[A-Z]' '[a-z]' )
-    CCFLAGS = -D _LINUX_
-endif
-
-ifeq ($(UNAME_S), darwin)
-    CCFLAGS = -D _OSX_
-endif
+# Platform detection + flags live in cx/platform.mk (single source of truth).
+include ../../cx/platform.mk
 
 ## Object & Libraries #########################################
 
-LIB_CX_PLATFORM_LIB_DIR=../../lib/$(UNAME_S)_$(ARCH)
+LIB_CX_PLATFORM_LIB_DIR=../../lib/$(PLATFORM)
 
-APP_OBJECT_DIR=$(UNAME_S)_$(ARCH)
+APP_OBJECT_DIR=$(PLATFORM)
 
 LIB_CX_BASE_NAME=libcx_base.a
 LIB_CX_EDITBUFFER_NAME=libcx_editbuffer.a
