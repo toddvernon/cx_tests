@@ -205,18 +205,18 @@ all:
 		cd cxstar; make; \
 	fi
 
-# cxstring tests (uses thread library - not on sunos)
+# cxstring tests (uses thread library - not on sunos4; DOES run on Solaris)
 
-	@if [ "$(UNAME_S)" != "sunos" ]; then \
+	@if [ "$(PLATFORM_OS)" != "sunos4" ]; then \
 		if [ -d "./cxstring" ]; then \
 			echo "Building cxstring tests..."; \
 			cd cxstring; make; \
 		fi; \
 	fi
 
-# cxthread tests (uses thread library - not on sunos)
+# cxthread tests (uses thread library - not on sunos4; DOES run on Solaris)
 
-	@if [ "$(UNAME_S)" != "sunos" ]; then \
+	@if [ "$(PLATFORM_OS)" != "sunos4" ]; then \
 		if [ -d "./cxthread" ]; then \
 			echo "Building cxthread tests..."; \
 			cd cxthread; make; \
@@ -413,14 +413,14 @@ test:
 		(cd cxstar && make test); \
 	fi; \
 	\
-	if [ "$(UNAME_S)" != "sunos" ]; then \
+	if [ "$(PLATFORM_OS)" != "sunos4" ]; then \
 		if [ -d "./cxstring" ]; then \
 			echo ""; echo "=== cxstring tests ==="; \
 			(cd cxstring && make test); \
 		fi; \
 	fi; \
 	\
-	if [ "$(UNAME_S)" != "sunos" ]; then \
+	if [ "$(PLATFORM_OS)" != "sunos4" ]; then \
 		if [ -d "./cxthread" ]; then \
 			echo ""; echo "=== cxthread tests ==="; \
 			(cd cxthread && make test); \

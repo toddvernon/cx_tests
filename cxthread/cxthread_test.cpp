@@ -4,6 +4,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/time.h>
+
+// Portable sub-second sleep via select(). Used instead of usleep() because on
+// Solaris 2.6 usleep is SIGALRM-based and unsafe once linked with -lpthread:
+// looped in a threaded program it self-terminates with "Alarm Clock" (SIGALRM,
+// exit 142). select() blocks only the calling thread (no SIGALRM), and it's
+// present on every cx platform -- including SunOS 4.1.4, which has no nanosleep.
+static void cxUSleep(long usec)
+{
+    struct timeval tv;
+    tv.tv_sec  = usec / 1000000;
+    tv.tv_usec = usec % 1000000;
+    select(0, (fd_set*)0, (fd_set*)0, (fd_set*)0, &tv);
+}
 
 #include <cx/base/string.h>
 #include <cx/base/exception.h>
@@ -170,7 +185,7 @@ public:
     SignalThread(int delay) : delayMs(delay) {}
 
     virtual void run() {
-        usleep(delayMs * 1000);
+        cxUSleep(delayMs * 1000);
         condMutex.acquire();
         condFlag = 1;
         cond.signal();
@@ -264,7 +279,7 @@ public:
     SleepThread(int ms) : sleepMs(ms), completed(0) {}
 
     virtual void run() {
-        usleep(sleepMs * 1000);
+        cxUSleep(sleepMs * 1000);
         completed = 1;
     }
 };
@@ -277,7 +292,7 @@ public:
     virtual void run() {
         while (!_suggestQuit) {
             iterations++;
-            usleep(10000);  // 10ms
+            cxUSleep(10000);  // 10ms
         }
     }
 };
@@ -317,7 +332,7 @@ void testThreadSuggestQuit() {
     {
         QuitCheckThread thread;
         thread.start();
-        usleep(50000);  // Let it run 50ms
+        cxUSleep(50000);  // Let it run 50ms
         thread.suggestQuit();
         thread.join();
         check(thread.iterations > 0, "thread ran some iterations");
@@ -330,7 +345,7 @@ void testThreadSuggestQuit() {
         thread.suggestQuit();
         thread.resetSuggestQuit();
         thread.start();
-        usleep(30000);  // 30ms
+        cxUSleep(30000);  // 30ms
         thread.suggestQuit();
         thread.join();
         check(thread.iterations > 0, "resetSuggestQuit allows restart");
@@ -632,7 +647,7 @@ void testRunnableThread() {
         rt.enQueue(new WorkItem());
         rt.enQueue(new WorkItem());
 
-        usleep(100000);  // Wait for work to complete
+        cxUSleep(100000);  // Wait for work to complete
 
         rt.suggestQuit();
         rt.join();
@@ -645,7 +660,7 @@ void testRunnableThread() {
         CxRunnableThread rt(10);
         check(rt.isExecuting() == 0, "RunnableThread not executing before start");
         rt.start();
-        usleep(10000);  // Let it start
+        cxUSleep(10000);  // Let it start
         // Note: isExecuting may or may not be 1 depending on timing
         rt.suggestQuit();
         rt.join();
@@ -665,7 +680,7 @@ public:
         poolCountMutex.acquire();
         poolWorkCount++;
         poolCountMutex.release();
-        usleep(10000);  // Simulate work (10ms)
+        cxUSleep(10000);  // Simulate work (10ms)
     }
 };
 

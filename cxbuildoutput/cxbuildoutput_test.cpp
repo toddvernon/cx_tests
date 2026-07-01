@@ -10,6 +10,20 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/time.h>
+
+// Portable sub-second sleep via select(). See the note in cxthread_test.cpp:
+// usleep is SIGALRM-based and unsafe under -lpthread on Solaris 2.6, and SunOS
+// 4.1.4 has no nanosleep. select() is thread-safe and present everywhere.
+static void cxUSleep(long usec)
+{
+    struct timeval tv;
+    tv.tv_sec  = usec / 1000000;
+    tv.tv_usec = usec % 1000000;
+    select(0, (fd_set*)0, (fd_set*)0, (fd_set*)0, &tv);
+}
+
 #include <cx/base/string.h>
 #include <cx/process/process.h>
 #include <cx/buildoutput/buildoutput.h>
@@ -253,7 +267,7 @@ TEST(test_buildoutput_start_simple)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);  // 10ms
+        cxUSleep(10000);  // 10ms
         maxPolls--;
     }
 
@@ -290,7 +304,7 @@ TEST(test_buildoutput_start_failing_command)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -311,7 +325,7 @@ TEST(test_buildoutput_multiline)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -348,7 +362,7 @@ TEST(test_buildoutput_classify_error)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -375,7 +389,7 @@ TEST(test_buildoutput_classify_warning)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -401,7 +415,7 @@ TEST(test_buildoutput_classify_note)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -423,7 +437,7 @@ TEST(test_buildoutput_classify_command)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -445,7 +459,7 @@ TEST(test_buildoutput_classify_plain)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -473,7 +487,7 @@ TEST(test_buildoutput_mixed_output)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -502,7 +516,7 @@ TEST(test_buildoutput_clear)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -529,7 +543,7 @@ TEST(test_buildoutput_reuse_after_clear)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
     ASSERT(build.lineAt(0)->text.index("first") >= 0);
@@ -539,7 +553,7 @@ TEST(test_buildoutput_reuse_after_clear)
     maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
@@ -566,7 +580,7 @@ TEST(test_buildoutput_get_command)
     int maxPolls = 100;
     while (build.isRunning() && maxPolls > 0) {
         build.poll();
-        usleep(10000);
+        cxUSleep(10000);
         maxPolls--;
     }
 
